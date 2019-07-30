@@ -2,6 +2,7 @@
 #include <Method.hpp>
 #include <open62541/server.h>
 #include "NodeId.h"
+#include "DataSource.h"
 
 struct UA_Server;
 namespace opc {
@@ -42,6 +43,11 @@ public:
     UA_VariableAttributes attr = TypeConverter::getVariableAttributes(initialValue);
     UA_Server_addVariableNode(server, requestedId.toUA_NodeId(), parentId.toUA_NodeId(), UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
                               UA_QUALIFIEDNAME(1, (char *)browseName.c_str()), UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), attr, nullptr, nullptr);
+  }
+
+  void setDataSource(const NodeId& id, const DataSource<int>& src)
+  {
+    UA_Server_setVariableNode_dataSource(server, id.toUA_NodeId(), *src.getRawSource());
   }
 
 private:

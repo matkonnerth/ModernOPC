@@ -44,5 +44,5 @@ class NodeId
     private:
         const int nsIdx;
         const IdentifierType type;
-        NodeId::identifier i;        
+        NodeId::identifier i;
 };

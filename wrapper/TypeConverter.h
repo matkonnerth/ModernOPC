@@ -1,7 +1,9 @@
+#pragma once
 #include <open62541/server.h>
 #include <typeinfo>
 #include <array>
 #include <vector>
+#include <iostream>
 
 
 namespace TypeConverter
@@ -114,4 +116,6 @@ namespace TypeConverter
     attr.arrayDimensions = new UA_UInt32{v.size()};
     return attr;
   }
-}
+
+  auto UA_VariantTo(UA_Variant *var);
+  } // namespace TypeConverter
