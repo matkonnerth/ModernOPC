@@ -4,7 +4,7 @@
 
 namespace opc
 {
-    Server::Server()
+    Server::Server():isRunning{true}
     {
         server = UA_Server_new();
         UA_ServerConfig_setDefault(UA_Server_getConfig(server));

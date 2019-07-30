@@ -1,5 +1,7 @@
 #include <open62541/server.h>
 #include <typeinfo>
+#include <array>
+#include <vector>
 
 
 namespace TypeConverter
@@ -26,7 +28,24 @@ namespace TypeConverter
     return var;
   }  
   
-  template <typename T> 
+  //specialize for std::array
+  template <typename T, size_t N> 
+  UA_Variant toVariant(std::array<T,N> &arr) {
+    UA_Variant var;
+    UA_Variant_init(&var);
+    UA_Variant_setArrayCopy(&var, arr.data(), N, getDataType<T>());
+    return var;
+  }
+
+  // specialize for std::vector
+  template <typename T> UA_Variant toVariant(std::vector<T> &v) {
+    UA_Variant var;
+    UA_Variant_init(&var);
+    UA_Variant_setArrayCopy(&var, v.data(), v.size(), getDataType<T>());
+    return var;
+  }
+
+  template<typename T>
   UA_NodeId uaTypeNodeIdFromCpp() {
 
     if (std::is_same<T, bool>::value) {
@@ -62,6 +81,37 @@ namespace TypeConverter
     //static_assert(false, "uaTypeNodeIdFromCpp");
     return UA_NodeId();
   }
-  
 
+  template<typename T>
+  UA_VariableAttributes getVariableAttributes(T val)
+  {
+    UA_VariableAttributes attr = UA_VariableAttributes_default;
+    attr.dataType = uaTypeNodeIdFromCpp<T>();
+    attr.valueRank = -1;
+    attr.value = toVariant(val);
+    return attr;
+  }
+
+  template <typename T, size_t N>
+  UA_VariableAttributes getVariableAttributes(std::array<T, N> &arr) 
+  {
+    UA_VariableAttributes attr = UA_VariableAttributes_default;
+    attr.value = toVariant(arr);
+    attr.dataType = uaTypeNodeIdFromCpp<T>();
+    attr.valueRank = 1;
+    attr.arrayDimensionsSize = 1;
+    attr.arrayDimensions = new UA_UInt32{arr.size()};
+    return attr;
+  }
+
+  template <typename T>
+  UA_VariableAttributes getVariableAttributes(std::vector<T> &v) {
+    UA_VariableAttributes attr = UA_VariableAttributes_default;
+    attr.value = toVariant(v);
+    attr.dataType = uaTypeNodeIdFromCpp<T>();
+    attr.valueRank = 1;
+    attr.arrayDimensionsSize = 1;
+    attr.arrayDimensions = new UA_UInt32{v.size()};
+    return attr;
+  }
 }
