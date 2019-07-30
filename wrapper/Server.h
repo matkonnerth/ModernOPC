@@ -1,6 +1,7 @@
 
 #include <Method.hpp>
 #include <open62541/server.h>
+#include "NodeId.h"
 
 struct UA_Server;
 namespace opc {
@@ -24,6 +25,28 @@ public:
                             UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER),
                             UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
                             UA_QUALIFIEDNAME(1, "myMethod"), methAttr, nullptr, MethodTraits<M>::getNumArgs(), data, 0, nullptr, nullptr, nullptr);
+  }
+
+  template <typename T>
+  void addVariableNode(const NodeId& parentId, const std::string& browseName, T initialValue)
+  {
+    UA_VariableAttributes attr = UA_VariableAttributes_default;
+    attr.dataType = TypeConverter::uaTypeNodeIdFromCpp<T>();
+    attr.valueRank = -1;
+    attr.value = TypeConverter::toVariant(initialValue);
+    UA_Server_addVariableNode(server, UA_NODEID_NULL, parentId.toUA_NodeId(), UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), 
+      UA_QUALIFIEDNAME(1, (char*)browseName.c_str()), UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), attr, nullptr, nullptr);
+  }
+
+  template <typename T>
+  void addVariableNode(const NodeId& parentId, const NodeId& requestedId, const std::string& browseName, T initialValue)
+  {
+    UA_VariableAttributes attr = UA_VariableAttributes_default;
+    attr.dataType = TypeConverter::uaTypeNodeIdFromCpp<T>();
+    attr.valueRank = -1;
+    attr.value = TypeConverter::toVariant(initialValue);
+    UA_Server_addVariableNode(server, requestedId.toUA_NodeId(), parentId.toUA_NodeId(), UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), 
+      UA_QUALIFIEDNAME(1, (char*)browseName.c_str()), UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), attr, nullptr, nullptr);
   }
 
 private:
