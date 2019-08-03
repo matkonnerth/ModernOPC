@@ -12,8 +12,10 @@ class NodeId
 
     union identifier
     {
+        identifier(): numeric(0){}
         identifier(int id): numeric(id){}
         identifier(const std::string& id): stringIdentifier(id){}
+        identifier(const char* id): stringIdentifier(id){}
         const std::string& stringIdentifier;
         int numeric;
     };
@@ -21,6 +23,23 @@ class NodeId
     public:
         NodeId(int nsIdx, int id):nsIdx(nsIdx), type(NodeId::IdentifierType::NUMERIC), i(id){}
         NodeId(int nsIdx, const std::string& id):nsIdx(nsIdx), type(NodeId::IdentifierType::STRING), i(id){}
+        NodeId(UA_NodeId id):i("test")
+        {
+            
+            nsIdx = id.namespaceIndex;
+            switch (id.identifierType)
+            {
+            case UA_NODEIDTYPE_NUMERIC:
+                type = IdentifierType::NUMERIC;
+                i.numeric = id.identifier.numeric;
+                break;
+            case UA_NODEIDTYPE_STRING:
+                type = IdentifierType::STRING;
+                //i.stringIdentifier = "test";
+                break;
+            }
+        }
+
         inline UA_NodeId toUA_NodeId() const
         {
             UA_NodeId id;
@@ -42,7 +61,7 @@ class NodeId
             return id;
         }
     private:
-        const int nsIdx;
-        const IdentifierType type;
+        int nsIdx;
+        IdentifierType type;
         NodeId::identifier i;
 };

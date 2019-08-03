@@ -2,15 +2,17 @@
 #include <functional>
 #include <open62541/server.h>
 #include "TypeConverter.h"
+#include "DataValue.h"
 
-template <typename T>
+
+
 class DataSource
 {
     public:
-        DataSource(std::function<T()> read)
+        DataSource(std::function<void(DataValue& val)> read)
         {
             storedRead = read;
-            src.read = &DataSource<T>::internalRead;
+            src.read = &DataSource::internalRead;
             src.write = nullptr;
         }
 
@@ -19,14 +21,14 @@ class DataSource
             return src;
         }
 
-        T read()
+        void read(DataValue& val)
         {
-            return storedRead();
+            return storedRead(val);
         }
 
     private:
         UA_DataSource src;
-        std::function<T()> storedRead;
+        std::function<void(DataValue& val)> storedRead;
 
         static UA_StatusCode internalRead(
             UA_Server *server, const UA_NodeId *sessionId, void *sessionContext,
@@ -38,11 +40,8 @@ class DataSource
                     return UA_STATUSCODE_BADNODATA;
 
                 DataSource *ds = (DataSource *)nodeContext;
-                auto val = ds->read();
-                UA_Variant var = TypeConverter::toVariant(val);
-                UA_Variant_copy(&var, &value->value);
-                value->hasValue = true;
-                value->status = UA_STATUSCODE_GOOD;
+                DataValue val{value};
+                ds->read(val);
                 return UA_STATUSCODE_GOOD;
         }
 };

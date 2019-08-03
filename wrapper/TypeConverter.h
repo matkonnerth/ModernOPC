@@ -4,6 +4,7 @@
 #include <array>
 #include <vector>
 #include <iostream>
+#include <memory>
 
 
 namespace TypeConverter
@@ -27,15 +28,34 @@ namespace TypeConverter
     UA_Variant var;
     UA_Variant_init(&var);
     UA_Variant_setScalarCopy(&var, &val, getDataType<T>());
+    var.storageType = UA_VariantStorageType::UA_VARIANT_DATA;
     return var;
-  }  
-  
+  }
+
+  template <typename T> 
+  UA_Variant toVariant(T* val, bool zeroCopy=false) {
+    UA_Variant var;
+    UA_Variant_init(&var);
+    if(zeroCopy)
+    {
+      UA_Variant_setScalar(&var, val, getDataType<T>());
+      var.storageType = UA_VariantStorageType::UA_VARIANT_DATA_NODELETE;
+    }
+    else
+    {
+      UA_Variant_setScalarCopy(&var, &val, getDataType<T>());
+      var.storageType = UA_VariantStorageType::UA_VARIANT_DATA;
+    }   
+    return var;
+  }
+
   //specialize for std::array
   template <typename T, size_t N> 
   UA_Variant toVariant(std::array<T,N> &arr) {
     UA_Variant var;
     UA_Variant_init(&var);
     UA_Variant_setArrayCopy(&var, arr.data(), N, getDataType<T>());
+    var.storageType = UA_VariantStorageType::UA_VARIANT_DATA;
     return var;
   }
 
@@ -44,6 +64,17 @@ namespace TypeConverter
     UA_Variant var;
     UA_Variant_init(&var);
     UA_Variant_setArrayCopy(&var, v.data(), v.size(), getDataType<T>());
+    var.storageType = UA_VariantStorageType::UA_VARIANT_DATA;
+    return var;
+  }
+
+  //here it's clear: copy and delete
+  template <typename T> UA_Variant toVariant(std::unique_ptr<T> val)
+  {
+    UA_Variant var;
+    UA_Variant_init(&var);
+    UA_Variant_setScalarCopy(&var, val.get(), getDataType<T>());
+    var.storageType = UA_VariantStorageType::UA_VARIANT_DATA;
     return var;
   }
 
@@ -116,6 +147,4 @@ namespace TypeConverter
     attr.arrayDimensions = new UA_UInt32{v.size()};
     return attr;
   }
-
-  auto UA_VariantTo(UA_Variant *var);
-  } // namespace TypeConverter
+} // namespace TypeConverter
