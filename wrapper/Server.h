@@ -25,7 +25,7 @@ public:
     UA_Server_addMethodNode(server, UA_NODEID_NULL,
                             UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER),
                             UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-                            UA_QUALIFIEDNAME(1, "myMethod"), methAttr, nullptr, MethodTraits<M>::getNumArgs(), data, 0, nullptr, nullptr, nullptr);
+                            UA_QUALIFIEDNAME(1, const_cast<char*>(name.c_str())), methAttr, nullptr, MethodTraits<M>::getNumArgs(), data, 0, nullptr, nullptr, nullptr);
   }
 
   template <typename T>

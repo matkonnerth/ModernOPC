@@ -144,7 +144,7 @@ namespace TypeConverter
     attr.dataType = uaTypeNodeIdFromCpp<T>();
     attr.valueRank = 1;
     attr.arrayDimensionsSize = 1;
-    attr.arrayDimensions = new UA_UInt32{v.size()};
+    attr.arrayDimensions = new UA_UInt32{static_cast<UA_UInt32>(v.size())};
     return attr;
   }
 } // namespace TypeConverter
