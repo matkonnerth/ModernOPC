@@ -45,9 +45,11 @@ public:
                               UA_QUALIFIEDNAME(1, (char *)browseName.c_str()), UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), attr, nullptr, nullptr);
   }
 
-  void setDataSource(const NodeId& id, const DataSource<int>& src)
+  template <typename T>
+  void setDataSource(const NodeId& id, DataSource<T>& src)
   {
-    UA_Server_setVariableNode_dataSource(server, id.toUA_NodeId(), *src.getRawSource());
+    UA_Server_setNodeContext(server, id.toUA_NodeId(), &src);
+    UA_Server_setVariableNode_dataSource(server, id.toUA_NodeId(), src.getRawSource());
   }
 
 private:
