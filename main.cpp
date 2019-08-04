@@ -1,42 +1,42 @@
-#include "Server.h"
-#include "NodeId.h"
-#include <iostream>
 #include <array>
-#include "DataSource.h"
 #include <functional>
+#include <iostream>
 #include <vector>
+#include "DataSource.h"
 #include "DataValue.h"
+#include "NodeId.h"
+#include "Server.h"
 
-void add(int a, int b, double c)
-{
+void
+add(int a, int b, double c) {
     std::cout << a + b << std::endl;
 }
 
-void getValue(DataValue& val)
-{
+void
+getValue(DataValue &val) {
     static int test = 0;
     test++;
-    val.set(std::make_unique<int>(test));
+    val(std::make_unique<int>(test));
 }
 
-void getVectorValue(DataValue& val)
-{
+void
+getVectorValue(DataValue &val) {
     std::vector<int> vec;
     vec.push_back(3);
     vec.push_back(4);
     vec.push_back(5);
-    val.set(vec);
+    val(vec);
 }
 
-void floatSourceFunc(DataValue& val)
-{
+void
+floatSourceFunc(DataValue &val) {
     static float f = 100.0;
     f += 0.7;
-    val.set(&f, true);
+    val(&f, true);
 }
 
-int main()
-{
+int
+main() {
 
     opc::Server s;
     s.addMethod("addMethod", &add);
@@ -57,12 +57,10 @@ int main()
     s.addVariableNode(NodeId(0, 85), NodeId(1, "demoArray"), "demoArray", test);
     s.addVariableNode(NodeId(0, 85), NodeId(1, "demoInt"), "demoInt", 23);
 
-    s.addVariableNode(NodeId(0, 85), NodeId(1, "IntVector"), "IntVector",
-                      0);
+    s.addVariableNode(NodeId(0, 85), NodeId(1, "IntVector"), "IntVector", 0);
 
     s.setDataSource(NodeId(1, "IntVector"), d2);
     s.setDataSource(NodeId(1, "demoInt"), ds);
-    
 
     s.addVariableNode(NodeId(0, 85), "demoFloat", 23.0f);
     s.addVariableNode(NodeId(0, 85), NodeId(1, "myStringId"), "demoFloat", 23.0f);
