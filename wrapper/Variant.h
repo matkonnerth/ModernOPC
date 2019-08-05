@@ -14,10 +14,25 @@ class Variant
       }
 
       template <typename T>
-      T get()
+      typename std::enable_if_t<std::is_arithmetic<T>::value,T>
+      get() 
       {
+          static_assert(std::is_arithmetic<T>::value, "must be a arithmetic type");
           assert(TypeConverter::isTypeMatching<T>(variant->type));
-          return static_cast<T>(*(T *)variant->data);
+          return *static_cast<T*>(variant->data);
+      }
+
+      //specialize for vector
+      template <typename T>
+      typename std::enable_if_t<std::is_same<T, std::vector<typename T::value_type>>::value, T>
+      get() 
+      {
+          static_assert(std::is_arithmetic<typename T::value_type>::value, "must be a arithmetic type");
+          assert(TypeConverter::isTypeMatching<typename T::value_type>(variant->type));
+          std::vector<typename T::value_type> newVec;
+          newVec.assign(static_cast<typename T::value_type *>(variant->data),
+                        static_cast<typename T::value_type *>(variant->data) + variant->arrayLength);
+          return newVec;
       }
 
       ~Variant()

@@ -35,13 +35,14 @@ getVectorValue(Variant &var) {
     var(std::move(vec));
 }
 
+
 void
 setVectorValue(Variant &var) {
-    std::vector<int> vec = var.get<std::vector<int>>();
-    for(auto& elem : vec)
-    {
-        std::cout << elem << std::endl;
-    }
+    //std::vector<int> vec = var.get<std::vector<int>>();
+    //for(auto& elem : vec)
+    //{
+    //    std::cout << elem << std::endl;
+    //}
 }
 
 /*

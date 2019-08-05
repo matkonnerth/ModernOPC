@@ -9,6 +9,16 @@
 
 namespace TypeConverter {
 
+template <typename T>
+constexpr bool isSupportedCppType()
+{
+    if(std::is_arithmetic<T>::value)
+    {
+        return true;
+    }
+    return false;
+}
+
 template<typename T>
 bool isTypeMatching(const UA_DataType* uatype)
 {
@@ -28,8 +38,14 @@ const UA_DataType *
 getDataType() {
     if(std::is_same<T, int>::value) {
         return &UA_TYPES[UA_TYPES_INT32];
-    } else if(std::is_same<T, float>::value) {
+    } 
+    else if(std::is_same<T, float>::value) 
+    {
         return &UA_TYPES[UA_TYPES_FLOAT];
+    } 
+    else if(std::is_same<T, bool>::value) 
+    {
+        return &UA_TYPES[UA_TYPES_BOOLEAN];
     }
 }
 
@@ -45,6 +61,7 @@ toVariant(T val, UA_Variant* var) {
 template <typename T, size_t N>
 void 
 toVariant(std::array<T, N> &arr, UA_Variant* var) {
+    static_assert(isSupportedCppType<T>(), "This type is currently not supported!");
     UA_Variant_init(var);
     UA_Variant_setArrayCopy(var, arr.data(), N, getDataType<T>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
@@ -54,6 +71,7 @@ toVariant(std::array<T, N> &arr, UA_Variant* var) {
 template <typename T>
 void
 toVariant(std::vector<T> &v, UA_Variant* var) {
+    static_assert(isSupportedCppType<T>(), "This type is currently not supported!");
     UA_Variant_init(var);
     UA_Variant_setArrayCopy(var, v.data(), v.size(), getDataType<T>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;

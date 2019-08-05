@@ -9,3 +9,5 @@ target_include_directories(server
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/open62541/include
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/wrapper)
 target_link_libraries(server open62541)
+
+add_subdirectory(tests)
