@@ -6,7 +6,7 @@ int main()
     UA_Variant_init(&uavar);
     float f = 3.1;
     UA_Variant_setScalar(&uavar, &f, &UA_TYPES[UA_TYPES_FLOAT]);
-    Variant var{&uavar, false};
+    opc::Variant var{&uavar, false};
     float f2 = var.get<float>();
 
     //

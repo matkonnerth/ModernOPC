@@ -15,19 +15,19 @@ add(int a, int b, double c) {
 static int test = 0;
 
 void
-getValue(Variant& var) {    
+getValue(opc::Variant& var) {    
     test++;
     var(test);
 }
 
-void setValue(Variant&var)
+void setValue(opc::Variant&var)
 {
     double test = var.get<double>();
 }
 
 
 void
-getVectorValue(Variant &var) {
+getVectorValue(opc::Variant &var) {
     std::vector<int> vec;
     vec.push_back(3);
     vec.push_back(4);
@@ -37,7 +37,7 @@ getVectorValue(Variant &var) {
 
 
 void
-setVectorValue(Variant &var) {
+setVectorValue(opc::Variant &var) {
     std::vector<int> vec = var.get<std::vector<int>>();
     for(auto& elem : vec)
     {
@@ -57,8 +57,8 @@ main() {
 
     std::vector<float> fVector{1.1f, 2.2f, 3.3f};
 
-    DataSource ds{getValue,setValue};
-    DataSource d2{getVectorValue, setVectorValue};
+    opc::DataSource ds{getValue,setValue};
+    opc::DataSource d2{getVectorValue, setVectorValue};
 
     s.addVariableNode(NodeId(0, 85), NodeId(1, "demoVector"), "demoVector", fVector);
     s.addVariableNode(NodeId(0, 85), NodeId(1, "demoArray"), "demoArray", test);
