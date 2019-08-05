@@ -1,12 +1,11 @@
 #pragma once
 #include <open62541/server.h>
 #include <functional>
-#include "DataValue.h"
-#include "TypeConverter.h"
+#include "Variant.h"
 
 class DataSource {
   public:
-    DataSource(std::function<void(DataValue &val)> read) {
+    DataSource(std::function<void(Variant&var)> read) {
         storedRead = read;
         src.read = &DataSource::internalRead;
         src.write = nullptr;
@@ -18,13 +17,13 @@ class DataSource {
     }
 
     void
-    read(DataValue &val) {
-        return storedRead(val);
+    read(Variant&var) {
+        return storedRead(var);
     }
 
   private:
     UA_DataSource src;
-    std::function<void(DataValue &val)> storedRead;
+    std::function<void(Variant&var)> storedRead;
 
     static UA_StatusCode
     internalRead(UA_Server *server, const UA_NodeId *sessionId, void *sessionContext,
@@ -36,8 +35,8 @@ class DataSource {
             return UA_STATUSCODE_BADNODATA;
 
         DataSource *ds = (DataSource *)nodeContext;
-        DataValue val{value};
-        ds->read(val);
+        Variant var{&value->value};
+        ds->read(var);
         return UA_STATUSCODE_GOOD;
     }
 };

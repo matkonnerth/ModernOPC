@@ -6,7 +6,9 @@
 #include <typeinfo>
 #include <vector>
 
+
 namespace TypeConverter {
+
 template <typename T>
 const UA_DataType *
 getDataType() {
@@ -18,62 +20,52 @@ getDataType() {
 }
 
 template <typename T>
-UA_Variant
-toVariant(T val) {
-    UA_Variant var;
-    UA_Variant_init(&var);
-    UA_Variant_setScalarCopy(&var, &val, getDataType<T>());
-    var.storageType = UA_VariantStorageType::UA_VARIANT_DATA;
-    return var;
+void
+toVariant(T val, UA_Variant* var) {
+    UA_Variant_init(var);
+    UA_Variant_setScalarCopy(var, &val, getDataType<T>());
+    var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
 
 template <typename T>
-UA_Variant
-toVariant(T *val, bool zeroCopy = false) {
-    UA_Variant var;
-    UA_Variant_init(&var);
+void
+toVariant(T *val, UA_Variant *var, bool zeroCopy = false) {
+    UA_Variant_init(var);
     if(zeroCopy) {
-        UA_Variant_setScalar(&var, val, getDataType<T>());
-        var.storageType = UA_VariantStorageType::UA_VARIANT_DATA_NODELETE;
+        UA_Variant_setScalar(var, val, getDataType<T>());
+        var->storageType = UA_VariantStorageType::UA_VARIANT_DATA_NODELETE;
     } else {
-        UA_Variant_setScalarCopy(&var, &val, getDataType<T>());
-        var.storageType = UA_VariantStorageType::UA_VARIANT_DATA;
+        UA_Variant_setScalarCopy(var, val, getDataType<T>());
+        var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
     }
-    return var;
 }
 
 // specialize for std::array
 template <typename T, size_t N>
-UA_Variant
-toVariant(std::array<T, N> &arr) {
-    UA_Variant var;
-    UA_Variant_init(&var);
-    UA_Variant_setArrayCopy(&var, arr.data(), N, getDataType<T>());
-    var.storageType = UA_VariantStorageType::UA_VARIANT_DATA;
-    return var;
+void 
+toVariant(std::array<T, N> &arr, UA_Variant* var) {
+    UA_Variant_init(var);
+    UA_Variant_setArrayCopy(var, arr.data(), N, getDataType<T>());
+    var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
 
 // specialize for std::vector
 template <typename T>
-UA_Variant
-toVariant(std::vector<T> &v) {
-    UA_Variant var;
-    UA_Variant_init(&var);
-    UA_Variant_setArrayCopy(&var, v.data(), v.size(), getDataType<T>());
-    var.storageType = UA_VariantStorageType::UA_VARIANT_DATA;
-    return var;
+void
+toVariant(std::vector<T> &v, UA_Variant* var) {
+    UA_Variant_init(var);
+    UA_Variant_setArrayCopy(var, v.data(), v.size(), getDataType<T>());
+    var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
 
 // here it's clear: we have ownership, so there no need for copy, stack is responsible for
 // cleaning up
 template <typename T>
-UA_Variant
-toVariant(std::unique_ptr<T> val) {
-    UA_Variant var;
-    UA_Variant_init(&var);
-    UA_Variant_setScalar(&var, val.release(), getDataType<T>());
-    var.storageType = UA_VariantStorageType::UA_VARIANT_DATA;
-    return var;
+void
+toVariant(std::unique_ptr<T> val, UA_Variant* var) {
+    UA_Variant_init(var);
+    UA_Variant_setScalar(var, val.release(), getDataType<T>());
+    var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
 
 template <typename T>
@@ -120,7 +112,7 @@ getVariableAttributes(T val) {
     UA_VariableAttributes attr = UA_VariableAttributes_default;
     attr.dataType = uaTypeNodeIdFromCpp<T>();
     attr.valueRank = -1;
-    attr.value = toVariant(val);
+    toVariant(val, &attr.value);
     return attr;
 }
 
@@ -128,7 +120,7 @@ template <typename T, size_t N>
 UA_VariableAttributes
 getVariableAttributes(std::array<T, N> &arr) {
     UA_VariableAttributes attr = UA_VariableAttributes_default;
-    attr.value = toVariant(arr);
+    toVariant(arr, &attr.value);
     attr.dataType = uaTypeNodeIdFromCpp<T>();
     attr.valueRank = 1;
     attr.arrayDimensionsSize = 1;
@@ -140,7 +132,7 @@ template <typename T>
 UA_VariableAttributes
 getVariableAttributes(std::vector<T> &v) {
     UA_VariableAttributes attr = UA_VariableAttributes_default;
-    attr.value = toVariant(v);
+    toVariant(v, &attr.value);
     attr.dataType = uaTypeNodeIdFromCpp<T>();
     attr.valueRank = 1;
     attr.arrayDimensionsSize = 1;
