@@ -36,6 +36,7 @@ class Server {
     addVariableNode(const NodeId &parentId, const std::string &browseName,
                     T initialValue) {
         UA_VariableAttributes attr = TypeConverter::getVariableAttributes(initialValue);
+        attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
         UA_Server_addVariableNode(server, UA_NODEID_NULL, parentId.toUA_NodeId(),
                                   UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
                                   UA_QUALIFIEDNAME(1, (char *)browseName.c_str()),
@@ -48,6 +49,7 @@ class Server {
     addVariableNode(const NodeId &parentId, const NodeId &requestedId,
                     const std::string &browseName, T initialValue) {
         UA_VariableAttributes attr = TypeConverter::getVariableAttributes(initialValue);
+        attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
         UA_Server_addVariableNode(
             server, requestedId.toUA_NodeId(), parentId.toUA_NodeId(),
             UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),

@@ -9,6 +9,20 @@
 
 namespace TypeConverter {
 
+template<typename T>
+bool isTypeMatching(const UA_DataType* uatype)
+{
+    if(uatype->typeIndex == UA_TYPES_INT32 && std::is_same<T, int>::value)
+    {
+        return true;
+    }
+    else if(uatype->typeIndex == UA_TYPES_FLOAT && std::is_same<T, float>::value)
+    {
+        return true;
+    }
+    return false;
+}
+
 template <typename T>
 const UA_DataType *
 getDataType() {
@@ -27,19 +41,6 @@ toVariant(T val, UA_Variant* var) {
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
 
-template <typename T>
-void
-toVariant(T *val, UA_Variant *var, bool zeroCopy = false) {
-    UA_Variant_init(var);
-    if(zeroCopy) {
-        UA_Variant_setScalar(var, val, getDataType<T>());
-        var->storageType = UA_VariantStorageType::UA_VARIANT_DATA_NODELETE;
-    } else {
-        UA_Variant_setScalarCopy(var, val, getDataType<T>());
-        var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
-    }
-}
-
 // specialize for std::array
 template <typename T, size_t N>
 void 
@@ -55,16 +56,6 @@ void
 toVariant(std::vector<T> &v, UA_Variant* var) {
     UA_Variant_init(var);
     UA_Variant_setArrayCopy(var, v.data(), v.size(), getDataType<T>());
-    var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
-}
-
-// here it's clear: we have ownership, so there no need for copy, stack is responsible for
-// cleaning up
-template <typename T>
-void
-toVariant(std::unique_ptr<T> val, UA_Variant* var) {
-    UA_Variant_init(var);
-    UA_Variant_setScalar(var, val.release(), getDataType<T>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
 
