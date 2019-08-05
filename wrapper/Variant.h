@@ -29,10 +29,8 @@ class Variant
       {
           static_assert(std::is_arithmetic<typename T::value_type>::value, "must be a arithmetic type");
           assert(TypeConverter::isTypeMatching<typename T::value_type>(variant->type));
-          std::vector<typename T::value_type> newVec;
-          newVec.assign(static_cast<typename T::value_type *>(variant->data),
-                        static_cast<typename T::value_type *>(variant->data) + variant->arrayLength);
-          return newVec;
+          return std::vector<typename T::value_type> {static_cast<typename T::value_type *>(variant->data),
+                        static_cast<typename T::value_type *>(variant->data) + variant->arrayLength};
       }
 
       ~Variant()

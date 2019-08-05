@@ -63,10 +63,9 @@ class DataSource {
             return UA_STATUSCODE_BADNODATA;
 
         DataSource *ds = (DataSource *)nodeContext;
-        UA_Variant* uavar = UA_Variant_new();
         //TODO: can we avoid this copy?
-        UA_Variant_copy(&value->value, uavar);
-        Variant var{uavar, true};
+        // we can avoid it at the moment, because it's copied in Variant.get<>()
+        Variant var{const_cast<UA_Variant*>(&value->value), false};
         ds->write(var);
         return UA_STATUSCODE_GOOD;
     }

@@ -38,21 +38,12 @@ getVectorValue(Variant &var) {
 
 void
 setVectorValue(Variant &var) {
-    //std::vector<int> vec = var.get<std::vector<int>>();
-    //for(auto& elem : vec)
-    //{
-    //    std::cout << elem << std::endl;
-    //}
+    std::vector<int> vec = var.get<std::vector<int>>();
+    for(auto& elem : vec)
+    {
+        std::cout << elem << std::endl;
+    }
 }
-
-/*
-void
-floatSourceFunc(DataValue &val) {
-    static float f = 100.0;
-    f += 0.7;
-    val(&f, true);
-}
-*/
 
 int
 main() {
@@ -67,22 +58,18 @@ main() {
     std::vector<float> fVector{1.1f, 2.2f, 3.3f};
 
     DataSource ds{getValue,setValue};
-    DataSource d2{getVectorValue};
-
-    float fval = 223.2f;
-    //DataSource floatSource{floatSourceFunc};
+    DataSource d2{getVectorValue, setVectorValue};
 
     s.addVariableNode(NodeId(0, 85), NodeId(1, "demoVector"), "demoVector", fVector);
     s.addVariableNode(NodeId(0, 85), NodeId(1, "demoArray"), "demoArray", test);
     s.addVariableNode(NodeId(0, 85), NodeId(1, "demoInt"), "demoInt", 23);
 
-    s.addVariableNode(NodeId(0, 85), NodeId(1, "IntVector"), "IntVector", 0);
+    s.addVariableNode(NodeId(0, 85), NodeId(1, "IntVector"), "IntVector", test);
 
     s.setDataSource(NodeId(1, "IntVector"), d2);
     s.setDataSource(NodeId(1, "demoInt"), ds);
 
     s.addVariableNode(NodeId(0, 85), "demoFloat", 23.0f);
     s.addVariableNode(NodeId(0, 85), NodeId(1, "myStringId"), "demoFloat", 23.0f);
-    //s.setDataSource(NodeId(1, "myStringId"), floatSource);
     s.run();
 }
