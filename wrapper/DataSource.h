@@ -2,8 +2,7 @@
 #include <open62541/server.h>
 #include <functional>
 
-namespace opc
-{
+namespace opc {
 class Variant;
 class DataSource {
   public:

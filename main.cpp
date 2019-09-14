@@ -45,6 +45,11 @@ setVectorValue(opc::Variant &var) {
     }
 }
 
+void NodesetLoader_load(int test)
+{
+    std::cout << "method called" << std::endl;
+}
+
 int
 main() {
 
@@ -74,5 +79,12 @@ main() {
 
     s.addVariableNode(NodeId(0, 85), "demoFloat", 23.0f);
     s.addVariableNode(NodeId(0, 85), NodeId(1, "myStringId"), "demoFloat", 23.0f);
+
+
+    s.loadNodeset("../models/serviceobject.xml");
+
+    std::function<void(int)> f {NodesetLoader_load};
+    s.bindMethodNode(NodeId(2,7003), f);
+
     s.run();
 }
