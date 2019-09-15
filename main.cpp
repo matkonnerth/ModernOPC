@@ -2,8 +2,8 @@
 #include <functional>
 #include <iostream>
 #include <vector>
-#include "DataSource.h"
-#include "Variant.h"
+#include <DataSource.h>
+#include <Variant.h>
 #include "NodeId.h"
 #include "Server.h"
 
@@ -47,7 +47,7 @@ setVectorValue(opc::Variant &var) {
 
 void NodesetLoader_load(int test)
 {
-    std::cout << "method called" << std::endl;
+    std::cout << "method called: " << test << std::endl;
 }
 
 int

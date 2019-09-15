@@ -2,6 +2,8 @@
 #include <tuple>
 #include <variant>
 
+namespace opc
+{
 class ICallable {
   public:
     virtual void
@@ -18,7 +20,7 @@ template <typename... ARGS> class Functor : public ICallable {
         for(size_t i = 0; i < n; i++) {
         }
         using type = typename std::tuple_element<0, std::tuple<ARGS...>>::type;
-        std::get<0>(calculatedArgs) = std::get<type>(arguments.at(0)) + 19;
+        std::get<0>(calculatedArgs) = std::get<type>(arguments.at(0));
 
         std::apply(m_f, calculatedArgs);
     }
@@ -28,3 +30,4 @@ template <typename... ARGS> class Functor : public ICallable {
     std::tuple<ARGS...> args;
     const size_t n = sizeof...(ARGS);
 };
+}  // namespace opc
