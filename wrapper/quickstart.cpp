@@ -48,7 +48,6 @@ class Functor : public IFunction
         
 };
 
-
 int main(int argc, char const* argv[]) {
    
     std::function<void(int)> f {f2};
@@ -63,6 +62,9 @@ int main(int argc, char const* argv[]) {
     i->call(args);
 
     std::tuple<int, int, double> tup {10, 12, 3.14};
+
+
+    auto elem2 = get<int>(tup,1);
     
     int idx = 1;
     auto elem = get<int>(tup, idx);

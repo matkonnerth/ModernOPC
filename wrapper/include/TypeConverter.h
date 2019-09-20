@@ -6,7 +6,6 @@
 #include <typeinfo>
 #include <vector>
 
-
 namespace TypeConverter {
 
 template <typename T>
@@ -48,6 +47,7 @@ getDataType() {
         return &UA_TYPES[UA_TYPES_BOOLEAN];
     }
 }
+
 
 template <typename T>
 void
@@ -148,4 +148,7 @@ getVariableAttributes(std::vector<T> &v) {
     attr.arrayDimensions = new UA_UInt32{static_cast<UA_UInt32>(v.size())};
     return attr;
 }
+
+
+
 }  // namespace TypeConverter

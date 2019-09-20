@@ -1,7 +1,7 @@
 #include "include/DataSource.h"
 #include <open62541/server.h>
 #include <functional>
-#include "Variant.h"
+#include "include/Variant.h"
 
 namespace opc {
 

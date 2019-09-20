@@ -39,11 +39,12 @@ class Server {
     void bindMethodNode(const NodeId &id, std::function<void(ARGS...)> fn)
     {
         UA_Server_setMethodNode_callback(server, id.toUA_NodeId(), internalMethodCallback);
+        //todo: add nodeId instead of
         callbacks.insert(std::pair<int, std::unique_ptr<ICallable>>(std::get<int>(id.getIdentifier()), std::make_unique<Functor<ARGS...>>(fn)));
         UA_Server_setNodeContext(server, id.toUA_NodeId(), this);
     }
 
-    void call(NodeId id);
+    void call(const NodeId& id, const std::vector<Variant>& inputArgs, std::vector<Variant>& outputArgs);
 
         template <typename T>
         void addVariableNode(const NodeId &parentId, const std::string &browseName,

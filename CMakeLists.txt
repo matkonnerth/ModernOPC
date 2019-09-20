@@ -3,7 +3,9 @@ project(open62541Wrapper)
 
 add_subdirectory(open62541)
 
-add_library(wrapper ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/Server.cpp ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/DataSource.cpp)
+add_library(wrapper SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/Server.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/DataSource.cpp)
 target_include_directories(wrapper
     PUBLIC 
         $<INSTALL_INTERFACE:include>
@@ -13,7 +15,8 @@ target_include_directories(wrapper
         ${CMAKE_CURRENT_SOURCE_DIR}/wrapper
     )
 
-target_link_libraries(wrapper PRIVATE open62541)
+#get rid of this public
+target_link_libraries(wrapper PUBLIC open62541)
 target_compile_features(wrapper PRIVATE cxx_std_17)
 
 add_executable(appserver main.cpp)
@@ -25,3 +28,9 @@ add_subdirectory(tests)
 
 add_executable(delegates ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/quickstart.cpp)
 target_compile_features(delegates PRIVATE cxx_std_17)
+
+add_executable(test_variant 
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/test_variant.cpp)
+target_include_directories(test_variant PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
+target_link_libraries(test_variant PRIVATE open62541)
+target_compile_features(test_variant PRIVATE cxx_std_17)

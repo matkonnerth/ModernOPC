@@ -32,13 +32,10 @@ void Server::loadNodeset(const std::string &path)
 }
 
 void
-Server::call(NodeId id) {
+Server::call(const NodeId& id, const std::vector<Variant>& inputArgs, std::vector<Variant>& outputArgs) {
     ICallable *c = callbacks.at(std::get<int>(id.getIdentifier())).get();
     if(c) {
-        std::vector<std::variant<int, double>> vec;
-        std::variant<int, double> val{10};
-        vec.push_back(val);
-        c->call(vec);
+        c->call(inputArgs, outputArgs);
     }
 }
 
@@ -55,7 +52,14 @@ Server::internalMethodCallback(UA_Server *server, const UA_NodeId *sessionId,
 
     if(s)
     {
-        s->call(NodeId(*methodId));
+        std::vector<Variant> inputArgs;
+        std::vector<Variant> outputArgs;
+        for(size_t i=0; i< inputSize; i++)
+        {
+            Variant v{const_cast<UA_Variant*>(&input[i]),false};
+            inputArgs.push_back(v);
+        }
+        s->call(NodeId(*methodId), inputArgs, outputArgs);
     }
     return UA_STATUSCODE_GOOD;
 }
