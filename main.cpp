@@ -20,7 +20,7 @@ getValue(opc::Variant& var) {
     var(test);
 }
 
-void setValue(opc::Variant&var)
+void setValue(opc::Variant& var)
 {
     double test = var.get<double>();
 }
@@ -55,10 +55,6 @@ main() {
 
     opc::Server s;
     s.addMethod("addMethod", &add);
-
-    //custom datatypes
-    s.registerStructType();
-
     NodeId id{3, 1234};
 
     std::array<int, 3> test{12, 13, 14};

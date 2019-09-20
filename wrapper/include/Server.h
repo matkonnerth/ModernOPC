@@ -74,9 +74,6 @@ class Server {
     void
     setDataSource(const NodeId &id, DataSource &src);
     
-
-    void registerStructType();    
-
   private:
     UA_Server *server;
     bool isRunning;
