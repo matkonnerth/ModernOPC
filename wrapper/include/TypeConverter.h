@@ -21,11 +21,16 @@ constexpr bool isSupportedCppType()
 template<typename T>
 bool isTypeMatching(const UA_DataType* uatype)
 {
-    if(uatype->typeIndex == UA_TYPES_INT32 && std::is_same<T, int>::value)
+    using type = typename std::remove_reference<T>::type;
+    if(uatype->typeIndex == UA_TYPES_INT32 && std::is_same<type, int>::value)
     {
         return true;
     }
-    else if(uatype->typeIndex == UA_TYPES_FLOAT && std::is_same<T, float>::value)
+    else if(uatype->typeIndex == UA_TYPES_FLOAT && std::is_same<type, float>::value)
+    {
+        return true;
+    }
+    else if(uatype->typeIndex == UA_TYPES_STRING && std::is_same<type, std::string>::value)
     {
         return true;
     }
@@ -51,7 +56,7 @@ getDataType() {
 
 template <typename T>
 void
-toVariant(T val, UA_Variant* var) {
+toUAVariant(T val, UA_Variant* var) {
     UA_Variant_init(var);
     UA_Variant_setScalarCopy(var, &val, getDataType<T>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
@@ -60,7 +65,7 @@ toVariant(T val, UA_Variant* var) {
 // specialize for std::array
 template <typename T, size_t N>
 void 
-toVariant(std::array<T, N> &arr, UA_Variant* var) {
+toUAVariant(std::array<T, N> &arr, UA_Variant* var) {
     static_assert(isSupportedCppType<T>(), "This type is currently not supported!");
     UA_Variant_init(var);
     UA_Variant_setArrayCopy(var, arr.data(), N, getDataType<T>());
@@ -70,7 +75,7 @@ toVariant(std::array<T, N> &arr, UA_Variant* var) {
 // specialize for std::vector
 template <typename T>
 void
-toVariant(std::vector<T> &v, UA_Variant* var) {
+toUAVariant(std::vector<T> &v, UA_Variant* var) {
     static_assert(isSupportedCppType<T>(), "This type is currently not supported!");
     UA_Variant_init(var);
     UA_Variant_setArrayCopy(var, v.data(), v.size(), getDataType<T>());
@@ -121,7 +126,7 @@ getVariableAttributes(T val) {
     UA_VariableAttributes attr = UA_VariableAttributes_default;
     attr.dataType = uaTypeNodeIdFromCpp<T>();
     attr.valueRank = -1;
-    toVariant(val, &attr.value);
+    toUAVariant(val, &attr.value);
     return attr;
 }
 
@@ -129,7 +134,7 @@ template <typename T, size_t N>
 UA_VariableAttributes
 getVariableAttributes(std::array<T, N> &arr) {
     UA_VariableAttributes attr = UA_VariableAttributes_default;
-    toVariant(arr, &attr.value);
+    toUAVariant(arr, &attr.value);
     attr.dataType = uaTypeNodeIdFromCpp<T>();
     attr.valueRank = 1;
     attr.arrayDimensionsSize = 1;
@@ -141,7 +146,7 @@ template <typename T>
 UA_VariableAttributes
 getVariableAttributes(std::vector<T> &v) {
     UA_VariableAttributes attr = UA_VariableAttributes_default;
-    toVariant(v, &attr.value);
+    toUAVariant(v, &attr.value);
     attr.dataType = uaTypeNodeIdFromCpp<T>();
     attr.valueRank = 1;
     attr.arrayDimensionsSize = 1;
@@ -149,6 +154,37 @@ getVariableAttributes(std::vector<T> &v) {
     return attr;
 }
 
+template <typename T>
+typename std::enable_if_t<std::is_arithmetic<T>::value, T>
+toStdType(UA_Variant* variant){
+    static_assert(std::is_arithmetic<T>::value, "must be a arithmetic type");
+    assert(TypeConverter::isTypeMatching<T>(variant->type));
+    return *static_cast<T *>(variant->data);
+}
 
+// specialize for vector
+template <typename T>
+typename std::enable_if_t<std::is_same<T, std::vector<typename T::value_type>>::value, T>
+toStdType(UA_Variant* variant){
+    static_assert(std::is_arithmetic<typename T::value_type>::value,
+                  "must be a arithmetic type");
+    assert(TypeConverter::isTypeMatching<typename T::value_type>(variant->type));
+    return std::vector<typename T::value_type>{
+        static_cast<typename T::value_type *>(variant->data),
+        static_cast<typename T::value_type *>(variant->data) + variant->arrayLength};
+}
+
+// specialize for string
+template <typename T>
+typename std::enable_if_t<
+    std::is_same<typename std::remove_reference<T>::type, std::string>::value, T>
+toStdType(UA_Variant* variant){
+    // todo: assertation is not working as expected
+    // assert(TypeConverter::isTypeMatching<typename T::value_type>(variant->type));
+
+    UA_String *s = (UA_String *)variant->data;
+    std::string stdString = (s->length, reinterpret_cast<char *>(s->data));
+    return stdString;
+}
 
 }  // namespace TypeConverter

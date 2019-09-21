@@ -39,8 +39,7 @@ class Server {
     void bindMethodNode(const NodeId &id, std::function<void(ARGS...)> fn)
     {
         UA_Server_setMethodNode_callback(server, id.toUA_NodeId(), internalMethodCallback);
-        //todo: add nodeId instead of
-        callbacks.insert(std::pair<int, std::unique_ptr<ICallable>>(std::get<int>(id.getIdentifier()), std::make_unique<Functor<ARGS...>>(fn)));
+        callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(id, std::make_unique<Functor<ARGS...>>(fn)));
         UA_Server_setNodeContext(server, id.toUA_NodeId(), this);
     }
 
@@ -83,6 +82,6 @@ class Server {
                                        void *objectContext, size_t inputSize,
                                        const UA_Variant *input, size_t outputSize,
                                        UA_Variant *output);
-    std::map<int, std::unique_ptr<ICallable>> callbacks;
+    std::map<const NodeId, std::unique_ptr<ICallable>> callbacks;
 };
 }  // namespace opc

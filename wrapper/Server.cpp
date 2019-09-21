@@ -33,7 +33,7 @@ void Server::loadNodeset(const std::string &path)
 
 void
 Server::call(const NodeId& id, const std::vector<Variant>& inputArgs, std::vector<Variant>& outputArgs) {
-    ICallable *c = callbacks.at(std::get<int>(id.getIdentifier())).get();
+    ICallable *c = callbacks.at(id).get();
     if(c) {
         c->call(inputArgs, outputArgs);
     }

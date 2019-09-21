@@ -5,13 +5,13 @@ add_subdirectory(open62541)
 
 add_library(wrapper SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/Server.cpp 
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/DataSource.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/DataSource.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/Variant.cpp)
 target_include_directories(wrapper
     PUBLIC 
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include>
     PRIVATE 
-        ${CMAKE_CURRENT_SOURCE_DIR}/open62541/include
         ${CMAKE_CURRENT_SOURCE_DIR}/wrapper
     )
 
@@ -30,7 +30,7 @@ add_executable(delegates ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/quickstart.cpp)
 target_compile_features(delegates PRIVATE cxx_std_17)
 
 add_executable(test_variant 
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/test_variant.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/test_variant.cpp ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/Variant.cpp)
 target_include_directories(test_variant PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
 target_link_libraries(test_variant PRIVATE open62541)
 target_compile_features(test_variant PRIVATE cxx_std_17)

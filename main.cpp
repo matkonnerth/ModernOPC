@@ -45,9 +45,19 @@ setVectorValue(opc::Variant &var) {
     }
 }
 
-void NodesetLoader_load(int test, int d2)
+void NodesetLoader_load(int test, std::string s)
 {
-    std::cout << "method called: " << test << "arg2: " << d2 << std::endl;
+    std::cout << "method called: " << test << "arg2: " << s << std::endl;
+}
+
+void
+NodesetLoader_unload(std::vector<int> s1, std::string s2, std::string s3, float f) {
+    for(auto&s : s1)
+    {
+        std::cout << s;
+        std::cout << std::endl;
+    }
+    std::cout << s2 << s3 << f << std::endl;
 }
 
 int
@@ -78,7 +88,9 @@ main() {
 
 
     s.loadNodeset("../models/serviceobject.xml");
-    s.bindMethodNode(NodeId(2,7003), std::function<void(int,int)>{NodesetLoader_load});
+    s.bindMethodNode(NodeId(2,7003), std::function<void(int,std::string)>{NodesetLoader_load});
+    s.bindMethodNode(NodeId(2, 7004),
+                     std::function<void(std::vector<int>, std::string, std::string, float)>{NodesetLoader_unload});
 
     s.run();
 }

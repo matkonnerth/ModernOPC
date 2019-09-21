@@ -1,11 +1,26 @@
 #include <functional>
 #include <tuple>
 #include "Variant.h"
-#include "../tuple_getruntime.h"
+
+template <typename Tuple, typename F, std::size_t... Indices>
+void
+for_each_impl(Tuple &&tuple, F &&f, std::index_sequence<Indices...>) {
+    using swallow = int[];
+    (void)swallow{1,
+                  (f(std::get<Indices>(std::forward<Tuple>(tuple))), void(), int{})...};
+}
+
+template <typename Tuple, typename F>
+void
+for_each(Tuple &&tuple, F &&f) {
+    constexpr std::size_t N = std::tuple_size<std::remove_reference_t<Tuple>>::value;
+    for_each_impl(std::forward<Tuple>(tuple), std::forward<F>(f),
+                  std::make_index_sequence<N>{});
+}
 
 namespace opc
 {
-  
+
 class ICallable {
   public:
     virtual void
@@ -19,12 +34,10 @@ template <typename... ARGS> class Functor : public ICallable {
     call(const std::vector<Variant> &inputArguments,
          std::vector<Variant> &outputArguments) override {
         std::tuple<ARGS...> calculatedArgs;
+        size_t i=0;
 
-        for(size_t i = 0; i < n; i++) {
-            //todo, get the correct type
-            get<int>(calculatedArgs, i) = inputArguments[i].get<int>();
-        }
-        std::apply(m_f, calculatedArgs);
+      for_each(calculatedArgs, [&](auto &x) { x=inputArguments[i].get<typename std::remove_reference<decltype(x)>::type>();i++; });
+      std::apply(m_f, calculatedArgs);
     }
 
   private:

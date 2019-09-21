@@ -43,5 +43,6 @@ int main()
     std::vector<opc::Variant> vectorOfVar;
     //vectorOfVar.push_back(testVariant);
 
-    return 0;
+
+        return 0;
 }

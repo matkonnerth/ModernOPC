@@ -51,6 +51,27 @@ class NodeId {
         return i;
     }
 
+    static std::size_t getIdentifierHash(const NodeId& id)
+    {
+        switch(id.type) {
+            case IdentifierType::NUMERIC:
+                return std::get<int>(id.i);
+                break;
+            case IdentifierType::STRING:
+                return std::hash<std::string>()(std::get<std::string>(id.i));
+                break;
+        }
+        return 0;
+    }
+
+    bool operator<(const NodeId& other) const
+    {
+        if(nsIdx < other.nsIdx) return true;
+        if(other.nsIdx < nsIdx) return false;
+        //nsIdx same
+        return getIdentifierHash(*this) < getIdentifierHash(other);
+    }
+
   private:
     int nsIdx;
     IdentifierType type;
