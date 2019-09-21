@@ -22,34 +22,37 @@ template<typename T>
 bool isTypeMatching(const UA_DataType* uatype)
 {
     using type = typename std::remove_reference<T>::type;
-    if(uatype->typeIndex == UA_TYPES_INT32 && std::is_same<type, int>::value)
+    if(uatype->memSize == sizeof(type))
     {
         return true;
-    }
-    else if(uatype->typeIndex == UA_TYPES_FLOAT && std::is_same<type, float>::value)
-    {
-        return true;
-    }
-    else if(uatype->typeIndex == UA_TYPES_STRING && std::is_same<type, std::string>::value)
-    {
-        return true;
-    }
+    }    
     return false;
 }
 
 template <typename T>
 const UA_DataType *
 getDataType() {
-    if(std::is_same<T, int>::value) {
+    if(std::is_same<T, bool>::value)
+    {
+        return &UA_TYPES[UA_TYPES_BOOLEAN];
+    }
+    else if(std::is_same<T, int>::value) {
         return &UA_TYPES[UA_TYPES_INT32];
     } 
+    else if(std::is_same<T, uint>::value)
+    {
+        return &UA_TYPES[UA_TYPES_UINT32];
+    }
     else if(std::is_same<T, float>::value) 
     {
         return &UA_TYPES[UA_TYPES_FLOAT];
     } 
-    else if(std::is_same<T, bool>::value) 
+    else if(std::is_same<T, double>::value) 
     {
-        return &UA_TYPES[UA_TYPES_BOOLEAN];
+        return &UA_TYPES[UA_TYPES_DOUBLE];
+    } 
+    else if(std::is_same<T, std::string>::value) {
+        return &UA_TYPES[UA_TYPES_STRING];
     }
 }
 
@@ -90,7 +93,7 @@ uaTypeNodeIdFromCpp() {
         return UA_NODEID_NUMERIC(0, UA_NS0ID_BOOLEAN);
     } else if(std::is_same<T, char>::value) {
         return UA_NODEID_NUMERIC(0, UA_NS0ID_SBYTE);
-    } else if(std::is_same<T, u_char>::value) {
+    } else if(std::is_same<T, unsigned char>::value) {
         return UA_NODEID_NUMERIC(0, UA_NS0ID_BYTE);
     } else if(std::is_same<T, int16_t>::value) {
         return UA_NODEID_NUMERIC(0, UA_NS0ID_INT16);
@@ -179,9 +182,6 @@ template <typename T>
 typename std::enable_if_t<
     std::is_same<typename std::remove_reference<T>::type, std::string>::value, T>
 toStdType(UA_Variant* variant){
-    // todo: assertation is not working as expected
-    // assert(TypeConverter::isTypeMatching<typename T::value_type>(variant->type));
-
     UA_String *s = (UA_String *)variant->data;
     std::string stdString = (s->length, reinterpret_cast<char *>(s->data));
     return stdString;
