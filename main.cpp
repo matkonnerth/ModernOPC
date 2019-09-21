@@ -45,11 +45,6 @@ setVectorValue(opc::Variant &var) {
     }
 }
 
-void NodesetLoader_load(int test, std::string s)
-{
-    std::cout << "method called: " << test << "arg2: " << s << std::endl;
-}
-
 void
 NodesetLoader_unload(std::vector<int> s1, std::string s2, std::string s3, float f) {
     for(auto&s : s1)
@@ -64,20 +59,15 @@ int
 main() {
 
     opc::Server s;
-    s.addMethod("addMethod", &add);
-    NodeId id{3, 1234};
-
-    std::array<int, 3> test{12, 13, 14};
-
     std::vector<float> fVector{1.1f, 2.2f, 3.3f};
 
     opc::DataSource ds{getValue,setValue};
     opc::DataSource d2{getVectorValue, setVectorValue};
 
+    //adding of variable nodes
     s.addVariableNode(NodeId(0, 85), NodeId(1, "demoVector"), "demoVector", fVector);
-    s.addVariableNode(NodeId(0, 85), NodeId(1, "demoArray"), "demoArray", test);
+    s.addVariableNode(NodeId(0, 85), NodeId(1, "demoArray"), "demoArray", std::array<int, 3> {12, 13, 14});
     s.addVariableNode(NodeId(0, 85), NodeId(1, "demoInt"), "demoInt", 23);
-
     s.addVariableNode(NodeId(0, 85), NodeId(1, "IntVector"), "IntVector", test);
 
     s.setDataSource(NodeId(1, "IntVector"), d2);
@@ -86,11 +76,17 @@ main() {
     s.addVariableNode(NodeId(0, 85), "demoFloat", 23.0f);
     s.addVariableNode(NodeId(0, 85), NodeId(1, "myStringId"), "demoFloat", 23.0f);
 
-
+    //loading of a xml nodeset
     s.loadNodeset("../models/serviceobject.xml");
-    s.bindMethodNode(NodeId(2,7003), std::function<void(int,std::string)>{NodesetLoader_load});
+    std::function<void(std::string)> load = std::bind(&opc::Server::loadNodeset, &s, std::placeholders::_1);
+
+    //bind opc ua methods to business logic
+    s.bindMethodNode(NodeId(2,7003), load);
     s.bindMethodNode(NodeId(2, 7004),
                      std::function<void(std::vector<int>, std::string, std::string, float)>{NodesetLoader_unload});
+
+    //not really useful now, lacks parent node id
+    s.addMethod("addMethod", &add);
 
     s.run();
 }
