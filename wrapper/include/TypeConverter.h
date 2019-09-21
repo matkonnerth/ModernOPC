@@ -165,9 +165,9 @@ toStdType(UA_Variant* variant){
     return *static_cast<T *>(variant->data);
 }
 
-// specialize for vector
+// specialize for vector with exclusion of std::string
 template <typename T>
-typename std::enable_if_t<std::is_same<T, std::vector<typename T::value_type>>::value, T>
+typename std::enable_if_t<!std::is_same<T, std::vector<std::string>>::value && std::is_same<T, std::vector<typename T::value_type>>::value, T>
 toStdType(UA_Variant* variant){
     static_assert(std::is_arithmetic<typename T::value_type>::value,
                   "must be a arithmetic type");
@@ -182,9 +182,37 @@ template <typename T>
 typename std::enable_if_t<
     std::is_same<typename std::remove_reference<T>::type, std::string>::value, T>
 toStdType(UA_Variant* variant){
+    assert(variant->type->typeIndex == UA_TYPES_STRING);
     UA_String *s = (UA_String *)variant->data;
-    std::string stdString = (s->length, reinterpret_cast<char *>(s->data));
-    return stdString;
+    if(s->length>0)
+    {
+        std::string stdString = (s->length, reinterpret_cast<char *>(s->data));
+        return stdString;
+    }
+    return std::string{};
+}
+
+// specialize for vector of string
+template <typename T>
+typename std::enable_if_t<
+    std::is_same<T, std::vector<std::string>>::value, T>
+toStdType(UA_Variant *variant) {
+    assert(variant->type->typeIndex == UA_TYPES_STRING);
+
+    std::vector<std::string> vec;
+    for(size_t i=0; i<variant->arrayLength; i++)
+    {
+        UA_String *s = ((UA_String *)variant->data)+i;
+        if(s->length > 0) {
+            std::string stdString = (s->length, reinterpret_cast<char *>(s->data));
+            vec.push_back(stdString);
+        }
+        else
+        {
+            vec.push_back(std::string{});
+        }
+    }
+    return vec;
 }
 
 }  // namespace TypeConverter

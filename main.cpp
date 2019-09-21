@@ -46,7 +46,7 @@ setVectorValue(opc::Variant &var) {
 }
 
 void
-NodesetLoader_unload(std::vector<int> s1, std::string s2, std::string s3, float f) {
+NodesetLoader_unload(std::vector<std::string> s1, std::string s2, std::string s3, float f) {
     for(auto&s : s1)
     {
         std::cout << s;
@@ -83,7 +83,7 @@ main() {
     //bind opc ua methods to business logic
     s.bindMethodNode(NodeId(2,7003), load);
     s.bindMethodNode(NodeId(2, 7004),
-                     std::function<void(std::vector<int>, std::string, std::string, float)>{NodesetLoader_unload});
+                     std::function<void(std::vector<std::string>, std::string, std::string, float)>{NodesetLoader_unload});
 
     //not really useful now, lacks parent node id
     s.addMethod("addMethod", &add);
