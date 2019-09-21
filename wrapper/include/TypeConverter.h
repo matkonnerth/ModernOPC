@@ -5,6 +5,7 @@
 #include <memory>
 #include <typeinfo>
 #include <vector>
+#include <cassert>
 
 namespace TypeConverter {
 
