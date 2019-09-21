@@ -26,9 +26,6 @@ target_compile_features(appserver PRIVATE cxx_std_17)
 
 add_subdirectory(tests)
 
-add_executable(delegates ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/quickstart.cpp)
-target_compile_features(delegates PRIVATE cxx_std_17)
-
 add_executable(test_variant 
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/test_variant.cpp ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/Variant.cpp)
 target_include_directories(test_variant PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
