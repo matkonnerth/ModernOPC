@@ -12,7 +12,7 @@ namespace TypeConverter {
 template <typename T>
 constexpr bool isSupportedCppType()
 {
-    if(std::is_arithmetic<T>::value)
+    if(std::is_arithmetic_v<T>)
     {
         return true;
     }
@@ -22,7 +22,7 @@ constexpr bool isSupportedCppType()
 template<typename T>
 bool isTypeMatching(const UA_DataType* uatype)
 {
-    using type = typename std::remove_reference<T>::type;
+    using type = typename std::remove_reference_t<T>;
     if(uatype->memSize == sizeof(type))
     {
         return true;
@@ -33,26 +33,26 @@ bool isTypeMatching(const UA_DataType* uatype)
 template <typename T>
 const UA_DataType *
 getDataType() {
-    if(std::is_same<T, bool>::value)
+    if(std::is_same_v<T, bool>)
     {
         return &UA_TYPES[UA_TYPES_BOOLEAN];
     }
-    else if(std::is_same<T, int>::value) {
+    else if(std::is_same_v<T, int>) {
         return &UA_TYPES[UA_TYPES_INT32];
     } 
-    else if(std::is_same<T, uint>::value)
+    else if(std::is_same_v<T, uint>)
     {
         return &UA_TYPES[UA_TYPES_UINT32];
     }
-    else if(std::is_same<T, float>::value) 
+    else if(std::is_same_v<T, float>)
     {
         return &UA_TYPES[UA_TYPES_FLOAT];
     } 
-    else if(std::is_same<T, double>::value) 
+    else if(std::is_same_v<T, double>) 
     {
         return &UA_TYPES[UA_TYPES_DOUBLE];
     } 
-    else if(std::is_same<T, std::string>::value) {
+    else if(std::is_same_v<T, std::string>) {
         return &UA_TYPES[UA_TYPES_STRING];
     }
 }
@@ -90,37 +90,35 @@ template <typename T>
 UA_NodeId
 uaTypeNodeIdFromCpp() {
 
-    if(std::is_same<T, bool>::value) {
+    if(std::is_same_v<T, bool>) {
         return UA_NODEID_NUMERIC(0, UA_NS0ID_BOOLEAN);
-    } else if(std::is_same<T, char>::value) {
+    } else if(std::is_same_v<T, char>) {
         return UA_NODEID_NUMERIC(0, UA_NS0ID_SBYTE);
-    } else if(std::is_same<T, unsigned char>::value) {
+    } else if(std::is_same_v<T, unsigned char>) {
         return UA_NODEID_NUMERIC(0, UA_NS0ID_BYTE);
-    } else if(std::is_same<T, int16_t>::value) {
+    } else if(std::is_same_v<T, int16_t>) {
         return UA_NODEID_NUMERIC(0, UA_NS0ID_INT16);
-    } else if(std::is_same<T, uint16_t>::value) {
+    } else if(std::is_same_v<T, uint16_t>) {
         return UA_NODEID_NUMERIC(0, UA_NS0ID_UINT16);
-    } else if(std::is_same<T, int>::value) {
+    } else if(std::is_same_v<T, int>) {
         return UA_NODEID_NUMERIC(0, UA_NS0ID_INT32);
-    } else if(std::is_same<T, int32_t>::value) {
+    } else if(std::is_same_v<T, int32_t>) {
         return UA_NODEID_NUMERIC(0, UA_NS0ID_INT32);
-    } else if(std::is_same<T, uint32_t>::value) {
+    } else if(std::is_same_v<T, uint32_t>) {
         return UA_NODEID_NUMERIC(0, UA_NS0ID_UINT32);
-    } else if(std::is_same<T, int64_t>::value) {
+    } else if(std::is_same_v<T, int64_t>) {
         return UA_NODEID_NUMERIC(0, UA_NS0ID_INT64);
-    } else if(std::is_same<T, uint64_t>::value) {
+    } else if(std::is_same_v<T, uint64_t>) {
         return UA_NODEID_NUMERIC(0, UA_NS0ID_UINT64);
-    } else if(std::is_same<T, float>::value) {
+    } else if(std::is_same_v<T, float>) {
         return UA_NODEID_NUMERIC(0, UA_NS0ID_FLOAT);
-    } else if(std::is_same<T, double>::value) {
+    } else if(std::is_same_v<T, double>) {
         return UA_NODEID_NUMERIC(0, UA_NS0ID_DOUBLE);
-    } else if(std::is_same<T, std::string>::value ||
-              std::is_same<T, const char *>::value) {
+    } else if(std::is_same_v<T, std::string> ||
+              std::is_same_v<T, const char *>) {
         return UA_NODEID_NUMERIC(0, UA_NS0ID_STRING);
     }
     std::cout << typeid(T).name() << std::endl;
-    // bool x = T::nothing;
-    // static_assert(false, "uaTypeNodeIdFromCpp");
     return UA_NodeId();
 }
 
@@ -159,61 +157,45 @@ getVariableAttributes(std::vector<T> &v) {
 }
 
 template <typename T>
-typename std::enable_if_t<std::is_arithmetic<T>::value, T>
-toStdType(UA_Variant* variant){
-    static_assert(std::is_arithmetic<T>::value, "must be a arithmetic type");
-    assert(TypeConverter::isTypeMatching<T>(variant->type));
-    return *static_cast<T *>(variant->data);
-}
-
-// specialize for vector with exclusion of std::string
-template <typename T>
-typename std::enable_if_t<!std::is_same<T, std::vector<std::string>>::value && std::is_same<T, std::vector<typename T::value_type>>::value, T>
-toStdType(UA_Variant* variant){
-    static_assert(std::is_arithmetic<typename T::value_type>::value,
-                  "must be a arithmetic type");
-    assert(TypeConverter::isTypeMatching<typename T::value_type>(variant->type));
-    return std::vector<typename T::value_type>{
-        static_cast<typename T::value_type *>(variant->data),
-        static_cast<typename T::value_type *>(variant->data) + variant->arrayLength};
-}
-
-// specialize for string
-template <typename T>
-typename std::enable_if_t<
-    std::is_same<typename std::remove_reference<T>::type, std::string>::value, T>
-toStdType(UA_Variant* variant){
-    assert(variant->type->typeIndex == UA_TYPES_STRING);
-    UA_String *s = (UA_String *)variant->data;
-    if(s->length>0)
+T toStdType(UA_Variant* variant){
+    if constexpr (std::is_arithmetic_v<T>)
     {
-        std::string stdString = (s->length, reinterpret_cast<char *>(s->data));
-        return stdString;
+        assert(TypeConverter::isTypeMatching<T>(variant->type));
+        return *static_cast<T *>(variant->data);
     }
-    return std::string{};
-}
-
-// specialize for vector of string
-template <typename T>
-typename std::enable_if_t<
-    std::is_same<T, std::vector<std::string>>::value, T>
-toStdType(UA_Variant *variant) {
-    assert(variant->type->typeIndex == UA_TYPES_STRING);
-
-    std::vector<std::string> vec;
-    for(size_t i=0; i<variant->arrayLength; i++)
+    else if constexpr(!std::is_same_v<T, std::vector<std::string>> &&
+            std::is_same_v<T, std::vector<typename T::value_type>>)
     {
-        UA_String *s = ((UA_String *)variant->data)+i;
+        assert(TypeConverter::isTypeMatching<typename T::value_type>(variant->type));
+        return std::vector<typename T::value_type>{
+            static_cast<typename T::value_type *>(variant->data),
+            static_cast<typename T::value_type *>(variant->data) + variant->arrayLength};
+    }
+    else if constexpr(std::is_same_v<typename std::remove_reference_t<T>    , std::string>)
+    {
+        assert(variant->type->typeIndex == UA_TYPES_STRING);
+        UA_String *s = (UA_String *)variant->data;
         if(s->length > 0) {
             std::string stdString = (s->length, reinterpret_cast<char *>(s->data));
-            vec.push_back(stdString);
+            return stdString;
         }
-        else
-        {
-            vec.push_back(std::string{});
-        }
+        return std::string{};
     }
-    return vec;
-}
+    else if constexpr(std::is_same_v<T, std::vector<std::string>>)
+    {
+        assert(variant->type->typeIndex == UA_TYPES_STRING);
 
+        std::vector<std::string> vec;
+        for(size_t i = 0; i < variant->arrayLength; i++) {
+            UA_String *s = ((UA_String *)variant->data) + i;
+            if(s->length > 0) {
+                std::string stdString = (s->length, reinterpret_cast<char *>(s->data));
+                vec.push_back(stdString);
+            } else {
+                vec.push_back(std::string{});
+            }
+        }
+        return vec;
+    }
+}
 }  // namespace TypeConverter
