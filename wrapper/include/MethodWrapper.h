@@ -23,14 +23,14 @@ namespace opc
 
 class ICallable {
   public:
-    virtual void
+    virtual bool
     call(const std::vector<Variant>&inputArguments, std::vector<Variant>& outputArguments) = 0;
 };
 
-template <typename... ARGS> class Functor : public ICallable {
+template <typename... ARGS> class CallWithOutOutputArgs : public ICallable {
   public:
-    Functor(std::function<void(ARGS...)> f) : m_f(f) {}
-    virtual void
+    CallWithOutOutputArgs(std::function<void(ARGS...)> f) : m_f(f) {}
+    virtual bool
     call(const std::vector<Variant> &inputArguments,
          std::vector<Variant> &outputArguments) override {
         std::tuple<ARGS...> calculatedArgs;
@@ -38,6 +38,7 @@ template <typename... ARGS> class Functor : public ICallable {
 
       for_each(calculatedArgs, [&](auto &x) { x=inputArguments[i].get<typename std::remove_reference<decltype(x)>::type>();i++; });
       std::apply(m_f, calculatedArgs);
+      return true;
     }
 
   private:

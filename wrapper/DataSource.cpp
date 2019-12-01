@@ -39,7 +39,7 @@ DataSource::internalRead(UA_Server *server, const UA_NodeId *sessionId,
         return UA_STATUSCODE_BADNODATA;
 
     DataSource *ds = (DataSource *)nodeContext;
-    Variant var{&value->value, false};
+    Variant var{&value->value};
     ds->read(var);
     return UA_STATUSCODE_GOOD;
 }
@@ -55,7 +55,7 @@ DataSource::internalWrite(UA_Server *server, const UA_NodeId *sessionId,
     DataSource *ds = (DataSource *)nodeContext;
     // TODO: can we avoid this copy?
     // we can avoid it at the moment, because it's copied in Variant.get<>()
-    Variant var{const_cast<UA_Variant *>(&value->value), false};
+    Variant var{const_cast<UA_Variant *>(&value->value)};
     ds->write(var);
     return UA_STATUSCODE_GOOD;
 }

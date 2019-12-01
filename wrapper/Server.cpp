@@ -31,12 +31,13 @@ void Server::loadNodeset(const std::string &path)
     UA_XmlImport_loadFile(&f);
 }
 
-void
+bool
 Server::call(const NodeId& id, const std::vector<Variant>& inputArgs, std::vector<Variant>& outputArgs) {
     ICallable *c = callbacks.at(id).get();
     if(c) {
-        c->call(inputArgs, outputArgs);
+        return c->call(inputArgs, outputArgs);
     }
+    return false;
 }
 
 UA_StatusCode
@@ -46,7 +47,7 @@ Server::internalMethodCallback(UA_Server *server, const UA_NodeId *sessionId,
                        void *objectContext, size_t inputSize, const UA_Variant *input,
                        size_t outputSize, UA_Variant *output)
 {
-    opc::Server *s = nullptr;
+    opc::Server *s {nullptr};
     UA_Server_getNodeContext(
         server, *methodId, (void**)&s);
 
@@ -56,11 +57,15 @@ Server::internalMethodCallback(UA_Server *server, const UA_NodeId *sessionId,
         std::vector<Variant> outputArgs;
         for(size_t i=0; i< inputSize; i++)
         {
-            Variant v{const_cast<UA_Variant*>(&input[i]),false};
+            Variant v{const_cast<UA_Variant*>(&input[i])};
             inputArgs.push_back(v);
         }
-        s->call(NodeId(*methodId), inputArgs, outputArgs);
+        if (s->call(NodeId(*methodId), inputArgs, outputArgs))
+        {
+            return UA_STATUSCODE_GOOD;
+        }
+        return UA_STATUSCODE_BADMETHODINVALID;
     }
-    return UA_STATUSCODE_GOOD;
+    return UA_STATUSCODE_BADMETHODINVALID;
 }
 }

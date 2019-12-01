@@ -5,26 +5,21 @@ namespace opc {
 
     class Variant {
       public:
-        //constructs and initializes Variant with UA_Variant
-        Variant(UA_Variant *var, bool careForMem)
-            : variant{var}, responsibleForMem{careForMem} {}
-
-        Variant();
-        ~Variant();
+        Variant() : variant{UA_Variant_new(), UA_Variant_delete} {}
+        Variant(UA_Variant *var) : variant{var, [](UA_Variant*){}} {}
 
         template <typename T>
         void
         operator()(T val) {
-            TypeConverter::toUAVariant(val, variant);
+            TypeConverter::toUAVariant(val, variant.get());
         }
 
         template <typename T>
         T get() const {
-            return TypeConverter::toStdType<T>(variant);
+            return TypeConverter::toStdType<T>(variant.get());
         }
-        
+       
       private:
-        UA_Variant *variant;
-        bool responsibleForMem;
+        std::shared_ptr<UA_Variant> variant{nullptr};
     };
 }

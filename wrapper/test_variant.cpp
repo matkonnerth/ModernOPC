@@ -24,7 +24,7 @@ int main()
     UA_Int32 i = 42;
     UA_Variant_setScalar(&v, &i, &UA_TYPES[UA_TYPES_INT32]);
 
-    opc::Variant t {&v, false};
+    opc::Variant t {&v};
 
     dataSource_readValueTemplated(t);
     std::cout << t.get<int>() << std::endl;
@@ -33,7 +33,7 @@ int main()
     UA_Int32 arr[3] = {1,2,3};
     UA_Variant_setArrayCopy(&varVec, arr, 3, &UA_TYPES[UA_TYPES_INT32]);
 
-    opc::Variant tVec {&varVec, false};
+    opc::Variant tVec {&varVec};
     dataSource_writeValueTemplated(tVec);
 
     opc::Variant testVariant{};

@@ -2,9 +2,9 @@
 #include <open62541/server.h>
 #include <open62541/server_config.h>
 #include <Method.hpp>
-#include "DataSource.h"
-#include "NodeId.h"
-#include "MethodWrapper.h"
+#include <DataSource.h>
+#include <NodeId.h>
+#include <MethodWrapper.h>
 
 struct UA_Server;
 namespace opc {
@@ -39,11 +39,11 @@ class Server {
     void bindMethodNode(const NodeId &id, std::function<void(ARGS...)> fn)
     {
         UA_Server_setMethodNode_callback(server, id.toUA_NodeId(), internalMethodCallback);
-        callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(id, std::make_unique<Functor<ARGS...>>(fn)));
+        callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(id, std::make_unique<CallWithOutOutputArgs<ARGS...>>(fn)));
         UA_Server_setNodeContext(server, id.toUA_NodeId(), this);
     }
 
-    void call(const NodeId& id, const std::vector<Variant>& inputArgs, std::vector<Variant>& outputArgs);
+    bool call(const NodeId& id, const std::vector<Variant>& inputArgs, std::vector<Variant>& outputArgs);
 
         template <typename T>
         void addVariableNode(const NodeId &parentId, const std::string &browseName,
@@ -72,7 +72,8 @@ class Server {
 
     void
     setDataSource(const NodeId &id, DataSource &src);
-    
+
+
   private:
     UA_Server *server;
     bool isRunning;
