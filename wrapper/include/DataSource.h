@@ -2,40 +2,62 @@
 #include <open62541/server.h>
 #include <functional>
 
+/*
+
+NodeInfo in nodeContext: pair<datasourceKey, nativekey> for attributes
+
+
+
+Server
+  registerDataSource(DataSource)
+  deregisterDataSource(DataSource)
+
+
+Datasource
+  getKey()
+  read(Variant var)
+  write(Variant var)
+
+
+UA_Server_Read(NodeInfo, NodeId, AttributeId, ) -> 
+  if NodeInfo[attribute]!=null
+  -> getDatasource -> read()
+  -> else getDatasource(NodeId)
+  -> else getDataSource(namespaceIndex)
+  -> return noDataSource
+*/
+
 namespace opc {
 class Variant;
 class DataSource {
   public:
-    DataSource(std::function<void(Variant &var)> read);
+    DataSource(const std::string &key, std::function<void(Variant &var)> read)
+        : key(key), storedRead(read), storedWrite(nullptr){}
 
-    DataSource(std::function<void(Variant &var)> read,
-               std::function<void(Variant &var)> write);
+    DataSource(const std::string &key, std::function<void(Variant &var)> read,
+               std::function<void(Variant &var)> write)
+        : key(key), storedRead(read), storedWrite(write) {}
 
-    inline UA_DataSource
-    getRawSource() const {
-        return src;
+    void
+    read(Variant &var)
+    {
+      storedRead(var);
     }
 
     void
-    read(Variant &var);
+    write(Variant &var)
+    {
+      storedRead(var);
+    }
 
-    void
-    write(Variant &var);
+    const std::string& getKey() const
+    {
+      return key;
+    }
 
   private:
-    UA_DataSource src;
+    std::string key;
     std::function<void(Variant &var)> storedRead;
     std::function<void(Variant &var)> storedWrite;
-
-    static UA_StatusCode
-    internalRead(UA_Server *server, const UA_NodeId *sessionId, void *sessionContext,
-                 const UA_NodeId *nodeId, void *nodeContext,
-                 UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range,
-                 UA_DataValue *value);
-
-    static UA_StatusCode
-    internalWrite(UA_Server *server, const UA_NodeId *sessionId, void *sessionContext,
-                  const UA_NodeId *nodeId, void *nodeContext,
-                  const UA_NumericRange *range, const UA_DataValue *value);
 };
 }

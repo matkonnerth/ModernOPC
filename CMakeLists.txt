@@ -4,8 +4,7 @@ project(open62541Wrapper)
 add_subdirectory(open62541)
 
 add_library(wrapper SHARED
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/Server.cpp 
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/DataSource.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/Server.cpp)
 target_include_directories(wrapper
     PUBLIC 
         $<INSTALL_INTERFACE:include>

@@ -29,9 +29,9 @@ void setValue(opc::Variant& var)
 void
 getVectorValue(opc::Variant &var) {
     std::vector<int> vec;
-    vec.push_back(3);
-    vec.push_back(4);
-    vec.push_back(5);
+    vec.push_back(33);
+    vec.push_back(423);
+    vec.push_back(5323);
     var(std::move(vec));
 }
 
@@ -61,20 +61,16 @@ main() {
     opc::Server s;
     std::vector<float> fVector{1.1f, 2.2f, 3.3f};
 
-    opc::DataSource ds{getValue,setValue};
-    opc::DataSource d2{getVectorValue, setVectorValue};
+    s.registerDataSource(
+         std::make_unique<opc::DataSource>("simpleVal", getValue, setValue));
+    s.registerDataSource(
+        std::make_unique<opc::DataSource>("vectorDataSource", getVectorValue));
 
-    //adding of variable nodes
-    s.addVariableNode(NodeId(0, 85), NodeId(1, "demoVector"), "demoVector", fVector);
+    // adding of variable nodes
+    s.addVariableNode(NodeId(0, 85), NodeId(1, "demoVector"), "demoVector", fVector, std::make_unique<opc::NodeInfo>("vectorDataSource", "blabla"));
     s.addVariableNode(NodeId(0, 85), NodeId(1, "demoArray"), "demoArray", std::array<int, 3> {12, 13, 14});
-    s.addVariableNode(NodeId(0, 85), NodeId(1, "demoInt"), "demoInt", 23);
+    s.addVariableNode(NodeId(0, 85), NodeId(1, "demoInt"), "demoInt", 23, std::make_unique<opc::NodeInfo>("simpleVal", "notImplemented"));
     s.addVariableNode(NodeId(0, 85), NodeId(1, "IntVector"), "IntVector", test);
-
-    s.setDataSource(NodeId(1, "IntVector"), d2);
-    s.setDataSource(NodeId(1, "demoInt"), ds);
-
-    s.addVariableNode(NodeId(0, 85), "demoFloat", 23.0f);
-    s.addVariableNode(NodeId(0, 85), NodeId(1, "myStringId"), "demoFloat", 23.0f);
 
     //loading of a xml nodeset
     s.loadNodeset("../models/serviceobject.xml");

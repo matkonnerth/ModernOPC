@@ -2,11 +2,13 @@
 #include <open62541/server.h>
 #include <open62541/server_config_default.h>
 #include <open62541/plugin/nodesetLoader.h>
+#include <NodeInfo.h>
 
 namespace opc {
 Server::Server() : isRunning{true} {
     server = UA_Server_new();
     UA_ServerConfig_setDefault(UA_Server_getConfig(server));
+    sServer = this;
 }
 
 Server::~Server() { UA_Server_delete(server); }
@@ -17,9 +19,10 @@ Server::run() {
 }
 
 void
-Server::setDataSource(const NodeId &id, DataSource &src) {
-    UA_Server_setNodeContext(server, id.toUA_NodeId(), &src);
-    UA_Server_setVariableNode_dataSource(server, id.toUA_NodeId(), src.getRawSource());
+Server::registerDataSource(std::unique_ptr<DataSource> src) {
+    //UA_Server_setNodeContext(server, id.toUA_NodeId(), &src);
+    //UA_Server_setVariableNode_dataSource(server, id.toUA_NodeId(), src.getRawSource());
+    datasources.push_back(std::move(src));
 }
 
 void Server::loadNodeset(const std::string &path)
@@ -68,4 +71,43 @@ Server::internalMethodCallback(UA_Server *server, const UA_NodeId *sessionId,
     }
     return UA_STATUSCODE_BADMETHODINVALID;
 }
+
+UA_StatusCode
+Server::internalRead(UA_Server *server, const UA_NodeId *sessionId,
+                         void *sessionContext, const UA_NodeId *nodeId, void *nodeContext,
+                         UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range,
+                         UA_DataValue *value) {
+
+    if(!nodeContext)
+        return UA_STATUSCODE_BADNODATA;
+
+    NodeInfo* info = static_cast<NodeInfo*>(nodeContext);
+    for(auto &ds : static_cast<Server *>(sServer)->getDataSources())
+    {
+        if(info->getDataSourceKey().compare(ds->getKey())==0)
+        {
+            Variant var{&value->value};
+            ds->read(var);
+            return UA_STATUSCODE_GOOD;
+        }
+    }
+    return UA_STATUSCODE_BADNODATA;    
+}
+
+UA_StatusCode
+Server::internalWrite(UA_Server *server, const UA_NodeId *sessionId,
+                          void *sessionContext, const UA_NodeId *nodeId,
+                          void *nodeContext, const UA_NumericRange *range,
+                          const UA_DataValue *value) {
+    //if(!nodeContext)
+    //    return UA_STATUSCODE_BADNODATA;
+    auto &ds = static_cast<Server *>(sServer)->getDataSources().at(0);
+    // TODO: can we avoid this copy?
+    // we can avoid it at the moment, because it's copied in Variant.get<>()
+    Variant var{const_cast<UA_Variant *>(&value->value)};
+    ds->write(var);
+    return UA_STATUSCODE_GOOD;
+}
+
+void* Server::sServer =nullptr;
 }

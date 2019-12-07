@@ -5,6 +5,7 @@
 #include <DataSource.h>
 #include <NodeId.h>
 #include <MethodWrapper.h>
+#include <NodeInfo.h>
 
 struct UA_Server;
 namespace opc {
@@ -13,8 +14,7 @@ class Server {
   public:
     Server();
     ~Server();
-    void
-    run();
+    void run();
 
     void loadNodeset(const std::string& path);
     template <typename M>
@@ -45,16 +45,19 @@ class Server {
 
     bool call(const NodeId& id, const std::vector<Variant>& inputArgs, std::vector<Variant>& outputArgs);
 
-        template <typename T>
-        void addVariableNode(const NodeId &parentId, const std::string &browseName,
-                             T initialValue) {
+    template <typename T>
+    void
+    addVariableNode(const NodeId &parentId, const NodeId &requestedId,
+                    const std::string &browseName, T initialValue, std::unique_ptr<NodeInfo> info) {
         UA_VariableAttributes attr = TypeConverter::getVariableAttributes(initialValue);
         attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
-        UA_Server_addVariableNode(server, UA_NODEID_NULL, parentId.toUA_NodeId(),
-                                  UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-                                  UA_QUALIFIEDNAME(1, (char *)browseName.c_str()),
-                                  UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE),
-                                  attr, nullptr, nullptr);
+        UA_Server_addVariableNode(
+            server, requestedId.toUA_NodeId(), parentId.toUA_NodeId(),
+            UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+            UA_QUALIFIEDNAME(1, (char *)browseName.c_str()),
+            UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), attr, info.release(), nullptr);
+
+        UA_Server_setVariableNode_dataSource(server, requestedId.toUA_NodeId(), internalSrc);
     }
 
     template <typename T>
@@ -63,19 +66,25 @@ class Server {
                     const std::string &browseName, T initialValue) {
         UA_VariableAttributes attr = TypeConverter::getVariableAttributes(initialValue);
         attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
-        UA_Server_addVariableNode(
-            server, requestedId.toUA_NodeId(), parentId.toUA_NodeId(),
-            UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-            UA_QUALIFIEDNAME(1, (char *)browseName.c_str()),
-            UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), attr, nullptr, nullptr);
+        UA_Server_addVariableNode(server, requestedId.toUA_NodeId(),
+                                  parentId.toUA_NodeId(),
+                                  UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                                  UA_QUALIFIEDNAME(1, (char *)browseName.c_str()),
+                                  UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE),
+                                  attr, nullptr, nullptr);
     }
 
-    void
-    setDataSource(const NodeId &id, DataSource &src);
+    void registerDataSource(std::unique_ptr<DataSource> src);
+
+    auto& getDataSources()
+    {
+      return datasources;
+    }
 
 
   private:
-    UA_Server *server;
+    UA_Server *server {nullptr};
+    UA_DataSource internalSrc {internalRead, internalWrite};
     bool isRunning;
     static UA_StatusCode internalMethodCallback(UA_Server *server, const UA_NodeId *sessionId,
                                        void *sessionContext, const UA_NodeId *methodId,
@@ -84,5 +93,19 @@ class Server {
                                        const UA_Variant *input, size_t outputSize,
                                        UA_Variant *output);
     std::map<const NodeId, std::unique_ptr<ICallable>> callbacks;
+    std::vector<std::unique_ptr<DataSource>> datasources;
+
+    static void* sServer;
+
+    static UA_StatusCode
+    internalRead(UA_Server *server, const UA_NodeId *sessionId, void *sessionContext,
+                 const UA_NodeId *nodeId, void *nodeContext,
+                 UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range,
+                 UA_DataValue *value);
+
+    static UA_StatusCode
+    internalWrite(UA_Server *server, const UA_NodeId *sessionId, void *sessionContext,
+                  const UA_NodeId *nodeId, void *nodeContext,
+                  const UA_NumericRange *range, const UA_DataValue *value);
 };
 }  // namespace opc
