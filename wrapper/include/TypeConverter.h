@@ -140,7 +140,7 @@ getVariableAttributes(std::array<T, N> &arr) {
     attr.dataType = uaTypeNodeIdFromCpp<T>();
     attr.valueRank = 1;
     attr.arrayDimensionsSize = 1;
-    attr.arrayDimensions = new UA_UInt32{arr.size()};
+    attr.arrayDimensions = new UA_UInt32{static_cast<UA_UInt32>(arr.size())};
     return attr;
 }
 
@@ -176,7 +176,7 @@ T toStdType(UA_Variant* variant){
         assert(variant->type->typeIndex == UA_TYPES_STRING);
         UA_String *s = (UA_String *)variant->data;
         if(s->length > 0) {
-            std::string stdString = (s->length, reinterpret_cast<char *>(s->data));
+            std::string stdString{reinterpret_cast<char *>(s->data), s->length};
             return stdString;
         }
         return std::string{};
@@ -189,7 +189,7 @@ T toStdType(UA_Variant* variant){
         for(size_t i = 0; i < variant->arrayLength; i++) {
             UA_String *s = ((UA_String *)variant->data) + i;
             if(s->length > 0) {
-                std::string stdString = (s->length, reinterpret_cast<char *>(s->data));
+                std::string stdString{reinterpret_cast<char *>(s->data), s->length};
                 vec.push_back(stdString);
             } else {
                 vec.push_back(std::string{});

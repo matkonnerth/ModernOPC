@@ -25,6 +25,7 @@ class ICallable {
   public:
     virtual bool
     call(const std::vector<Variant>&inputArguments, std::vector<Variant>& outputArguments) = 0;
+    virtual ~ICallable()=default;
 };
 
 template <typename... ARGS> class CallWithOutOutputArgs : public ICallable {
@@ -42,8 +43,8 @@ template <typename... ARGS> class CallWithOutOutputArgs : public ICallable {
     }
 
   private:
-    std::function<void(ARGS...)> m_f;
-    std::tuple<ARGS...> args;
+    std::function<void(ARGS...)> m_f{};
+    std::tuple<ARGS...> args{};
     const size_t n = sizeof...(ARGS);
 };
 }

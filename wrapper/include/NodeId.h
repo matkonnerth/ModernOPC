@@ -23,6 +23,10 @@ class NodeId {
                 type = IdentifierType::STRING;
                 i = std::string(reinterpret_cast<char*>(id.identifier.string.data), id.identifier.string.length);
                 break;
+            case UA_NODEIDTYPE_BYTESTRING:
+            case UA_NODEIDTYPE_GUID:
+                assert(false);
+                break;
         }
     }
 
@@ -30,11 +34,11 @@ class NodeId {
     toUA_NodeId() const {
         UA_NodeId id;
         UA_NodeId_init(&id);
-        id.namespaceIndex = nsIdx;
+        id.namespaceIndex = static_cast<UA_UInt16>(nsIdx);
         switch(type) {
             case IdentifierType::NUMERIC:
                 id.identifierType = UA_NodeIdType::UA_NODEIDTYPE_NUMERIC;
-                id.identifier.numeric = std::get<int>(i);
+                id.identifier.numeric = static_cast<UA_UInt32>(std::get<int>(i));
                 break;
             case IdentifierType::STRING:
                 id.identifierType = UA_NodeIdType::UA_NODEIDTYPE_STRING;
@@ -55,7 +59,7 @@ class NodeId {
     {
         switch(id.type) {
             case IdentifierType::NUMERIC:
-                return std::get<int>(id.i);
+                return static_cast<std::size_t>(std::get<int>(id.i));
                 break;
             case IdentifierType::STRING:
                 return std::hash<std::string>()(std::get<std::string>(id.i));
@@ -73,7 +77,7 @@ class NodeId {
     }
 
   private:
-    int nsIdx;
-    IdentifierType type;
-    std::variant<int, std::string> i;
+    int nsIdx {0};
+    IdentifierType type {IdentifierType::NUMERIC};
+    std::variant<int, std::string> i{0};
 };

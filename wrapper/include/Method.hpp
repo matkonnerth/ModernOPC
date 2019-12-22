@@ -7,7 +7,7 @@
 
 template <typename ClassType, typename ReturnType, typename... Args>
 struct MethodTraitsBase {
-    inline static const size_t
+    inline static size_t
     getNumArgs() {
         return sizeof...(Args);
     }

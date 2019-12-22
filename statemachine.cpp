@@ -4,6 +4,7 @@
 #include <functional>
 #include <vector>
 #include <queue>
+#include <chrono>
 
 enum class EState
 {
@@ -33,8 +34,8 @@ namespace Version2
     class State
     {
         public:
-          State(const std::string &name, EState superState)
-              : name(name), superState(superState) {};
+          State(std::string name, EState superState)
+              : superState(superState), name(std::move(name)) {};
           void entry(){};
           void exit(){};
           EState
@@ -112,7 +113,7 @@ namespace Version2
                     }
                 }
                 current = next;
-                std::cout <<  states[static_cast<size_t>(current)].getName() << std::endl;
+                //std::cout <<  states[static_cast<size_t>(current)].getName() << std::endl;
             }
         }
 
@@ -125,7 +126,7 @@ namespace Version2
             EState current {EState::Init};
             std::queue<Message> inputEvents{{Message::Empty}};
     };
-};
+}
 
 EState getNextState(EState current, Message m, const TransitionTable& transitions)
 {
@@ -140,8 +141,8 @@ EState getNextState(EState current, Message m, const TransitionTable& transition
 
 class State {
   public:
-    State(const std::string &name) : name(name) {}
-    virtual ~State(){};
+    State(std::string name) : name(std::move(name)) {}
+    virtual ~State() = default;
 
     virtual EState
     evaluate(EState currentState, Message m)=0;
@@ -159,8 +160,8 @@ class Init : public State
 {
     public:
         using State::State;
-        virtual EState
-        evaluate(EState currentState, Message m) override {
+        EState
+        evaluate(EState currentState, Message m) final {
             return getNextState(currentState, m, transitions);
         }
 
@@ -174,7 +175,7 @@ class Running: public State {
   public:
     using State::State;
 
-    virtual EState
+    EState
     evaluate(EState currentState, Message m) override {
         return getNextState(currentState, m, transitions);
     }
@@ -195,8 +196,8 @@ class Running_Interrupted: public Running
     public:
         using Running::Running;
 
-        virtual EState
-        evaluate(EState currentState, Message m) override {
+        EState
+        evaluate(EState currentState, Message m) final {
             
             EState next = getNextState(currentState, m, transitions);
             if(next!=currentState)
@@ -216,8 +217,8 @@ class Running_Interrupted: public Running
 class Halted: public State {
   public:
     using State::State;
-    virtual EState
-    evaluate(EState currentState, Message m) override {
+    EState
+    evaluate(EState currentState, Message m) final {
         return getNextState(currentState, m, transitions);
     }
 
@@ -241,7 +242,7 @@ class Statemachine
                 currentState =
                     states[static_cast<size_t>(currentState)]->evaluate(currentState, inputEvents.front());
                 inputEvents.pop();
-                std::cout << getCurrentState() << std::endl;
+                //std::cout << getCurrentState() << std::endl;
             }
         }
 
@@ -269,28 +270,41 @@ int main()
 {
     Statemachine s;
 
+    auto start = std::chrono::high_resolution_clock::now();
     std::cout << s.getCurrentState() << std::endl;
-    s.setEvent(Message::Request_Stopping);
-    s.setEvent(Message::Request_Running);
-    s.setEvent(Message::Request_Interrupt);
-    s.setEvent(Message::Empty);
-    s.setEvent(Message::Request_Stopping);
-    s.setEvent(Message::Empty);
-    s.setEvent(Message::Request_Interrupt);
-    s.setEvent(Message::Request_Stopping);
-    s.run();
+    for(size_t i = 0; i < 10000; i++) {
+        s.setEvent(Message::Request_Stopping);
+        s.setEvent(Message::Request_Running);
+        s.setEvent(Message::Request_Interrupt);
+        s.setEvent(Message::Empty);
+        s.setEvent(Message::Request_Stopping);
+        s.setEvent(Message::Empty);
+        s.setEvent(Message::Request_Interrupt);
+        s.setEvent(Message::Request_Stopping);
+        s.run();
+    }
+    auto end = std::chrono::high_resolution_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    std::cout << "v1 (ms): " <<  elapsed.count() << std::endl;
 
     std::cout << "Version 2" << std::endl;
 
     Version2::Statemachine s2;
 
-    s2.setEvent(Message::Request_Stopping);
-    s2.setEvent(Message::Request_Running);
-    s2.setEvent(Message::Request_Interrupt);
-    s2.setEvent(Message::Empty);
-    s2.setEvent(Message::Request_Stopping);
-    s2.setEvent(Message::Empty);
-    s2.setEvent(Message::Request_Interrupt);
-    s2.setEvent(Message::Request_Stopping);
-    s2.run();
+    start = std::chrono::high_resolution_clock::now();
+    for(size_t i = 0; i<10000; i++)
+    {
+        s2.setEvent(Message::Request_Stopping);
+        s2.setEvent(Message::Request_Running);
+        s2.setEvent(Message::Request_Interrupt);
+        s2.setEvent(Message::Empty);
+        s2.setEvent(Message::Request_Stopping);
+        s2.setEvent(Message::Empty);
+        s2.setEvent(Message::Request_Interrupt);
+        s2.setEvent(Message::Request_Stopping);
+        s2.run();
+    }
+    end = std::chrono::high_resolution_clock::now();
+    elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    std::cout << "v2 (ms): " << elapsed.count() << std::endl;
 }

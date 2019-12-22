@@ -15,14 +15,15 @@ add(int a, int b, double c) {
 static int test = 0;
 
 void
-getValue(opc::Variant& var) {    
+getValue(opc::Variant& var) {
     test++;
     var(test);
 }
 
 void setValue(opc::Variant& var)
 {
-    double test = var.get<double>();
+    auto test = var.get<double>();
+    (void)test;
 }
 
 
@@ -38,7 +39,7 @@ getVectorValue(opc::Variant &var) {
 
 void
 setVectorValue(opc::Variant &var) {
-    std::vector<int> vec = var.get<std::vector<int>>();
+    auto vec = var.get<std::vector<int>>();
     for(auto& elem : vec)
     {
         std::cout << elem << std::endl;
@@ -46,7 +47,7 @@ setVectorValue(opc::Variant &var) {
 }
 
 void
-NodesetLoader_unload(std::vector<std::string> s1, std::string s2, std::string s3, float f) {
+NodesetLoader_unload(std::vector<std::string> s1, const std::string& s2, const std::string& s3, float f) {
     for(auto&s : s1)
     {
         std::cout << s;

@@ -14,6 +14,11 @@ class Server {
   public:
     Server();
     ~Server();
+    Server(const Server&) = delete;
+    Server& operator=(const Server&) = delete;
+    Server(Server &&) = delete;
+    Server & operator=(Server &&) = delete;
+
     void run();
 
     void loadNodeset(const std::string& path);
@@ -85,17 +90,17 @@ class Server {
   private:
     UA_Server *server {nullptr};
     UA_DataSource internalSrc {internalRead, internalWrite};
-    bool isRunning;
+    bool isRunning {false};
     static UA_StatusCode internalMethodCallback(UA_Server *server, const UA_NodeId *sessionId,
                                        void *sessionContext, const UA_NodeId *methodId,
                                        void *methodContext, const UA_NodeId *objectId,
                                        void *objectContext, size_t inputSize,
                                        const UA_Variant *input, size_t outputSize,
                                        UA_Variant *output);
-    std::map<const NodeId, std::unique_ptr<ICallable>> callbacks;
-    std::vector<std::unique_ptr<DataSource>> datasources;
+    std::map<const NodeId, std::unique_ptr<ICallable>> callbacks{};
+    std::vector<std::unique_ptr<DataSource>> datasources{};
 
-    static void* sServer;
+    inline static void* sServer {nullptr};
 
     static UA_StatusCode
     internalRead(UA_Server *server, const UA_NodeId *sessionId, void *sessionContext,

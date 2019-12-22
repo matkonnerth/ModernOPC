@@ -81,7 +81,7 @@ Server::internalRead(UA_Server *server, const UA_NodeId *sessionId,
     if(!nodeContext)
         return UA_STATUSCODE_BADNODATA;
 
-    NodeInfo* info = static_cast<NodeInfo*>(nodeContext);
+    auto info = static_cast<NodeInfo*>(nodeContext);
     for(auto &ds : static_cast<Server *>(sServer)->getDataSources())
     {
         if(info->getDataSourceKey().compare(ds->getKey())==0)
@@ -108,6 +108,4 @@ Server::internalWrite(UA_Server *server, const UA_NodeId *sessionId,
     ds->write(var);
     return UA_STATUSCODE_GOOD;
 }
-
-void* Server::sServer =nullptr;
 }

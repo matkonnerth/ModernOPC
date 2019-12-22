@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.0)
 project(open62541Wrapper)
 
+
+set(DO_CLANG_TIDY clang-tidy -checks=-*,modernize-*,performance-*,boost-*)
+set(COMPILER_OPTIONS -Werror -Wall -Wextra -pedantic-errors -Wconversion -Wsign-conversion -Wpedantic -Weffc++ -Wno-unused-parameter)
 add_subdirectory(open62541)
 
 add_library(wrapper SHARED
@@ -16,10 +19,14 @@ target_include_directories(wrapper
 #get rid of this public
 target_link_libraries(wrapper PUBLIC open62541)
 target_compile_features(wrapper PRIVATE cxx_std_17)
+target_compile_options(wrapper PRIVATE ${COMPILER_OPTIONS})
+set_target_properties(wrapper PROPERTIES CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
 
 add_executable(appserver main.cpp)
 target_link_libraries(appserver PRIVATE wrapper)
 target_compile_features(appserver PRIVATE cxx_std_17)
+target_compile_options(appserver PRIVATE ${COMPILER_OPTIONS})
+set_target_properties(appserver PROPERTIES CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
 
 
 add_subdirectory(tests)
@@ -31,4 +38,6 @@ target_link_libraries(test_variant PRIVATE open62541)
 target_compile_features(test_variant PRIVATE cxx_std_17)
 
 add_executable(statemachine statemachine.cpp)
-#target_compile_options(statemachine PRIVATE -Werror -Wall -Wextra -pedantic-errors -Wconversion -Wsign-conversion -Wpedantic)
+target_compile_features(statemachine PRIVATE cxx_std_17)
+target_compile_options(statemachine PRIVATE ${COMPILER_OPTIONS})
+set_target_properties(statemachine PROPERTIES CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
