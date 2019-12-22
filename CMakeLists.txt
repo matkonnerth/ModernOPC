@@ -17,7 +17,7 @@ target_include_directories(wrapper
     )
 
 #get rid of this public
-target_link_libraries(wrapper PUBLIC open62541)
+target_link_libraries(wrapper PRIVATE open62541)
 target_compile_features(wrapper PRIVATE cxx_std_17)
 target_compile_options(wrapper PRIVATE ${COMPILER_OPTIONS})
 set_target_properties(wrapper PROPERTIES CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
