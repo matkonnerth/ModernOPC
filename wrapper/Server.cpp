@@ -2,7 +2,8 @@
 #include <open62541/server.h>
 #include <open62541/server_config_default.h>
 #include <open62541/plugin/nodesetLoader.h>
-#include <NodeInfo.h>
+#include <NodeMetaInfo.h>
+#include <NodeId.h>
 
 namespace opc {
 Server::Server() : isRunning{true} {
@@ -19,10 +20,10 @@ Server::run() {
 }
 
 void
-Server::registerDataSource(std::unique_ptr<DataSource> src) {
-    //UA_Server_setNodeContext(server, id.toUA_NodeId(), &src);
-    //UA_Server_setVariableNode_dataSource(server, id.toUA_NodeId(), src.getRawSource());
-    datasources.push_back(std::move(src));
+Server::registerDataSource(const std::string &key,
+                           std::function<void(const NodeId &id, Variant &var)> read,
+                           std::function<void(const NodeId &id, Variant &var)> write) {
+    datasources.push_back(std::make_unique<DataSource>(key, read, write));
 }
 
 void Server::loadNodeset(const std::string &path)
@@ -81,17 +82,17 @@ Server::internalRead(UA_Server *server, const UA_NodeId *sessionId,
     if(!nodeContext)
         return UA_STATUSCODE_BADNODATA;
 
-    auto info = static_cast<NodeInfo*>(nodeContext);
+    auto info = static_cast<NodeMetaInfo*>(nodeContext);
     for(auto &ds : static_cast<Server *>(sServer)->getDataSources())
     {
         if(info->getDataSourceKey().compare(ds->getKey())==0)
         {
             Variant var{&value->value};
-            ds->read(var);
+            ds->read(NodeId{*nodeId}, var);
             return UA_STATUSCODE_GOOD;
         }
     }
-    return UA_STATUSCODE_BADNODATA;    
+    return UA_STATUSCODE_BADNODATA;
 }
 
 UA_StatusCode
@@ -105,7 +106,7 @@ Server::internalWrite(UA_Server *server, const UA_NodeId *sessionId,
     // TODO: can we avoid this copy?
     // we can avoid it at the moment, because it's copied in Variant.get<>()
     Variant var{const_cast<UA_Variant *>(&value->value)};
-    ds->write(var);
+    ds->write(NodeId{*nodeId}, var);
     return UA_STATUSCODE_GOOD;
 }
 }

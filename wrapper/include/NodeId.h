@@ -3,6 +3,10 @@
 #include <iostream>
 #include <variant>
 
+namespace opc
+{
+
+
 class NodeId {
     enum class IdentifierType { NUMERIC, STRING };
 
@@ -81,3 +85,5 @@ class NodeId {
     IdentifierType type {IdentifierType::NUMERIC};
     std::variant<int, std::string> i{0};
 };
+
+}  // namespace opc

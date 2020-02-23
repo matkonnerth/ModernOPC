@@ -4,7 +4,7 @@
 
 /*
 
-NodeInfo in nodeContext: pair<datasourceKey, nativekey> for attributes
+NodeInfo in nodeContext: pair<datasourceKey> for attributes
 
 
 
@@ -19,7 +19,7 @@ Datasource
   write(Variant var)
 
 
-UA_Server_Read(NodeInfo, NodeId, AttributeId, ) -> 
+UA_Server_Read(NodeInfo, NodeId, AttributeId, ) ->
   if NodeInfo[attribute]!=null
   -> getDatasource -> read()
   -> else getDatasource(NodeId)
@@ -29,35 +29,31 @@ UA_Server_Read(NodeInfo, NodeId, AttributeId, ) ->
 
 namespace opc {
 class Variant;
+class NodeId;
 class DataSource {
   public:
-    DataSource(const std::string &key, std::function<void(Variant &var)> read)
-        : key(key), storedRead(read), storedWrite(nullptr){}
-
-    DataSource(const std::string &key, std::function<void(Variant &var)> read,
-               std::function<void(Variant &var)> write)
-        : key(key), storedRead(read), storedWrite(write) {}
+    DataSource(const std::string &key, std::function<void(const NodeId&, Variant &var)> read,
+               std::function<void(const NodeId&, Variant &var)> write)
+        : key(key), m_read(read), m_write(write) {}
 
     void
-    read(Variant &var)
-    {
-      storedRead(var);
+    read(const NodeId& id, Variant &var) {
+        m_read(id, var);
     }
 
     void
-    write(Variant &var)
-    {
-      storedRead(var);
+    write(const NodeId& id, Variant &var) {
+        m_write(id, var);
     }
 
-    const std::string& getKey() const
-    {
-      return key;
+    const std::string &
+    getKey() const {
+        return key;
     }
 
   private:
     std::string key;
-    std::function<void(Variant &var)> storedRead;
-    std::function<void(Variant &var)> storedWrite;
+    std::function<void(const NodeId&, Variant &)> m_read;
+    std::function<void(const NodeId&, Variant &)> m_write;
 };
-}
+}  // namespace opc

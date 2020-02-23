@@ -5,7 +5,7 @@
 #include <DataSource.h>
 #include <NodeId.h>
 #include <MethodWrapper.h>
-#include <NodeInfo.h>
+#include <NodeMetaInfo.h>
 
 struct UA_Server;
 namespace opc {
@@ -22,10 +22,10 @@ class Server {
     void run();
 
     void loadNodeset(const std::string& path);
-    template <typename M>
+    template <typename T>
     void
-    addMethod(const std::string &name, const M &callback) {
-        std::vector<UA_Argument> inputArgs = MethodTraits<M>::getInputArguments();
+    addMethod(const std::string &name, const T &callback) {
+        std::vector<UA_Argument> inputArgs = MethodTraits<T>::getInputArguments();
 
         UA_Argument *data = inputArgs.data();
 
@@ -37,7 +37,7 @@ class Server {
             server, UA_NODEID_NULL, UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER),
             UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
             UA_QUALIFIEDNAME(1, const_cast<char *>(name.c_str())), methAttr, nullptr,
-            MethodTraits<M>::getNumArgs(), data, 0, nullptr, nullptr, nullptr);
+            MethodTraits<T>::getNumArgs(), data, 0, nullptr, nullptr, nullptr);
     }
 
     template <typename... ARGS>
@@ -53,7 +53,7 @@ class Server {
     template <typename T>
     void
     addVariableNode(const NodeId &parentId, const NodeId &requestedId,
-                    const std::string &browseName, T initialValue, std::unique_ptr<NodeInfo> info) {
+                    const std::string &browseName, T initialValue, std::unique_ptr<NodeMetaInfo> info) {
         UA_VariableAttributes attr = TypeConverter::getVariableAttributes(initialValue);
         attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
         UA_Server_addVariableNode(
@@ -79,13 +79,13 @@ class Server {
                                   attr, nullptr, nullptr);
     }
 
-    void registerDataSource(std::unique_ptr<DataSource> src);
+    void registerDataSource(const std::string &key,
+                               std::function<void(const NodeId &id, Variant &var)> read,
+                               std::function<void(const NodeId &id, Variant &var)> write);
 
-    auto& getDataSources()
-    {
-      return datasources;
+        auto &getDataSources() {
+        return datasources;
     }
-
 
   private:
     UA_Server *server {nullptr};
