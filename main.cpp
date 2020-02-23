@@ -84,8 +84,7 @@ main() {
 
     // loading of a xml nodeset
     s.loadNodeset("../models/serviceobject.xml");
-    std::function<void(std::string)> load =
-        std::bind(&opc::Server::loadNodeset, &s, std::placeholders::_1);
+    std::function<void(std::string)> load = [&](std::string path){s.loadNodeset(path);};
 
     // bind opc ua methods to business logic
     s.bindMethodNode(opc::NodeId(2, 7003), load);
