@@ -23,7 +23,7 @@ target_compile_options(wrapper PRIVATE ${COMPILER_OPTIONS})
 set_target_properties(wrapper PROPERTIES CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
 
 add_executable(appserver main.cpp)
-target_link_libraries(appserver PRIVATE wrapper)
+target_link_libraries(appserver PRIVATE wrapper pthread)
 target_compile_features(appserver PRIVATE cxx_std_17)
 target_compile_options(appserver PRIVATE ${COMPILER_OPTIONS})
 set_target_properties(appserver PROPERTIES CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
