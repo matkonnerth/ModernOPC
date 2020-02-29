@@ -71,12 +71,6 @@ void run()
 int
 main() {
     createServer();
-    /*
-    for(auto cnt = 0; cnt < 100000; cnt++) {
-        s->addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, cnt),
-                           "demoNode" + std::to_string(cnt), 42);
-    }
-    */
     s->addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, 233),
                        "demoNode" + std::to_string(233), 42);
 
@@ -113,8 +107,8 @@ main() {
 
     // loading of a xml nodeset
     s->loadNodeset("../models/serviceobject.xml");
-    s->loadNodeset("../../nodesetLoader/nodesets/testNodeset.xml");
-    s->loadNodeset("../../open62541/deps/ua-nodeset/DI/Opc.Ua.Di.NodeSet2.xml");
+    s->loadNodeset("../../nodesetLoader/nodesets/testNodeset100nodes.xml");
+    //s->loadNodeset("../../open62541/deps/ua-nodeset/DI/Opc.Ua.Di.NodeSet2.xml");
     std::function<void(std::string)> load = [&](std::string path) {
         s->loadNodeset(path);
     };

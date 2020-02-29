@@ -36,22 +36,6 @@ void Server::loadNodeset(const std::string &path)
     handler.userContext = server;
     handler.file = path.c_str();
     loadFile(&handler);
-
-/*
-    for(int cnt = 1; cnt < argc; cnt++) {
-        handler.file = argv[cnt];
-        if(!loadFile(&handler)) {
-            printf("nodeset could not be loaded, exit\n");
-            return EXIT_FAILURE;
-        }
-    }
-
-    FileHandler f;
-    f.addNamespace = UA_Server_addNamespace;
-    f.server = server;
-    f.file = path.c_str();
-    UA_XmlImport_loadFile(&f);
-*/
 }
 
 bool
