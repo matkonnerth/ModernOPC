@@ -71,11 +71,19 @@ void run()
 int
 main() {
     createServer();
-    std::thread serverThread{run};
+    /*
+    for(auto cnt = 0; cnt < 100000; cnt++) {
+        s->addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, cnt),
+                           "demoNode" + std::to_string(cnt), 42);
+    }
+    */
+    s->addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, 233),
+                       "demoNode" + std::to_string(233), 42);
+
     //wild west
     //server is accessed from multiple threads
     using namespace std::chrono_literals;
-    std::this_thread::sleep_for(5s);
+    std::this_thread::sleep_for(0s);
     std::vector<float> fVector{1.1f, 2.2f, 3.3f};
 
     MyDataSource source1{"source1"};
@@ -100,8 +108,13 @@ main() {
     s->addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, "source1Var"), "source1Var", 12,
                       std::make_unique<opc::NodeMetaInfo>("source1"));
 
+    
+    
+
     // loading of a xml nodeset
     s->loadNodeset("../models/serviceobject.xml");
+    s->loadNodeset("../../nodesetLoader/nodesets/testNodeset.xml");
+    s->loadNodeset("../../open62541/deps/ua-nodeset/DI/Opc.Ua.Di.NodeSet2.xml");
     std::function<void(std::string)> load = [&](std::string path) {
         s->loadNodeset(path);
     };
@@ -115,5 +128,6 @@ main() {
 
     // not really useful now, lacks parent node id
     s->addMethod("addMethod", &add);
+    std::thread serverThread{run};
     serverThread.join();
 }
