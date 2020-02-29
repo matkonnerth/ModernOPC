@@ -3,15 +3,15 @@
 
 static UA_NodeId
 getNodeIdFromChars(TNodeId id) {
-    if(id.id == 0) {
+    if(!id.id) {
         return UA_NODEID_NULL;
     }
-    UA_UInt16 nsidx = (UA_UInt16)id.nsIdx;
+    auto nsidx = static_cast<UA_UInt16>(id.nsIdx);
 
     switch(id.id[0]) {
         // integer
         case 'i': {
-            UA_UInt32 nodeId = (UA_UInt32)atoi(&id.id[2]);
+            auto nodeId = static_cast<UA_UInt32>(atoi(&id.id[2]));
             return UA_NODEID_NUMERIC(nsidx, nodeId);
             break;
         }
@@ -33,12 +33,11 @@ getTypeDefinitionIdFromChars2(const TNode *node) {
         hierachicalRef = hierachicalRef->next;
     }
     return UA_NODEID_NULL;
-    return UA_NODEID_NULL;
 }
 
 static UA_NodeId
 getReferenceTypeId(const Reference *ref) {
-    if(ref == NULL) {
+    if(!ref) {
         return UA_NODEID_NULL;
     }
     if(!strcmp(ref->refType.idString, "HasProperty")) {
@@ -63,7 +62,7 @@ getReferenceTarget(const Reference *ref);
 
 UA_NodeId
 getReferenceTarget(const Reference *ref) {
-    if(ref == NULL) {
+    if(!ref) {
         return UA_NODEID_NULL;
     }
     return getNodeIdFromChars(ref->target);
@@ -82,12 +81,12 @@ getHierachicalInverseReference(const TNode *node) {
         }
         hierachicalRef = hierachicalRef->next;
     }
-    return NULL;
+    return nullptr;
 }
 
 void
 importNodesCallback(void *userContext, const TNode *node) {
-    UA_Server *server = (UA_Server *)userContext;
+    auto *server = static_cast<UA_Server *>(userContext);
     UA_NodeId id = getNodeIdFromChars(node->id);
     switch(node->nodeClass) {
         case NODECLASS_OBJECT: {
@@ -106,7 +105,7 @@ importNodesCallback(void *userContext, const TNode *node) {
 
             UA_StatusCode retval = UA_Server_addObjectNode(
                 server, id, parentId, refId, UA_QUALIFIEDNAME(1, node->browseName),
-                typeDefId, oAttr, NULL, NULL);
+                typeDefId, oAttr, nullptr, nullptr);
             if(retval != UA_STATUSCODE_GOOD) {
                 printf("adding object node %s failed\n", node->id.idString);
             }
@@ -131,7 +130,7 @@ importNodesCallback(void *userContext, const TNode *node) {
 
             UA_StatusCode retval = UA_Server_addMethodNode(
                 server, id, parentId, refId, UA_QUALIFIEDNAME(1, node->browseName), attr,
-                NULL, 0, NULL, 0, NULL, NULL, NULL);
+                nullptr, 0, nullptr, 0, nullptr, nullptr, nullptr);
 
             if(retval != UA_STATUSCODE_GOOD) {
                 printf("adding method node %s failed\n", node->id.idString);
@@ -151,7 +150,7 @@ importNodesCallback(void *userContext, const TNode *node) {
 
             UA_StatusCode retval = UA_Server_addObjectTypeNode(
                 server, id, parentId, refId, UA_QUALIFIEDNAME(1, node->browseName), oAttr,
-                NULL, NULL);
+                nullptr, nullptr);
 
             if(retval != UA_STATUSCODE_GOOD) {
                 printf("adding objecttype node %s failed\n", node->id.idString);
@@ -172,7 +171,7 @@ importNodesCallback(void *userContext, const TNode *node) {
 
             UA_StatusCode retval = UA_Server_addReferenceTypeNode(
                 server, id, parentId, refId, UA_QUALIFIEDNAME(1, node->browseName), attr,
-                NULL, NULL);
+                nullptr, nullptr);
 
             if(retval != UA_STATUSCODE_GOOD) {
                 printf("adding reftype node %s failed\n", node->id.idString);
@@ -200,7 +199,7 @@ importNodesCallback(void *userContext, const TNode *node) {
 
             UA_StatusCode retval = UA_Server_addVariableTypeNode(
                 server, id, parentId, refId, UA_QUALIFIEDNAME(1, node->browseName),
-                typeDefId, attr, NULL, NULL);
+                typeDefId, attr, nullptr, nullptr);
 
             if(retval != UA_STATUSCODE_GOOD) {
                 printf("adding variabletype node %s failed\n", node->id.idString);
@@ -231,7 +230,7 @@ importNodesCallback(void *userContext, const TNode *node) {
             UA_NodeId typeDefId = getTypeDefinitionIdFromChars2(node);
             UA_StatusCode retval = UA_Server_addVariableNode(
                 server, id, parentId, refId, UA_QUALIFIEDNAME(1, node->browseName),
-                typeDefId, attr, NULL, NULL);
+                typeDefId, attr, nullptr, nullptr);
             if(retval != UA_STATUSCODE_GOOD) {
                 printf("adding variable node %s failed\n", node->id.idString);
             }
@@ -247,7 +246,7 @@ importNodesCallback(void *userContext, const TNode *node) {
 
             UA_StatusCode retval = UA_Server_addDataTypeNode(
                 server, id, parentId, refId, UA_QUALIFIEDNAME(1, node->browseName), attr,
-                NULL, NULL);
+                nullptr, nullptr);
             if(retval != UA_STATUSCODE_GOOD) {
                 printf("adding datatype node %s failed\n", node->id.idString);
             }
