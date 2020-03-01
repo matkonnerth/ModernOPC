@@ -7,6 +7,8 @@
 
 template <typename ClassType, typename ReturnType, typename... Args>
 struct MethodTraitsBase {
+    using R = ReturnType;
+
     inline static size_t
     getNumArgs() {
         return sizeof...(Args);

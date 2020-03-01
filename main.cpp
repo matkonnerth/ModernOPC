@@ -46,7 +46,7 @@ setVectorValue(const opc::NodeId &id, opc::Variant &var) {
     }
 }
 
-void
+std::string
 NodesetLoader_unload(std::vector<std::string> s1, const std::string &s2,
                      const std::string &s3, float f) {
     for(auto &s : s1) {
@@ -54,6 +54,7 @@ NodesetLoader_unload(std::vector<std::string> s1, const std::string &s2,
         std::cout << std::endl;
     }
     std::cout << s2 << s3 << f << std::endl;
+    return "test";
 }
 
 opc::Server* s;
@@ -113,11 +114,13 @@ main() {
         s->loadNodeset(path);
     };
 
+    //using returnType = typename std::function<load>::result_type;
+
     // bind opc ua methods to business logic
     s->bindMethodNode(opc::NodeId(2, 7003), load);
     s->bindMethodNode(
         opc::NodeId(2, 7004),
-        std::function<void(std::vector<std::string>, std::string, std::string, float)>{
+        std::function<std::string(std::vector<std::string>, std::string, std::string, float)>{
             NodesetLoader_unload});
 
     // not really useful now, lacks parent node id

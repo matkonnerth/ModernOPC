@@ -18,33 +18,58 @@ for_each(Tuple &&tuple, F &&f) {
                   std::make_index_sequence<N>{});
 }
 
-namespace opc
-{
+namespace opc {
 
 class ICallable {
   public:
     virtual bool
-    call(const std::vector<Variant>&inputArguments, std::vector<Variant>& outputArguments) = 0;
-    virtual ~ICallable()=default;
+    call(const std::vector<Variant> &inputArguments,
+         std::vector<Variant> &outputArguments) = 0;
+    virtual ~ICallable() = default;
 };
 
-template <typename... ARGS> class CallWithOutOutputArgs : public ICallable {
+template <typename R, typename... INARGS> class Call : public ICallable {
   public:
-    CallWithOutOutputArgs(std::function<void(ARGS...)> f) : m_f(f) {}
+    Call(std::function<R(INARGS...)> f) : m_f(f) {}
     virtual bool
     call(const std::vector<Variant> &inputArguments,
          std::vector<Variant> &outputArguments) override {
-        std::tuple<ARGS...> calculatedArgs;
-        size_t i=0;
+        std::tuple<INARGS...> inputArgs;
+        size_t i = 0;
 
-      for_each(calculatedArgs, [&](auto &x) { x=inputArguments[i].get<typename std::remove_reference<decltype(x)>::type>();i++; });
-      std::apply(m_f, calculatedArgs);
-      return true;
+        for_each(inputArgs, [&](auto &x) {
+            x = inputArguments[i]
+                    .get<typename std::remove_reference<decltype(x)>::type>();
+            i++;
+        });
+        R result = std::apply(m_f, inputArgs);
+        return true;
     }
 
   private:
-    std::function<void(ARGS...)> m_f{};
-    std::tuple<ARGS...> args{};
-    const size_t n = sizeof...(ARGS);
+    std::function<R(INARGS...)> m_f{};
 };
-}
+
+template <typename... INARGS> 
+class Call<void, INARGS...> : public ICallable {
+  public:
+    Call(std::function<void (INARGS...)> f) : m_f(f) {}
+    virtual bool
+    call(const std::vector<Variant> &inputArguments,
+         std::vector<Variant> &outputArguments) override {
+        std::tuple<INARGS...> inputArgs;
+        size_t i = 0;
+
+        for_each(inputArgs, [&](auto &x) {
+            x = inputArguments[i]
+                    .get<typename std::remove_reference<decltype(x)>::type>();
+            i++;
+        });
+        std::apply(m_f, inputArgs);
+        return true;
+    }
+
+  private:
+    std::function<void(INARGS...)> m_f{};
+};
+}  // namespace opc

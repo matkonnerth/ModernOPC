@@ -33,18 +33,32 @@ class Server {
         methAttr.executable = true;
         methAttr.userExecutable = true;
 
+        UA_NodeId newId;
         UA_Server_addMethodNode(
             server, UA_NODEID_NULL, UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER),
             UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
             UA_QUALIFIEDNAME(1, const_cast<char *>(name.c_str())), methAttr, nullptr,
-            MethodTraits<T>::getNumArgs(), data, 0, nullptr, nullptr, nullptr);
+            MethodTraits<T>::getNumArgs(), data, 0, nullptr, nullptr, &newId);
+
+        UA_Server_setMethodNode_callback(server, newId,
+                                         internalMethodCallback);
+
+
+        
+/*
+        std::function test{callback};
+        using returnType = typename std::function<test>::result_type;
+
+            callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
+                newId, std::make_unique < Call<>(test)));
+                */
     }
 
-    template <typename... ARGS>
-    void bindMethodNode(const NodeId &id, std::function<void(ARGS...)> fn)
+    template <typename R, typename... ARGS>
+    void bindMethodNode(const NodeId &id, std::function<R(ARGS...)> fn)
     {
         UA_Server_setMethodNode_callback(server, id.toUA_NodeId(), internalMethodCallback);
-        callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(id, std::make_unique<CallWithOutOutputArgs<ARGS...>>(fn)));
+        callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(id, std::make_unique<Call<R, ARGS...>>(fn)));
         UA_Server_setNodeContext(server, id.toUA_NodeId(), this);
     }
 
