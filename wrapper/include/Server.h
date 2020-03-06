@@ -22,12 +22,11 @@ class Server {
     void run();
 
     void loadNodeset(const std::string& path);
-    template <typename T>
+    template <typename R, typename...ARGS>
     void
-    addMethod(const std::string &name, const T &callback) {
-        std::vector<UA_Argument> inputArgs = MethodTraits<T>::getInputArguments();
-
-        UA_Argument *data = inputArgs.data();
+    addMethod(const std::string &name, std::function<R(ARGS...)> fn) {
+        std::vector<UA_Argument> inputArgs = MethodTraits<decltype(fn)>::getInputArguments();
+        std::vector<UA_Argument> outputArgs = MethodTraits<decltype(fn)>::getOutputArguments();
 
         UA_MethodAttributes methAttr = UA_MethodAttributes_default;
         methAttr.executable = true;
@@ -38,20 +37,17 @@ class Server {
             server, UA_NODEID_NULL, UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER),
             UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
             UA_QUALIFIEDNAME(1, const_cast<char *>(name.c_str())), methAttr, nullptr,
-            MethodTraits<T>::getNumArgs(), data, 0, nullptr, nullptr, &newId);
+            MethodTraits<decltype(fn)>::getNumArgs(), inputArgs.data(), 1, outputArgs.data(), nullptr, &newId);
 
         UA_Server_setMethodNode_callback(server, newId,
                                          internalMethodCallback);
-
+        UA_Server_setNodeContext(server, newId, this);
 
         
-/*
-        std::function test{callback};
-        using returnType = typename std::function<test>::result_type;
 
-            callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
-                newId, std::make_unique < Call<>(test)));
-                */
+        callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
+            newId,
+            std::make_unique<Call<R, ARGS...>>(fn)));
     }
 
     template <typename R, typename... ARGS>

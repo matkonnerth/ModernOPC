@@ -69,6 +69,11 @@ Server::internalMethodCallback(UA_Server *server, const UA_NodeId *sessionId,
         }
         if (s->call(NodeId(*methodId), inputArgs, outputArgs))
         {
+            outputSize=outputArgs.size();
+            if(outputSize==1)
+            {
+                UA_Variant_copy(outputArgs[0].getImpl().get(), output);
+            }
             return UA_STATUSCODE_GOOD;
         }
         return UA_STATUSCODE_BADMETHODINVALID;

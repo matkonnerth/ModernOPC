@@ -1,5 +1,6 @@
 #include <open62541/server.h>
 #include <open62541/types.h>
+#include <functional>
 #include <iostream>
 #include <typeinfo>
 #include <vector>
@@ -7,7 +8,6 @@
 
 template <typename ClassType, typename ReturnType, typename... Args>
 struct MethodTraitsBase {
-    using R = ReturnType;
 
     inline static size_t
     getNumArgs() {
@@ -51,9 +51,36 @@ struct MethodTraitsBase {
         // return
         return inputArgument;
     }
+
+    inline static std::vector<UA_Argument>
+    getOutputArguments() {
+
+        //return std::vector<UA_Argument>();
+        return {getOutputArgument<ReturnType>()};
+    }
+
+    template <typename T>
+    inline static UA_Argument
+    getOutputArgument() {
+
+        UA_NodeId id = TypeConverter::uaTypeNodeIdFromCpp<T>();
+        UA_Argument inputArgument;
+        UA_Argument_init(&inputArgument);
+        // create n-th argument with name "Arg" + number
+        inputArgument.description =
+            UA_LOCALIZEDTEXT((char *)"", (char *)"Method Argument");
+        inputArgument.name = UA_STRING_NULL;
+        inputArgument.dataType = id;
+        inputArgument.valueRank = UA_VALUERANK_SCALAR;
+        // return
+        return inputArgument;
+    }
 };
 
 template <typename T> struct MethodTraits : MethodTraits<decltype(&T::operator())> {};
 
 template <typename R, typename... Args>
 struct MethodTraits<R (*)(Args...)> : MethodTraitsBase<void, R, Args...> {};
+
+template <typename R, typename... Args>
+struct MethodTraits<std::function<R(Args...)>> : MethodTraitsBase<void, R, Args...> {};

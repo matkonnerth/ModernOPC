@@ -43,6 +43,9 @@ template <typename R, typename... INARGS> class Call : public ICallable {
             i++;
         });
         R result = std::apply(m_f, inputArgs);
+        Variant var;
+        var(result);
+        outputArguments.push_back(var);
         return true;
     }
 
@@ -68,8 +71,36 @@ class Call<void, INARGS...> : public ICallable {
         std::apply(m_f, inputArgs);
         return true;
     }
+    //{result};
 
   private:
     std::function<void(INARGS...)> m_f{};
 };
+/*
+template <typename R, typename...INARGS> class Call<std::function<R(INARGS...)>> : public ICallable {
+  public:
+    Call(std::function<R(INARGS...)> f) : m_f(f) {}
+    virtual bool
+    call(const std::vector<Variant> &inputArguments,
+         std::vector<Variant> &outputArguments) override {
+        std::tuple<INARGS...> inputArgs;
+        size_t i = 0;
+
+        for_each(inputArgs, [&](auto &x) {
+            x = inputArguments[i]
+                    .get<typename std::remove_reference<decltype(x)>::type>();
+            i++;
+        });
+        R result = std::apply(m_f, inputArgs);
+        Variant var;
+        var(result);
+        outputArguments.push_back(var);
+        return true;
+    }
+
+  private:
+    std::function<R(INARGS...)> m_f{};
+};
+*/
+
 }  // namespace opc
