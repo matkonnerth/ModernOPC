@@ -1,5 +1,6 @@
 #include <open62541/server.h>
 #include "nodesetLoader.h"
+#include "value.h"
 
 static UA_NodeId
 getNodeIdFromChars(TNodeId id) {
@@ -25,7 +26,7 @@ getNodeIdFromChars(TNodeId id) {
 
 static UA_NodeId
 getTypeDefinitionIdFromChars2(const TNode *node) {
-    Reference *hierachicalRef = node->nonHierachicalRefs;
+    Reference *hierachicalRef = node->hierachicalRefs;
     while(hierachicalRef) {
         if(!strcmp("HasTypeDefinition", hierachicalRef->refType.idString)) {
             return getNodeIdFromChars(hierachicalRef->target);
@@ -211,12 +212,27 @@ importNodesCallback(void *userContext, const TNode *node) {
             attr.dataType = getNodeIdFromChars(((const TVariableNode *)node)->datatype);
             attr.valueRank = atoi(((const TVariableNode *)node)->valueRank);
             if(attr.valueRank >= 0) {
-                if(!strcmp(((const TVariableNode *)node)->arrayDimensions, "")) {
+                if(!strcmp(((const TVariableNode *)node)->arrayDimensions, "1")) {
                     attr.arrayDimensionsSize = 1;
                     UA_UInt32 arrayDimensions[1];
-                    arrayDimensions[0] = 0;
+                    arrayDimensions[0] = 1;
                     attr.arrayDimensions = &arrayDimensions[0];
                 }
+                }
+
+            TVariableNode* varnode = (TVariableNode *)node;
+            if(varnode->value)
+            {
+                if(varnode->value->isArray)
+                {
+                    UA_Variant_setArray(&attr.value, varnode->value->value,
+                                        varnode->value->arrayCnt,
+                                        varnode->value->datatype);
+                }
+                else
+                {
+                    UA_Variant_setScalar(&attr.value, varnode->value->value, varnode->value->datatype);
+                }                
             }
 
             UA_NodeId parentId =
@@ -229,7 +245,7 @@ importNodesCallback(void *userContext, const TNode *node) {
             UA_NodeId refId = getReferenceTypeId(ref);
             UA_NodeId typeDefId = getTypeDefinitionIdFromChars2(node);
             UA_StatusCode retval = UA_Server_addVariableNode(
-                server, id, parentId, refId, UA_QUALIFIEDNAME(1, node->browseName),
+                server, id, parentId, refId, UA_QUALIFIEDNAME(0, node->browseName),
                 typeDefId, attr, nullptr, nullptr);
             if(retval != UA_STATUSCODE_GOOD) {
                 printf("adding variable node %s failed\n", node->id.idString);

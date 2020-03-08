@@ -5,6 +5,7 @@
 #include <NodeMetaInfo.h>
 #include "nodesetLoader.h"
 #include "import.h"
+#include "value.h"
 
 namespace opc {
 Server::Server() : isRunning{true} {
@@ -35,6 +36,14 @@ void Server::loadNodeset(const std::string &path)
     handler.addNamespace = addNamespaceCallback;
     handler.userContext = server;
     handler.file = path.c_str();
+
+    ValueInterface valIf;
+    valIf.userData=nullptr;
+    valIf.newValue = Value_new;
+    valIf.start = Value_start;
+    valIf.end = Value_end;
+    valIf.finish = Value_finish;
+    handler.valueHandling = &valIf;
     loadFile(&handler);
 }
 
