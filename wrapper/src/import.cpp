@@ -228,6 +228,14 @@ importNodesCallback(void *userContext, const TNode *node) {
                     UA_Variant_setArray(&attr.value, varnode->value->value,
                                         varnode->value->arrayCnt,
                                         varnode->value->datatype);
+                    if(!attr.arrayDimensions)
+                    {
+                        attr.arrayDimensionsSize=1;
+                        attr.arrayDimensionsSize = 1;
+                        UA_UInt32 arrayDimensions[1];
+                        arrayDimensions[0] = 1;
+                        attr.arrayDimensions = &arrayDimensions[0];
+                    }
                     attr.arrayDimensions[0] = static_cast<UA_UInt32>(varnode->value->arrayCnt);
                 }
                 else

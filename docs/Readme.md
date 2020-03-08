@@ -9,3 +9,4 @@ When I create an instance of this ObjectType, I want to bind it to the service i
   * structures
   * enumerations
 * refactor Variant handling
+* tests for nodeset import

@@ -2,6 +2,7 @@
 #include "conversion.h"
 #include <nodesetLoader.h>
 #include <open62541/types_generated.h>
+#include <cassert>
 
 
 

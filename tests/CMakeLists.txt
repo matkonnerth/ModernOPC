@@ -7,3 +7,5 @@
 
 #target_link_libraries(test_variant wrapper)
 #target_compile_features(test_variant PRIVATE cxx_std_17)
+
+add_subdirectory(import)
