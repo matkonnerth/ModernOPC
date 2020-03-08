@@ -1,13 +1,10 @@
 #include "value.h"
-#include "conversion.h"
-#include <nodesetLoader.h>
 #include <open62541/types_generated.h>
 #include <cassert>
+#include <nodesetLoader.h>
+#include "conversion.h"
 
-
-
-
-typedef void (*ConversionFn)(uintptr_t adr, char *value);
+using ConversionFn = void (*)(uintptr_t adr, char *value);
 
 static UA_StatusCode
 getMem(Value *val) {
@@ -18,27 +15,26 @@ getMem(Value *val) {
     if(!newVal) {
         return UA_STATUSCODE_BADOUTOFMEMORY;
     }
-    if(val->value)
-    {
+    if(val->value) {
         memcpy(newVal, val->value, val->typestack->type->memSize * val->arrayCnt);
         UA_free(val->value);
-    }    
+    }
     val->value = newVal;
     val->offset = val->typestack->type->memSize * val->arrayCnt;
     val->arrayCnt++;
     return UA_STATUSCODE_GOOD;
 }
 
-static TypeList* TypeList_push(TypeList* stack, const UA_DataType* newType)
-{
-    TypeList *newStack = (TypeList *)(UA_calloc(1, sizeof(TypeList)));
+static TypeList *
+TypeList_push(TypeList *stack, const UA_DataType *newType) {
+    auto *newStack = static_cast<TypeList*>(UA_calloc(1, sizeof(TypeList)));
     newStack->next = stack;
     newStack->type = newType;
     return newStack;
 }
 
-static TypeList* TypeList_pop(TypeList* stack)
-{
+static TypeList *
+TypeList_pop(TypeList *stack) {
     TypeList *tmp = stack->next;
     UA_free(stack);
     return tmp;
@@ -46,16 +42,15 @@ static TypeList* TypeList_pop(TypeList* stack)
 
 Value *
 Value_new(const TNode *node) {
-    if(!(node->nodeClass==NODECLASS_VARIABLE))
-    {
+    if(!(node->nodeClass == NODECLASS_VARIABLE)) {
         assert(false && "Value_new on node that is not a variable node\n");
     }
-    Value *val = (Value *)UA_calloc(1, sizeof(Value));
+    auto *val = static_cast<Value*>(UA_calloc(1, sizeof(Value)));
     val->state = VALUE_STATE_DATA;
     val->typestack = (TypeList *)UA_calloc(1, sizeof(TypeList));
 
     // looks only in UA_TYPES, should also look in custom types
-    UA_NodeId dataTypeId = getNodeIdFromChars(((TVariableNode*)node)->datatype);
+    UA_NodeId dataTypeId = getNodeIdFromChars(((TVariableNode *)node)->datatype);
 
     val->typestack->type = UA_findDataType(&dataTypeId);
     val->datatype = val->typestack->type;
@@ -97,8 +92,7 @@ Value_start(Value *val, const char *localname) {
             break;
         case VALUE_STATE_FINISHED:
         case VALUE_STATE_DATA:
-            if(val->state == VALUE_STATE_FINISHED)
-            {
+            if(val->state == VALUE_STATE_FINISHED) {
                 val->typestack = (TypeList *)UA_calloc(1, sizeof(TypeList));
                 val->typestack->type = val->datatype;
                 val->typestack->memberIndex = 0;
@@ -108,8 +102,8 @@ Value_start(Value *val, const char *localname) {
                     return;
                 }
                 if(val->typestack->type->members) {
-                    val->name =
-                        val->typestack->type->members[val->typestack->memberIndex].memberName;
+                    val->name = val->typestack->type->members[val->typestack->memberIndex]
+                                    .memberName;
                 } else {
                     val->name = val->typestack->type->typeName;
                 }
@@ -126,7 +120,7 @@ Value_start(Value *val, const char *localname) {
                     val->name = val->typestack->type->members[idx].memberName;
                     val->offset =
                         val->offset + val->typestack->type->members[idx].padding;
-                    
+
                     val->typestack = TypeList_push(
                         val->typestack,
                         &UA_TYPES[val->typestack->type->members[idx].memberTypeIndex]);
@@ -211,7 +205,7 @@ setDouble(uintptr_t adr, char *value) {
 
 static void
 setString(uintptr_t adr, char *value) {
-    UA_String *s = (UA_String *)adr;
+    auto *s = (UA_String *)adr;
     s->length = strlen(value);
     s->data = (UA_Byte *)value;
 }
@@ -221,13 +215,11 @@ setDateTime(uintptr_t adr, char *value) {
     printf("DateTime: %s currently not handled\n", value);
 }
 
-
 static void
 setNodeId(uintptr_t adr, char *value) {
     // todo: namespaceIndex should be converted?
-    *(UA_NodeId *)adr = extractNodeId(value);   //getNodeIdFromChars(value);
+    *(UA_NodeId *)adr = extractNodeId(value);  // getNodeIdFromChars(value);
 }
-
 
 static void
 setNotImplemented(uintptr_t adr, char *value) {
@@ -268,14 +260,12 @@ nextType(Value *val) {
     val->typestack = TypeList_pop(val->typestack);
     val->state = VALUE_STATE_DATA;
 
-    if(!val->typestack)
-    {
+    if(!val->typestack) {
         val->state = VALUE_STATE_FINISHED;
         return;
     }
 
-    if(val->typestack->memberIndex >= (size_t)val->typestack->type->membersSize-1)
-    {
+    if(val->typestack->memberIndex >= (size_t)val->typestack->type->membersSize - 1) {
         return;
     }
 
@@ -316,9 +306,10 @@ Value_end(Value *val, const char *localname, char *value) {
             break;
         case VALUE_STATE_QUALIFIEDNAME:
             if(!strcmp(localname, "NamespaceIndex")) {
-                setScalarValueWithAddress(val->offset + (uintptr_t) &
-                                              ((UA_QualifiedName *)val->value)->namespaceIndex,
-                                          UA_DATATYPEKIND_UINT16, value);
+                setScalarValueWithAddress(
+                    val->offset + (uintptr_t) &
+                        ((UA_QualifiedName *)val->value)->namespaceIndex,
+                    UA_DATATYPEKIND_UINT16, value);
             } else if(!strcmp(localname, "Name")) {
                 setScalarValueWithAddress(val->offset + (uintptr_t) &
                                               ((UA_QualifiedName *)val->value)->name,
@@ -348,30 +339,4 @@ Value_finish(Value *val) {
     if(VALUE_STATE_FINISHED != val->state) {
         printf("Warning: value finish called while value state != finished\n");
     }
-    /*
-    if(val->value) {
-        UA_VariableNode *varnode = (UA_VariableNode *)node;
-        if(!val->isArray) {
-            UA_StatusCode retval = UA_Variant_setScalarCopy(
-                &varnode->value.data.value.value, val->value, val->datatype);
-            if(!(UA_STATUSCODE_GOOD == retval)) {
-                printf("error on seting scalar\n");
-            } else {
-                varnode->value.data.value.hasValue = UA_TRUE;
-            }
-        } else {
-            UA_StatusCode retval =
-                UA_Variant_setArrayCopy(&varnode->value.data.value.value, val->value,
-                                        val->arrayCnt, val->datatype);
-            if(!(UA_STATUSCODE_GOOD == retval)) {
-                printf("error on seting array\n");
-            } else {
-                varnode->value.data.value.hasValue = UA_TRUE;
-            }
-        }
-    }
-    UA_free(val->value);
-    UA_free(val->typestack);
-    UA_free(val);
-    */
 }
