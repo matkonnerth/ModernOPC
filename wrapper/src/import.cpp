@@ -241,7 +241,9 @@ importNodesCallback(void *userContext, const TNode *node) {
                 else
                 {
                     UA_Variant_setScalar(&attr.value, varnode->value->value, varnode->value->datatype);
-                }                
+                }
+                //todo: value is copied??
+                Value_delete(varnode->value);
             }
 
             UA_NodeId parentId =

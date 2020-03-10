@@ -64,6 +64,7 @@ class Server {
     void
     addVariableNode(const NodeId &parentId, const NodeId &requestedId,
                     const std::string &browseName, T initialValue, std::unique_ptr<NodeMetaInfo> info) {
+        //memleak with info.release()!!
         UA_VariableAttributes attr = TypeConverter::getVariableAttributes(initialValue);
         attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
         UA_Server_addVariableNode(

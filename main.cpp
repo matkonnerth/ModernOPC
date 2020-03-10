@@ -139,6 +139,7 @@ main() {
     s->addMethod("ob1", m);
 
 
-    std::thread serverThread{run};
-    serverThread.join();
+    //std::thread serverThread{run};
+    run();
+    //serverThread.join();
 }

@@ -340,3 +340,18 @@ Value_finish(Value *val) {
         printf("Warning: value finish called while value state != finished\n");
     }
 }
+
+void
+Value_delete(Value *val) {
+    if(!val)
+        return;
+    //we do not delete the data
+    while(val->typestack)
+    {
+        TypeList* next = val->typestack->next;
+        UA_free(val->typestack);
+        val->typestack = next;
+    }
+    UA_free(val->value);
+    UA_free(val);
+}

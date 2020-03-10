@@ -43,6 +43,7 @@ bool Server::loadNodeset(const std::string &path)
     valIf.start = Value_start;
     valIf.end = Value_end;
     valIf.finish = Value_finish;
+    valIf.deleteValue = Value_delete;
     handler.valueHandling = &valIf;
     return loadFile(&handler);
 }
