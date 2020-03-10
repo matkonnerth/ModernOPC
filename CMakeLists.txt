@@ -5,6 +5,8 @@ project(open62541Wrapper)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)
 
+enable_testing()
+
 set(DO_CLANG_TIDY clang-tidy -checks=-*,modernize-*,performance-*,boost-*)
 set(COMPILER_OPTIONS -Werror -Wall -Wextra -pedantic-errors -Wconversion -Wsign-conversion -Wpedantic -Weffc++ -Wno-unused-parameter)
 add_subdirectory(open62541)

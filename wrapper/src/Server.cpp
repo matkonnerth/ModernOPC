@@ -28,7 +28,7 @@ Server::registerDataSource(const std::string &key,
     datasources.push_back(std::make_unique<DataSource>(key, read, write));
 }
 
-void Server::loadNodeset(const std::string &path)
+bool Server::loadNodeset(const std::string &path)
 {
 
     FileHandler handler;
@@ -44,7 +44,7 @@ void Server::loadNodeset(const std::string &path)
     valIf.end = Value_end;
     valIf.finish = Value_finish;
     handler.valueHandling = &valIf;
-    loadFile(&handler);
+    return loadFile(&handler);
 }
 
 bool

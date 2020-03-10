@@ -21,7 +21,7 @@ class Server {
 
     void run();
 
-    void loadNodeset(const std::string& path);
+    bool loadNodeset(const std::string& path);
     template <typename R, typename...ARGS>
     void
     addMethod(const std::string &name, std::function<R(ARGS...)> fn) {

@@ -1,4 +1,5 @@
-add_executable(import test.cpp)
+add_executable(import importTests.cpp)
 target_compile_features(import PRIVATE cxx_std_17)
 target_link_libraries(import PRIVATE CONAN_PKG::gtest)
 target_link_libraries(import PRIVATE wrapper)
+add_test(NAME importTest WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin COMMAND import ${CMAKE_CURRENT_LIST_DIR})
