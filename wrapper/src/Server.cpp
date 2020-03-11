@@ -31,7 +31,7 @@ Server::registerDataSource(const std::string &key,
 bool Server::loadNodeset(const std::string &path)
 {
 
-    FileHandler handler;
+    FileContext handler;
     handler.callback = importNodesCallback;
     handler.addNamespace = addNamespaceCallback;
     handler.userContext = server;

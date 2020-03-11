@@ -342,16 +342,17 @@ Value_finish(Value *val) {
 }
 
 void
-Value_delete(Value *val) {
-    if(!val)
+Value_delete(Value **val) {
+    Value* v = *val;
+    if(!v)
         return;
-    //we do not delete the data
-    while(val->typestack)
+    while(v->typestack)
     {
-        TypeList* next = val->typestack->next;
-        UA_free(val->typestack);
-        val->typestack = next;
+        TypeList* next = v->typestack->next;
+        UA_free(v->typestack);
+        v->typestack = next;
     }
-    UA_free(val->value);
-    UA_free(val);
+    UA_free(v->value);
+    UA_free(v);
+    *val=NULL;
 }

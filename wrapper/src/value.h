@@ -40,6 +40,6 @@ void
 Value_end(Value *val, const char *localname, char *value);
 void
 Value_finish(Value *val);
-void Value_delete(Value* val);
+void Value_delete(Value** val);
 
 #endif
