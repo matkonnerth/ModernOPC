@@ -98,6 +98,8 @@ class Server {
         return datasources;
     }
 
+    bool readValue(const NodeId id, Variant&var);
+
   private:
     UA_Server *server {nullptr};
     UA_DataSource internalSrc {internalRead, internalWrite};

@@ -225,7 +225,7 @@ importNodesCallback(void *userContext, const TNode *node) {
             {
                 if(varnode->value->isArray)
                 {
-                    UA_Variant_setArray(&attr.value, varnode->value->value,
+                    UA_Variant_setArrayCopy(&attr.value, varnode->value->value,
                                         varnode->value->arrayCnt,
                                         varnode->value->datatype);
                     if(!attr.arrayDimensions)
@@ -240,7 +240,7 @@ importNodesCallback(void *userContext, const TNode *node) {
                 }
                 else
                 {
-                    UA_Variant_setScalar(&attr.value, varnode->value->value, varnode->value->datatype);
+                    UA_Variant_setScalarCopy(&attr.value, varnode->value->value, varnode->value->datatype);
                 }
                 //todo: value is copied??
                 Value_delete(&varnode->value);

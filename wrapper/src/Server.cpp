@@ -127,4 +127,10 @@ Server::internalWrite(UA_Server *server, const UA_NodeId *sessionId,
     ds->write(NodeId{*nodeId}, var);
     return UA_STATUSCODE_GOOD;
 }
+
+
+bool Server::readValue(const NodeId id, Variant& var)
+{
+    return (UA_STATUSCODE_GOOD == UA_Server_readValue(server, id.toUA_NodeId(), var.getImpl().get()));
+}
 }

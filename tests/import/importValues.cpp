@@ -1,4 +1,5 @@
 #include <Server.h>
+#include <Variant.h>
 #include <gtest/gtest.h>
 
 std::string path = "";
@@ -7,6 +8,11 @@ TEST(import, namespaceZeroValues) {
 
     opc::Server server;
     ASSERT_TRUE(server.loadNodeset(path + "/" + "namespaceZeroValues.xml"));
+
+    opc::Variant var;
+    ASSERT_TRUE(server.readValue(opc::NodeId(2,1003), var));
+    std::cout << var.get<double>() << std::endl;
+
     /*
         FileContext f;
         f.addNamespace = UA_Server_addNamespace;
