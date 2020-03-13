@@ -3,3 +3,4 @@ cmake
 
 [requires]
 gtest/1.10.0
+libxml2/2.9.9
