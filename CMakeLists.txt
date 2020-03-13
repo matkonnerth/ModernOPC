@@ -39,12 +39,6 @@ set_target_properties(appserver PROPERTIES CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
 
 add_subdirectory(tests)
 
-add_executable(test_variant 
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/test_variant.cpp)
-target_include_directories(test_variant PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
-target_link_libraries(test_variant PRIVATE open62541)
-target_compile_features(test_variant PRIVATE cxx_std_17)
-
 add_executable(statemachine statemachine.cpp)
 target_compile_features(statemachine PRIVATE cxx_std_17)
 target_compile_options(statemachine PRIVATE ${COMPILER_OPTIONS})

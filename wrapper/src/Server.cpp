@@ -75,14 +75,14 @@ Server::internalMethodCallback(UA_Server *server, const UA_NodeId *sessionId,
         for(size_t i=0; i< inputSize; i++)
         {
             Variant v{const_cast<UA_Variant*>(&input[i])};
-            inputArgs.push_back(v);
+            inputArgs.push_back(std::move(v));
         }
         if (s->call(NodeId(*methodId), inputArgs, outputArgs))
         {
             outputSize=outputArgs.size();
             if(outputSize==1)
             {
-                UA_Variant_copy(outputArgs[0].getImpl().get(), output);
+                UA_Variant_copy(outputArgs[0].data(), output);
             }
             return UA_STATUSCODE_GOOD;
         }
@@ -131,6 +131,6 @@ Server::internalWrite(UA_Server *server, const UA_NodeId *sessionId,
 
 bool Server::readValue(const NodeId id, Variant& var)
 {
-    return (UA_STATUSCODE_GOOD == UA_Server_readValue(server, id.toUA_NodeId(), var.getImpl().get()));
+    return (UA_STATUSCODE_GOOD == UA_Server_readValue(server, id.toUA_NodeId(), var.data()));
 }
 }

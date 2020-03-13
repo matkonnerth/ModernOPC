@@ -45,7 +45,7 @@ template <typename R, typename... INARGS> class Call : public ICallable {
         R result = std::apply(m_f, inputArgs);
         Variant var;
         var(result);
-        outputArguments.push_back(var);
+        outputArguments.push_back(std::move(var));
         return true;
     }
 
