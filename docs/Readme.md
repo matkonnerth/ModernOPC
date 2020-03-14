@@ -1,4 +1,4 @@
-# open62541 Wrapper
+# open62541 Wrapper [![Build Status](https://travis-ci.org/matkonnerth/openWrapper.svg?branch=master)](https://travis-ci.org/matkonnerth/openWrapper)
 
 # todos
 
