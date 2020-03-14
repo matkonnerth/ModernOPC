@@ -5,6 +5,7 @@ project(open62541Wrapper)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)
 
+include(CTest)
 enable_testing()
 
 set(DO_CLANG_TIDY clang-tidy -checks=-*,modernize-*,performance-*,boost-*)

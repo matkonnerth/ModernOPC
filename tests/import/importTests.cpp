@@ -15,11 +15,6 @@ TEST(import, nodeclass) {
     ASSERT_TRUE(server.loadNodeset(path + "/" + "basicNodeClassTest.xml"));
 }
 
-TEST(import, speed) {
-    opc::Server server;
-    //ASSERT_TRUE(server.loadNodeset(path + "/" + "100kNodes.xml"));
-}
-
 TEST(import, notFound)
 {
     opc::Server server;
