@@ -43,7 +43,7 @@ script:
 - cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .. 
 - make  - 
 - make test
-- 
+- ctest --overwrite MemoryCheckCommandOptions="--leak-check=full --error-exitcode=100" -T memcheck
 
 after_success:
 - echo == Build success ==
