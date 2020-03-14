@@ -30,7 +30,7 @@ matrix:
 before_install:
 
 install:
-- pip3 install conan
+- pip install conan
 - conan user
 
 script:
