@@ -14,8 +14,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: setup
-      run: apt-get update && apt-get install conan
+      run: sudo apt-get update && apt-get install conan
     - name: configure
-      run: mkdir build && cd build && cmake ..
+      run: mkdir build && cd build && conan install .. && cmake ..
     - name: make
       run: make
