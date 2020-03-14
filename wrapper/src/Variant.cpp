@@ -24,6 +24,8 @@ Variant::~Variant() {
 Variant::Variant(Variant &&other) {
     owned = other.owned;
     variant = other.variant;
+    other.owned=false;
+    other.variant=nullptr;
 }
 
 Variant &
@@ -33,6 +35,8 @@ Variant::operator=(Variant &&other) {
     }
     owned = other.owned;
     variant = other.variant;
+    other.owned=false;
+    other.variant=nullptr;
     return *this;
 }
 
@@ -52,6 +56,12 @@ Variant::operator()(int val) {
 template <>
 void
 Variant::operator()(std::vector<int> val) {
+    TypeConverter::toUAVariant(val, variant);
+}
+
+template <>
+void
+Variant::operator()(uintptr_t val) {
     TypeConverter::toUAVariant(val, variant);
 }
 

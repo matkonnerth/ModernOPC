@@ -30,8 +30,26 @@ TEST(variant, arrays) {
     ASSERT_EQ(vec[2], 3);
 }
 
+opc::Variant getVariant()
+{
+    UA_Variant* v=UA_Variant_new();
+    UA_Int32 arr[3] = {1, 2, 3};
+    UA_Variant_setArrayCopy(v, &arr, 3, &UA_TYPES[UA_TYPES_INT32]);
+    opc::Variant var {v, true};
+    return var;
+}
+
 TEST(variant, ownership)
 {
     UA_Variant* v = UA_Variant_new();
     opc::Variant var{v, true};
+}
+
+TEST(variant, ownership2) {
+    opc::Variant var = getVariant();
+    auto vec = var.get<std::vector<int>>();
+    ASSERT_EQ(vec.size(), 3);
+    ASSERT_EQ(vec[0], 1);
+    ASSERT_EQ(vec[1], 2);
+    ASSERT_EQ(vec[2], 3);
 }
