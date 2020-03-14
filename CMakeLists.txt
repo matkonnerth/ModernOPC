@@ -16,7 +16,8 @@ add_subdirectory(nodesetLoader)
 add_library(wrapper SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Server.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/import.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/value.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/value.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Variant.cpp)
 target_include_directories(wrapper
     PUBLIC 
         $<INSTALL_INTERFACE:include>
