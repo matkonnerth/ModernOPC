@@ -20,7 +20,7 @@ matrix:
           packages:
             - cmake
             # tests
-            #- python3
+            - python3
             - valgrind
       env:
         - DEBIAN=true
@@ -30,7 +30,7 @@ matrix:
 before_install:
 - pyenv versions
 #- pyenv install 3.5.0
-- pyenv global 3.5.0
+- pyenv global 3.6.0
 
 install:
 - pip install conan
