@@ -40,5 +40,5 @@ script:
   after_success:
   - echo == Build success ==
 
-  after_failure:
-  - echo == Build failed ==
+after_failure:
+- echo == Build failed ==
