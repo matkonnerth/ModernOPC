@@ -13,14 +13,14 @@ matrix:
 # gcc-4.8 (trusty) full host and cross build with tests:
 # doc, cert, cross-mingw32, cross-mingw64, cross-linux32, cross-raspi, linux64,
     - os: linux
-      dist: xenial
+      dist: bionic
       compiler: gcc
       addons:
         apt:
           packages:
             - cmake
             # tests
-            - python3
+            #- python3
             - valgrind
       env:
         - DEBIAN=true
@@ -28,7 +28,8 @@ matrix:
 
 
 before_install:
-- pyenv install 3.5.0
+- pyenv versions
+#- pyenv install 3.5.0
 - pyenv global 3.5.0
 
 install:
