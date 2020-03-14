@@ -31,15 +31,15 @@ before_install:
 install:
 
 script:
-  - mkdir -p build
-  - cd build
-  - cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .. 
-  - make  - 
-  - tests/check_sort
-  - make integrationTests
+- mkdir -p build
+- cd build
+- cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .. 
+- make  - 
+- tests/check_sort
+- make integrationTests
 
-  after_success:
-  - echo == Build success ==
+after_success:
+- echo == Build success ==
 
 after_failure:
-  - echo == Build failed ==
+- echo == Build failed ==
