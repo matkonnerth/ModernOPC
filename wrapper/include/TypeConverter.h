@@ -7,6 +7,7 @@
 #include <typeinfo>
 #include <vector>
 #include <type_traits>
+#include <NodeId.h>
 
 namespace TypeConverter {
 
@@ -203,4 +204,11 @@ toStdType(UA_Variant *variant) {
         return vec;
     }
 }
+
+opc::NodeId
+fromUaNodeId(const UA_NodeId& id);
+
+UA_NodeId
+fromNodeId(const opc::NodeId &nodeId);
+
 }  // namespace TypeConverter

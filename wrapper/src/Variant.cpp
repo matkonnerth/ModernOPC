@@ -1,7 +1,40 @@
-#include <TypeConverter.h>
 #include <Variant.h>
+#include <TypeConverter.h>
+
+
 
 namespace opc {
+
+Variant::Variant() {
+    variant = UA_Variant_new();
+    owned = true;
+}
+
+Variant::Variant(UA_Variant *var, bool owner) {
+    variant = var;
+    owned = owner;
+}
+
+Variant::~Variant() {
+    if(owned) {
+        UA_Variant_delete(variant);
+    }
+}
+
+Variant::Variant(Variant &&other) {
+    owned = other.owned;
+    variant = other.variant;
+}
+
+Variant &
+Variant::operator=(Variant &&other) {
+    if(owned) {
+        UA_Variant_delete(variant);
+    }
+    owned = other.owned;
+    variant = other.variant;
+    return *this;
+}
 
 /* setters */
 template<>

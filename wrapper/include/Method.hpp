@@ -1,3 +1,4 @@
+#pragma once
 #include <open62541/server.h>
 #include <open62541/types.h>
 #include <functional>

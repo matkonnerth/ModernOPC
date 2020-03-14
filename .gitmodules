@@ -1,3 +1,6 @@
 [submodule "nodesetLoader"]
 	path = nodesetLoader
 	url = https://github.com/matkonnerth/nodesetLoader.git
+[submodule "open62541"]
+	path = open62541
+	url = https://github.com/matkonnerth/open62541.git

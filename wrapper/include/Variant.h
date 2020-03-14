@@ -1,43 +1,20 @@
 #pragma once
-#include "TypeConverter.h"
+struct UA_Variant;
 
 namespace opc {
 
 class Variant {
   public:
-    Variant() {
-        variant = UA_Variant_new();
-        owned = true;
-    }
-
-    Variant(UA_Variant *var, bool owner = false) {
-        variant = var;
-        owned = owner;
-    }
-    ~Variant() {
-        if(owned) {
-            UA_Variant_delete(variant);
-        }
-    }
+    Variant();
+    Variant(UA_Variant *var, bool owner = false);
+    ~Variant();
 
     Variant(const Variant &other) = delete;
     Variant &
     operator=(const Variant &other) = delete;
-
-    Variant(Variant &&other) {
-        owned = other.owned;
-        variant = other.variant;
-    }
-
+    Variant(Variant &&other);
     Variant &
-    operator=(Variant &&other) {
-        if(owned) {
-            UA_Variant_delete(variant);
-        }
-        owned = other.owned;
-        variant = other.variant;
-        return *this;
-    }
+    operator=(Variant &&other);
 
     template <typename T>
     void

@@ -113,7 +113,7 @@ main() {
 
     // loading of a xml nodeset
     s->loadNodeset("../models/serviceobject.xml");
-    //s->loadNodeset("../../nodesetLoader/nodesets/testNodeset100nodes.xml");
+    s->loadNodeset("../../nodesetLoader/nodesets/testNodeset100nodes.xml");
     s->loadNodeset("/home/matzy/Dokumente/opc_ua/models/types.xml");
     s->loadNodeset("../tests/import/namespaceZeroValues.xml");
     //s->loadNodeset("../../open62541/deps/ua-nodeset/Di/Opc.Ua.Di.NodeSet2.xml");

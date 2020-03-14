@@ -1,3 +1,4 @@
+#pragma once
 #include <map>
 #include <open62541/server.h>
 #include <open62541/server_config.h>
@@ -46,16 +47,16 @@ class Server {
         
 
         callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
-            newId,
+            TypeConverter::fromUaNodeId(newId),
             std::make_unique<Call<R, ARGS...>>(fn)));
     }
 
     template <typename R, typename... ARGS>
     void bindMethodNode(const NodeId &id, std::function<R(ARGS...)> fn)
     {
-        UA_Server_setMethodNode_callback(server, id.toUA_NodeId(), internalMethodCallback);
+        UA_Server_setMethodNode_callback(server, TypeConverter::fromNodeId(id), internalMethodCallback);
         callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(id, std::make_unique<Call<R, ARGS...>>(fn)));
-        UA_Server_setNodeContext(server, id.toUA_NodeId(), this);
+        UA_Server_setNodeContext(server, TypeConverter::fromNodeId(id), this);
     }
 
     bool call(const NodeId& id, const std::vector<Variant>& inputArgs, std::vector<Variant>& outputArgs);
@@ -68,12 +69,12 @@ class Server {
         UA_VariableAttributes attr = TypeConverter::getVariableAttributes(initialValue);
         attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
         UA_Server_addVariableNode(
-            server, requestedId.toUA_NodeId(), parentId.toUA_NodeId(),
+            server, TypeConverter::fromNodeId(requestedId), TypeConverter::fromNodeId(parentId),
             UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
             UA_QUALIFIEDNAME(1, (char *)browseName.c_str()),
             UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), attr, info.release(), nullptr);
 
-        UA_Server_setVariableNode_dataSource(server, requestedId.toUA_NodeId(), internalSrc);
+        UA_Server_setVariableNode_dataSource(server, TypeConverter::fromNodeId(requestedId), internalSrc);
     }
 
     template <typename T>
@@ -82,8 +83,8 @@ class Server {
                     const std::string &browseName, T initialValue) {
         UA_VariableAttributes attr = TypeConverter::getVariableAttributes(initialValue);
         attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
-        UA_Server_addVariableNode(server, requestedId.toUA_NodeId(),
-                                  parentId.toUA_NodeId(),
+        UA_Server_addVariableNode(server, TypeConverter::fromNodeId(requestedId),
+                                  TypeConverter::fromNodeId(parentId),
                                   UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
                                   UA_QUALIFIEDNAME(1, (char *)browseName.c_str()),
                                   UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE),

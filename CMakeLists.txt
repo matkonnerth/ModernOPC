@@ -17,7 +17,8 @@ add_library(wrapper SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Server.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/import.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/value.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Variant.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Variant.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/TypeConverter.cpp)
 target_include_directories(wrapper
     PUBLIC 
         $<INSTALL_INTERFACE:include>
@@ -33,7 +34,7 @@ target_compile_options(wrapper PRIVATE ${COMPILER_OPTIONS})
 #set_target_properties(wrapper PROPERTIES CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
 
 add_executable(appserver main.cpp)
-target_link_libraries(appserver PRIVATE wrapper pthread)
+target_link_libraries(appserver PRIVATE wrapper open62541 pthread)
 target_compile_features(appserver PRIVATE cxx_std_17)
 target_compile_options(appserver PRIVATE ${COMPILER_OPTIONS})
 #set_target_properties(appserver PROPERTIES CXX_CLANG_TIDY "${DO_CLANG_TIDY}")

@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <Variant.h>
+#include <open62541/server.h>
 
 
 TEST(variant, baseTypes)
@@ -34,23 +35,3 @@ TEST(variant, ownership)
     UA_Variant* v = UA_Variant_new();
     opc::Variant var{v, true};
 }
-
-/*
-dataSource_readValueTemplated(t);
-std::cout << t.get<int>() << std::endl;
-
-UA_Variant varVec;
-UA_Int32 arr[3] = {1, 2, 3};
-UA_Variant_setArrayCopy(&varVec, arr, 3, &UA_TYPES[UA_TYPES_INT32]);
-
-opc::Variant tVec{&varVec};
-dataSource_writeValueTemplated(tVec);
-
-opc::Variant testVariant{};
-testVariant(std::vector<float>{1.0f, 2.0f, 3.0f});
-
-std::vector<opc::Variant> vectorOfVar;
-// vectorOfVar.push_back(testVariant);
-
-return 0;
-*/
