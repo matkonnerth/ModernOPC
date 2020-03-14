@@ -29,12 +29,13 @@ matrix:
 
 before_install:
 - pyenv versions
-- pyenv install 3.6.0
-- pyenv global 3.6.0
+#- pyenv install 3.6.0
+- pyenv global 3.8
 
 install:
 - pip install conan
 - conan user
+- conan profile update settings.compiler.libcxx=libstdc++11 default
 
 script:
 - mkdir -p build
@@ -42,6 +43,8 @@ script:
 - conan install ..
 - cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .. 
 - make  - 
+- make test
+- 
 
 after_success:
 - echo == Build success ==
