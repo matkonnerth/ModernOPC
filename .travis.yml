@@ -29,14 +29,15 @@ matrix:
 before_install:
 
 install:
+- pip install conan
+- conan user
 
 script:
 - mkdir -p build
 - cd build
+- conan install ..
 - cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .. 
 - make  - 
-- tests/check_sort
-- make integrationTests
 
 after_success:
 - echo == Build success ==
