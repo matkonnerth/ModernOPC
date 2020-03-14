@@ -20,6 +20,7 @@ matrix:
           packages:
             - cmake
             # tests
+            - python3
             - valgrind
       env:
         - DEBIAN=true
@@ -29,7 +30,7 @@ matrix:
 before_install:
 
 install:
-- pip install conan
+- pip3 install conan
 - conan user
 
 script:
