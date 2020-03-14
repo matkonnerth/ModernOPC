@@ -20,7 +20,6 @@ matrix:
           packages:
             - cmake
             # tests
-            - pyenv
             - python3
             - valgrind
       env:
