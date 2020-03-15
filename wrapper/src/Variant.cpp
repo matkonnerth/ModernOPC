@@ -103,6 +103,12 @@ Variant::get<std::vector<int>>() const {
 }
 
 template <>
+std::vector<uint> Variant::get<std::vector<uint>>() const
+{
+    return toStdType<std::vector<uint>>(variant);
+}
+
+template <>
 std::vector<std::string>
 Variant::get<std::vector<std::string>>() const {
     return toStdType<std::vector<std::string>>(variant);

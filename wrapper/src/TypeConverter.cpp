@@ -80,6 +80,14 @@ std::vector<int> toStdType(UA_Variant *variant)
 }
 
 template <>
+std::vector<uint> toStdType(UA_Variant *variant)
+{
+    return std::vector<uint>{static_cast<uint *>(variant->data),
+                            static_cast<uint *>(variant->data) +
+                                variant->arrayLength};
+}
+
+template <>
 std::string toStdType(UA_Variant *variant)
 {
     UA_String *s = (UA_String *)variant->data;

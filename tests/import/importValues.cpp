@@ -11,32 +11,13 @@ TEST(import, namespaceZeroValues) {
 
     opc::Variant var;
     ASSERT_TRUE(server.readValue(opc::NodeId(2,1003), var));
-    std::cout << var.get<double>() << std::endl;
+    ASSERT_TRUE(var.get<double>()-3.14 < 0.01);
+    ASSERT_TRUE(server.readValue(opc::NodeId(2, 1004), var));
+    ASSERT_TRUE(var.get<std::vector<uint>>()[2]==140);
 
     /*
-        FileContext f;
-        f.addNamespace = UA_Server_addNamespace;
-        f.server = server;
-        f.file = NS0VALUESXML;
-        UA_StatusCode retval = UA_XmlImport_loadFile(&f);
-        ck_assert_uint_eq(retval, UA_STATUSCODE_GOOD);
-        UA_UInt16 nsIdx =
-            getNamespaceIndex("http://open62541.com/nodesetimport/tests/namespaceZeroValues");
-        ck_assert_uint_gt(nsIdx, 0);
-        UA_Variant var;
-        UA_Variant_init(&var);
-        // scalar double
-        retval = UA_Server_readValue(server, UA_NODEID_NUMERIC(nsIdx, 1003), &var);
-        ck_assert_uint_eq(retval, UA_STATUSCODE_GOOD);
-        ck_assert(var.type->typeIndex == UA_TYPES_DOUBLE);
-        ck_assert(*(UA_Double *)var.data - 3.14 < 0.01);
-        UA_Variant_clear(&var);
-        // array of Uint32
-        retval = UA_Server_readValue(server, UA_NODEID_NUMERIC(nsIdx, 1004), &var);
-        ck_assert_uint_eq(retval, UA_STATUSCODE_GOOD);
-        ck_assert(var.type->typeIndex == UA_TYPES_UINT32);
-        ck_assert_uint_eq(((UA_UInt32 *)var.data)[2], 140);
-        UA_Variant_clear(&var);
+
+        
         // extension object with nested struct
         retval = UA_Server_readValue(server, UA_NODEID_NUMERIC(nsIdx, 1005), &var);
         ck_assert_uint_eq(retval, UA_STATUSCODE_GOOD);
