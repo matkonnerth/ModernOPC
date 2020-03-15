@@ -62,6 +62,19 @@ inline const UA_DataType *getDataType<long>()
 }
 
 template <>
+inline const UA_DataType *getDataType<unsigned long>()
+{
+    if (sizeof(unsigned long) == 4)
+    {
+        return &UA_TYPES[UA_TYPES_UINT32];
+    }
+    else if (sizeof(unsigned long) == 8)
+    {
+        return &UA_TYPES[UA_TYPES_UINT64];
+    }
+}
+
+template <>
 inline const UA_DataType *getDataType<int>()
 {
     if (sizeof(int) == 4)
