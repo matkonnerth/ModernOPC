@@ -1,30 +1,33 @@
 #pragma once
-#include <open62541/server.h>
+#include <NodeId.h>
 #include <array>
 #include <cassert>
 #include <iostream>
 #include <memory>
+#include <open62541/server.h>
+#include <type_traits>
 #include <typeinfo>
 #include <vector>
-#include <type_traits>
-#include <NodeId.h>
 
-namespace TypeConverter {
+namespace TypeConverter
+{
 
 template <typename T>
-constexpr bool
-isSupportedCppType() {
-    if(std::is_arithmetic_v<T>) {
+constexpr bool isSupportedCppType()
+{
+    if (std::is_arithmetic_v<T>)
+    {
         return true;
     }
     return false;
 }
 
 template <typename T>
-bool
-isTypeMatching(const UA_DataType *uatype) {
+bool isTypeMatching(const UA_DataType *uatype)
+{
     using type = typename std::remove_reference_t<T>;
-    if(uatype->memSize == sizeof(type)) {
+    if (uatype->memSize == sizeof(type))
+    {
         return true;
     }
     return false;
@@ -34,58 +37,64 @@ template <typename T>
 const UA_DataType *getDataType();
 
 template <>
-inline const UA_DataType *
-getDataType<bool>() {
+inline const UA_DataType *getDataType<bool>()
+{
     return &UA_TYPES[UA_TYPES_BOOLEAN];
 }
 
 template <>
-inline const UA_DataType *
-getDataType<char>() {
+inline const UA_DataType *getDataType<char>()
+{
     return &UA_TYPES[UA_TYPES_SBYTE];
 }
 
 template <>
-inline const UA_DataType *
-getDataType<long>() {
-    if(sizeof(long) == 4) {
+inline const UA_DataType *getDataType<long>()
+{
+    if (sizeof(long) == 4)
+    {
         return &UA_TYPES[UA_TYPES_INT32];
-    } else if(sizeof(long) == 8) {
+    }
+    else if (sizeof(long) == 8)
+    {
         return &UA_TYPES[UA_TYPES_INT64];
     }
 }
 
 template <>
-inline const UA_DataType *
-getDataType<int>() {
-    if(sizeof(int) == 4) {
+inline const UA_DataType *getDataType<int>()
+{
+    if (sizeof(int) == 4)
+    {
         return &UA_TYPES[UA_TYPES_INT32];
-    } else if(sizeof(int) == 8) {
+    }
+    else if (sizeof(int) == 8)
+    {
         return &UA_TYPES[UA_TYPES_INT64];
     }
 }
 
 template <>
-inline const UA_DataType *
-getDataType<float>() {
+inline const UA_DataType *getDataType<float>()
+{
     return &UA_TYPES[UA_TYPES_FLOAT];
 }
 
 template <>
-inline const UA_DataType *
-getDataType<double>() {
+inline const UA_DataType *getDataType<double>()
+{
     return &UA_TYPES[UA_TYPES_DOUBLE];
 }
 
 template <>
-inline const UA_DataType *
-getDataType<std::string>() {
+inline const UA_DataType *getDataType<std::string>()
+{
     return &UA_TYPES[UA_TYPES_STRING];
 }
 
 template <typename T>
-void
-toUAVariant(T val, UA_Variant *var) {
+void toUAVariant(T val, UA_Variant *var)
+{
     UA_Variant_init(var);
     UA_Variant_setScalarCopy(var, &val, getDataType<T>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
@@ -93,9 +102,10 @@ toUAVariant(T val, UA_Variant *var) {
 
 // specialize for std::array
 template <typename T, size_t N>
-void
-toUAVariant(std::array<T, N> &arr, UA_Variant *var) {
-    static_assert(isSupportedCppType<T>(), "This type is currently not supported!");
+void toUAVariant(std::array<T, N> &arr, UA_Variant *var)
+{
+    static_assert(isSupportedCppType<T>(),
+                  "This type is currently not supported!");
     UA_Variant_init(var);
     UA_Variant_setArrayCopy(var, arr.data(), N, getDataType<T>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
@@ -103,51 +113,21 @@ toUAVariant(std::array<T, N> &arr, UA_Variant *var) {
 
 // specialize for std::vector
 template <typename T>
-void
-toUAVariant(std::vector<T> &v, UA_Variant *var) {
-    static_assert(isSupportedCppType<T>(), "This type is currently not supported!");
+void toUAVariant(std::vector<T> &v, UA_Variant *var)
+{
+    static_assert(isSupportedCppType<T>(),
+                  "This type is currently not supported!");
     UA_Variant_init(var);
     UA_Variant_setArrayCopy(var, v.data(), v.size(), getDataType<T>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
 
 template <typename T>
-UA_NodeId
-getUADataTypeId() {
-
-    if(std::is_same_v<T, bool>) {
-        return UA_NODEID_NUMERIC(0, UA_NS0ID_BOOLEAN);
-    } else if(std::is_same_v<T, char>) {
-        return UA_NODEID_NUMERIC(0, UA_NS0ID_SBYTE);
-    } else if(std::is_same_v<T, unsigned char>) {
-        return UA_NODEID_NUMERIC(0, UA_NS0ID_BYTE);
-    } else if(std::is_same_v<T, int16_t>) {
-        return UA_NODEID_NUMERIC(0, UA_NS0ID_INT16);
-    } else if(std::is_same_v<T, uint16_t>) {
-        return UA_NODEID_NUMERIC(0, UA_NS0ID_UINT16);
-    } else if(std::is_same_v<T, int>) {
-        return UA_NODEID_NUMERIC(0, UA_NS0ID_INT32);
-    } else if(std::is_same_v<T, int32_t>) {
-        return UA_NODEID_NUMERIC(0, UA_NS0ID_INT32);
-    } else if(std::is_same_v<T, uint32_t>) {
-        return UA_NODEID_NUMERIC(0, UA_NS0ID_UINT32);
-    } else if(std::is_same_v<T, int64_t>) {
-        return UA_NODEID_NUMERIC(0, UA_NS0ID_INT64);
-    } else if(std::is_same_v<T, uint64_t>) {
-        return UA_NODEID_NUMERIC(0, UA_NS0ID_UINT64);
-    } else if(std::is_same_v<T, float>) {
-        return UA_NODEID_NUMERIC(0, UA_NS0ID_FLOAT);
-    } else if(std::is_same_v<T, double>) {
-        return UA_NODEID_NUMERIC(0, UA_NS0ID_DOUBLE);
-    } else if(std::is_same_v<T, std::string> || std::is_same_v<T, const char *>) {
-        return UA_NODEID_NUMERIC(0, UA_NS0ID_STRING);
-    }
-    return UA_NodeId();
-}
+UA_NodeId getUADataTypeId();
 
 template <typename T>
-UA_VariableAttributes
-getVariableAttributes(T val) {
+UA_VariableAttributes getVariableAttributes(T val)
+{
     UA_VariableAttributes attr = UA_VariableAttributes_default;
     attr.dataType = getUADataTypeId<T>();
     attr.valueRank = -1;
@@ -156,8 +136,8 @@ getVariableAttributes(T val) {
 }
 
 template <typename T, size_t N>
-UA_VariableAttributes
-getVariableAttributes(std::array<T, N> &arr) {
+UA_VariableAttributes getVariableAttributes(std::array<T, N> &arr)
+{
     UA_VariableAttributes attr = UA_VariableAttributes_default;
     toUAVariant(arr, &attr.value);
     attr.dataType = getUADataTypeId<T>();
@@ -168,8 +148,8 @@ getVariableAttributes(std::array<T, N> &arr) {
 }
 
 template <typename T>
-UA_VariableAttributes
-getVariableAttributes(std::vector<T> &v) {
+UA_VariableAttributes getVariableAttributes(std::vector<T> &v)
+{
     UA_VariableAttributes attr = UA_VariableAttributes_default;
     toUAVariant(v, &attr.value);
     attr.dataType = getUADataTypeId<T>();
@@ -180,55 +160,9 @@ getVariableAttributes(std::vector<T> &v) {
 }
 
 template <typename T>
-T
-toStdType(UA_Variant *variant) {
-    if constexpr(std::is_arithmetic_v<T>) {
-        assert(TypeConverter::isTypeMatching<T>(variant->type));
-        return *static_cast<T *>(variant->data);
-    } else if constexpr(!std::is_same_v<T, std::vector<std::string>> &&
-                        std::is_same_v<T, std::vector<typename T::value_type>>) {
-        assert(TypeConverter::isTypeMatching<typename T::value_type>(variant->type));
-        return std::vector<typename T::value_type>{
-            static_cast<typename T::value_type *>(variant->data),
-            static_cast<typename T::value_type *>(variant->data) + variant->arrayLength};
-    } else if constexpr(std::is_same_v<typename std::remove_reference_t<T>,
-                                       std::string>) {
-        assert(variant->type->typeIndex == UA_TYPES_STRING);
-        UA_String *s = (UA_String *)variant->data;
-        if(s->length > 0) {
-            std::string stdString{reinterpret_cast<char *>(s->data), s->length};
-            return stdString;
-        }
-        return std::string{};
-    } else if constexpr(std::is_same_v<T, std::vector<std::string>>) {
-        assert(variant->type->typeIndex == UA_TYPES_STRING);
+T toStdType(UA_Variant *variant);
 
-        std::vector<std::string> vec;
-        for(size_t i = 0; i < variant->arrayLength; i++) {
-            UA_String *s = ((UA_String *)variant->data) + i;
-            if(s->length > 0) {
-                std::string stdString{reinterpret_cast<char *>(s->data), s->length};
-                vec.push_back(stdString);
-            } else {
-                vec.push_back(std::string{});
-            }
-        }
-        return vec;
-    }
-}
+opc::NodeId fromUaNodeId(const UA_NodeId &id);
+UA_NodeId fromNodeId(const opc::NodeId &nodeId);
 
-/*
-opcType -> ua_type conversion
-ua_type -> opc_type conversion
-
-ua_variant -> opcType conversion
-opcType -> variantConversion
-*/
-
-opc::NodeId
-fromUaNodeId(const UA_NodeId& id);
-
-UA_NodeId
-fromNodeId(const opc::NodeId &nodeId);
-
-}  // namespace TypeConverter
+} // namespace TypeConverter
