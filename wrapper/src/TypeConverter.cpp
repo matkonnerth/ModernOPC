@@ -1,8 +1,64 @@
+#include <open62541/server.h>
 #include <TypeConverter.h>
+#include <Types.h>
 
-namespace TypeConverter
-{
+namespace TypeConverter {
 
+template <>
+const UA_DataType *
+getDataType<bool>() {
+    return &UA_TYPES[UA_TYPES_BOOLEAN];
+}
+
+template <>
+const UA_DataType *
+getDataType<char>() {
+    return &UA_TYPES[UA_TYPES_SBYTE];
+}
+
+template <>
+const UA_DataType *
+getDataType<long>() {
+    if(sizeof(long) == 4) {
+        return &UA_TYPES[UA_TYPES_INT32];
+    } else if(sizeof(long) == 8) {
+        return &UA_TYPES[UA_TYPES_INT64];
+    }
+}
+
+template <>
+const UA_DataType *
+getDataType<int>() {
+    if(sizeof(int) == 4) {
+        return &UA_TYPES[UA_TYPES_INT32];
+    } else if(sizeof(int) == 8) {
+        return &UA_TYPES[UA_TYPES_INT64];
+    }
+}
+
+template <>
+const UA_DataType *
+getDataType<float>() {
+    return &UA_TYPES[UA_TYPES_FLOAT];
+}
+
+template <>
+const UA_DataType *
+getDataType<double>() {
+    return &UA_TYPES[UA_TYPES_DOUBLE];
+}
+
+template <>
+const UA_DataType *
+getDataType<std::string>() {
+    return &UA_TYPES[UA_TYPES_STRING];
+}
+
+template <>
+const UA_DataType *
+getDataType<opc::types::Range>() {
+    return &UA_TYPES[UA_TYPES_RANGE];
+}
 
 opc::NodeId
 fromUaNodeId(const UA_NodeId &id) {

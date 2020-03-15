@@ -31,44 +31,7 @@ isTypeMatching(const UA_DataType *uatype) {
 }
 
 template <typename T>
-const UA_DataType *
-getDataType() {
-    if(std::is_same_v<T, bool>) {
-        return &UA_TYPES[UA_TYPES_BOOLEAN];
-    } else if(std::is_integral_v<T>) {
-        if(std::is_signed_v<T>) {
-            if(sizeof(T) == 1) {
-                return &UA_TYPES[UA_TYPES_SBYTE];
-            } else if(sizeof(T) == 2) {
-                return &UA_TYPES[UA_TYPES_INT16];
-            } else if(sizeof(T) == 4) {
-                return &UA_TYPES[UA_TYPES_INT32];
-            } else if(sizeof(T) == 8) {
-                return &UA_TYPES[UA_TYPES_INT64];
-            }
-        } else {
-            if(sizeof(T) == 1) {
-                return &UA_TYPES[UA_TYPES_BYTE];
-            } else if(sizeof(T) == 2) {
-                return &UA_TYPES[UA_TYPES_UINT16];
-            } else if(sizeof(T) == 4) {
-                return &UA_TYPES[UA_TYPES_UINT32];
-            } else if(sizeof(T) == 8) {
-                return &UA_TYPES[UA_TYPES_UINT64];
-            }
-        }
-
-    } else if(std::is_floating_point_v<T>) {
-        if(sizeof(T) == 4) {
-            return &UA_TYPES[UA_TYPES_FLOAT];
-        } else if(sizeof(T) == 8) {
-            return &UA_TYPES[UA_TYPES_DOUBLE];
-        }
-
-    } else if(std::is_same_v<T, std::string>) {
-        return &UA_TYPES[UA_TYPES_STRING];
-    }
-}
+const UA_DataType *getDataType();
 
 template <typename T>
 void
@@ -100,7 +63,7 @@ toUAVariant(std::vector<T> &v, UA_Variant *var) {
 
 template <typename T>
 UA_NodeId
-uaTypeNodeIdFromCpp() {
+getUADataTypeId() {
 
     if(std::is_same_v<T, bool>) {
         return UA_NODEID_NUMERIC(0, UA_NS0ID_BOOLEAN);
@@ -129,7 +92,6 @@ uaTypeNodeIdFromCpp() {
     } else if(std::is_same_v<T, std::string> || std::is_same_v<T, const char *>) {
         return UA_NODEID_NUMERIC(0, UA_NS0ID_STRING);
     }
-    std::cout << typeid(T).name() << std::endl;
     return UA_NodeId();
 }
 
@@ -137,7 +99,7 @@ template <typename T>
 UA_VariableAttributes
 getVariableAttributes(T val) {
     UA_VariableAttributes attr = UA_VariableAttributes_default;
-    attr.dataType = uaTypeNodeIdFromCpp<T>();
+    attr.dataType = getUADataTypeId<T>();
     attr.valueRank = -1;
     toUAVariant(val, &attr.value);
     return attr;
@@ -148,7 +110,7 @@ UA_VariableAttributes
 getVariableAttributes(std::array<T, N> &arr) {
     UA_VariableAttributes attr = UA_VariableAttributes_default;
     toUAVariant(arr, &attr.value);
-    attr.dataType = uaTypeNodeIdFromCpp<T>();
+    attr.dataType = getUADataTypeId<T>();
     attr.valueRank = 1;
     attr.arrayDimensionsSize = 1;
     attr.arrayDimensions = new UA_UInt32{static_cast<UA_UInt32>(arr.size())};
@@ -160,7 +122,7 @@ UA_VariableAttributes
 getVariableAttributes(std::vector<T> &v) {
     UA_VariableAttributes attr = UA_VariableAttributes_default;
     toUAVariant(v, &attr.value);
-    attr.dataType = uaTypeNodeIdFromCpp<T>();
+    attr.dataType = getUADataTypeId<T>();
     attr.valueRank = 1;
     attr.arrayDimensionsSize = 1;
     attr.arrayDimensions = new UA_UInt32{static_cast<UA_UInt32>(v.size())};
@@ -204,6 +166,14 @@ toStdType(UA_Variant *variant) {
         return vec;
     }
 }
+
+/*
+opcType -> ua_type conversion
+ua_type -> opc_type conversion
+
+ua_variant -> opcType conversion
+opcType -> variantConversion
+*/
 
 opc::NodeId
 fromUaNodeId(const UA_NodeId& id);

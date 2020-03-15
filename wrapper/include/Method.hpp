@@ -40,7 +40,7 @@ struct MethodTraitsBase {
     inline static UA_Argument
     getInputArgument(const int &iArg = 0) {
 
-        UA_NodeId id = TypeConverter::uaTypeNodeIdFromCpp<T>();
+        UA_NodeId id = TypeConverter::getUADataTypeId<T>();
         UA_Argument inputArgument;
         UA_Argument_init(&inputArgument);
         // create n-th argument with name "Arg" + number
@@ -64,7 +64,7 @@ struct MethodTraitsBase {
     inline static UA_Argument
     getOutputArgument() {
 
-        UA_NodeId id = TypeConverter::uaTypeNodeIdFromCpp<T>();
+        UA_NodeId id = TypeConverter::getUADataTypeId<T>();
         UA_Argument inputArgument;
         UA_Argument_init(&inputArgument);
         // create n-th argument with name "Arg" + number
