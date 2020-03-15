@@ -1,37 +1,13 @@
 #pragma once
 #include <NodeId.h>
 #include <array>
-#include <cassert>
-#include <iostream>
 #include <memory>
 #include <open62541/server.h>
-#include <type_traits>
-#include <typeinfo>
 #include <vector>
+#include <cassert>
 
-namespace TypeConverter
+namespace opc
 {
-
-template <typename T>
-constexpr bool isSupportedCppType()
-{
-    if (std::is_arithmetic_v<T>)
-    {
-        return true;
-    }
-    return false;
-}
-
-template <typename T>
-bool isTypeMatching(const UA_DataType *uatype)
-{
-    using type = typename std::remove_reference_t<T>;
-    if (uatype->memSize == sizeof(type))
-    {
-        return true;
-    }
-    return false;
-}
 
 template <typename T>
 const UA_DataType *getDataType();
@@ -113,23 +89,17 @@ void toUAVariant(T val, UA_Variant *var)
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
 
-// specialize for std::array
 template <typename T, size_t N>
 void toUAVariant(std::array<T, N> &arr, UA_Variant *var)
 {
-    static_assert(isSupportedCppType<T>(),
-                  "This type is currently not supported!");
     UA_Variant_init(var);
     UA_Variant_setArrayCopy(var, arr.data(), N, getDataType<T>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
 
-// specialize for std::vector
 template <typename T>
 void toUAVariant(std::vector<T> &v, UA_Variant *var)
 {
-    static_assert(isSupportedCppType<T>(),
-                  "This type is currently not supported!");
     UA_Variant_init(var);
     UA_Variant_setArrayCopy(var, v.data(), v.size(), getDataType<T>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;

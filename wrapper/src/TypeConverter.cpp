@@ -2,7 +2,7 @@
 #include <Types.h>
 #include <open62541/server.h>
 
-namespace TypeConverter
+namespace opc
 {
 
 template <>
@@ -56,28 +56,24 @@ UA_NodeId getUADataTypeId<std::string>()
 template <>
 bool toStdType(UA_Variant *variant)
 {
-    // assert(TypeConverter::isTypeMatching<T>(variant->type));
     return *static_cast<bool *>(variant->data);
 }
 
 template <>
 double toStdType(UA_Variant *variant)
 {
-    // assert(TypeConverter::isTypeMatching<T>(variant->type));
     return *static_cast<double *>(variant->data);
 }
 
 template <>
 int toStdType(UA_Variant *variant)
 {
-    // assert(TypeConverter::isTypeMatching<T>(variant->type));
     return *static_cast<int *>(variant->data);
 }
 
 template <>
 std::vector<int> toStdType(UA_Variant *variant)
 {
-    // assert(TypeConverter::isTypeMatching<T>(variant->type));
     return std::vector<int>{static_cast<int *>(variant->data),
                             static_cast<int *>(variant->data) +
                                 variant->arrayLength};
@@ -98,7 +94,6 @@ std::string toStdType(UA_Variant *variant)
 template <>
 std::vector<std::string> toStdType(UA_Variant *variant)
 {
-    assert(variant->type->typeIndex == UA_TYPES_STRING);
     std::vector<std::string> vec;
     for (size_t i = 0; i < variant->arrayLength; i++)
     {
@@ -161,4 +156,4 @@ UA_NodeId fromNodeId(const opc::NodeId &nodeId)
     return id;
 }
 
-} // namespace TypeConverter
+}

@@ -6,6 +6,8 @@
 #include "nodesetLoader.h"
 #include "import.h"
 #include "value.h"
+#include "TypeConverter.h"
+
 
 namespace opc {
 Server::Server() : isRunning{true} {
@@ -77,7 +79,7 @@ Server::internalMethodCallback(UA_Server *server, const UA_NodeId *sessionId,
             Variant v{const_cast<UA_Variant*>(&input[i])};
             inputArgs.push_back(std::move(v));
         }
-        if (s->call(TypeConverter::fromUaNodeId(*methodId), inputArgs, outputArgs))
+        if (s->call(opc::fromUaNodeId(*methodId), inputArgs, outputArgs))
         {
             outputSize=outputArgs.size();
             if(outputSize==1)
@@ -106,7 +108,7 @@ Server::internalRead(UA_Server *server, const UA_NodeId *sessionId,
         if(info->getDataSourceKey().compare(ds->getKey())==0)
         {
             Variant var{&value->value};
-            ds->read(TypeConverter::fromUaNodeId(*nodeId), var);
+            ds->read(opc::fromUaNodeId(*nodeId), var);
             return UA_STATUSCODE_GOOD;
         }
     }
@@ -124,13 +126,13 @@ Server::internalWrite(UA_Server *server, const UA_NodeId *sessionId,
     // TODO: can we avoid this copy?
     // we can avoid it at the moment, because it's copied in Variant.get<>()
     Variant var{const_cast<UA_Variant *>(&value->value)};
-    ds->write(TypeConverter::fromUaNodeId(*nodeId), var);
+    ds->write(opc::fromUaNodeId(*nodeId), var);
     return UA_STATUSCODE_GOOD;
 }
 
 
 bool Server::readValue(const NodeId id, Variant& var)
 {
-    return (UA_STATUSCODE_GOOD == UA_Server_readValue(server, TypeConverter::fromNodeId(id), var.data()));
+    return (UA_STATUSCODE_GOOD == UA_Server_readValue(server, fromNodeId(id), var.data()));
 }
 }

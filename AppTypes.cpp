@@ -3,7 +3,7 @@
 #include <Variant.h>
 
 // more or less an extension to the wrapper
-namespace TypeConverter
+namespace opc
 {
 
 template <>
@@ -21,16 +21,12 @@ const UA_DataType *getDataType<app::types::Range2>()
 template <>
 app::types::Range2 toStdType(UA_Variant *variant)
 {
-    assert(TypeConverter::isTypeMatching<app::types::Range2>(variant->type));
     return *static_cast<app::types::Range2 *>(variant->data);
 }
-} // namespace TypeConverter
 
-namespace opc
-{
 template <>
 app::types::Range2 Variant::get<app::types::Range2>() const
 {
-    return TypeConverter::toStdType<app::types::Range2>(variant);
+    return toStdType<app::types::Range2>(variant);
 }
 } // namespace opc
