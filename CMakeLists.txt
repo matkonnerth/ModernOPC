@@ -30,7 +30,7 @@ target_include_directories(wrapper
 target_link_libraries(wrapper PRIVATE open62541 xmlImport)
 target_compile_features(wrapper PRIVATE cxx_std_17)
 target_compile_options(wrapper PRIVATE ${COMPILER_OPTIONS})
-#set_target_properties(wrapper PROPERTIES CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
+set_target_properties(wrapper PROPERTIES CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
 
 add_subdirectory(tests)
 add_subdirectory(tutorial)
