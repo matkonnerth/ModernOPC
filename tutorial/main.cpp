@@ -10,7 +10,6 @@
 #include "MyDataSource.h"
 #include "NodeId.h"
 #include "Server.h"
-#include "AppTypes.h"
 
 auto
 add(int a, int b, double c) {
@@ -112,16 +111,6 @@ main() {
                        test);
     s->addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, "source1Var"), "source1Var", 12,
                        std::make_unique<opc::NodeMetaInfo>("source1"));
-
-    app::types::Range2 r{0.1, 9.9};
-    s->addVariableNode(opc::NodeId(0,85), opc::NodeId(1, "range"), "range", r);
-
-    opc::Variant var;
-    s->readValue(opc::NodeId(1, "range"), var);
-
-    auto r2 = var.get<app::types::Range2>();
-
-    std::cout << r2.min << " " << r2.max << std::endl;
 
     // loading of a xml nodeset
     s->loadNodeset("../models/serviceobject.xml");

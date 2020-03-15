@@ -4,12 +4,18 @@
 
 * suppport creating Objects from Object types
 As a developer I want to load a nodeset with the ObjectType of a service.
-When I create an instance of this ObjectType, I want to bind it to the service implmentation.
+When I create an instance of this ObjectType, I want to bind it to the service implementation.
+There can be several instances of the service
 * support user defined datatypes:
   * structures
   * enumerations
+  Solution 1) let open62541 generate the datatype, manually implement the conversion functions
+  Solution 2) generate the conversion functions
 * refactor Variant handling
   * hack in open library is necessary to forward declare UA_Variant in Variant.h
 * tests for nodeset import
 * benchmark tests
+* calculate test coverage
+* provide callback for reading Localized Text from database
+* is linking against open62541 in the application really needed?
 
