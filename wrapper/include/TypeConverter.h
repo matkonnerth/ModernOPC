@@ -33,6 +33,56 @@ isTypeMatching(const UA_DataType *uatype) {
 template <typename T>
 const UA_DataType *getDataType();
 
+template <>
+inline const UA_DataType *
+getDataType<bool>() {
+    return &UA_TYPES[UA_TYPES_BOOLEAN];
+}
+
+template <>
+inline const UA_DataType *
+getDataType<char>() {
+    return &UA_TYPES[UA_TYPES_SBYTE];
+}
+
+template <>
+inline const UA_DataType *
+getDataType<long>() {
+    if(sizeof(long) == 4) {
+        return &UA_TYPES[UA_TYPES_INT32];
+    } else if(sizeof(long) == 8) {
+        return &UA_TYPES[UA_TYPES_INT64];
+    }
+}
+
+template <>
+inline const UA_DataType *
+getDataType<int>() {
+    if(sizeof(int) == 4) {
+        return &UA_TYPES[UA_TYPES_INT32];
+    } else if(sizeof(int) == 8) {
+        return &UA_TYPES[UA_TYPES_INT64];
+    }
+}
+
+template <>
+inline const UA_DataType *
+getDataType<float>() {
+    return &UA_TYPES[UA_TYPES_FLOAT];
+}
+
+template <>
+inline const UA_DataType *
+getDataType<double>() {
+    return &UA_TYPES[UA_TYPES_DOUBLE];
+}
+
+template <>
+inline const UA_DataType *
+getDataType<std::string>() {
+    return &UA_TYPES[UA_TYPES_STRING];
+}
+
 template <typename T>
 void
 toUAVariant(T val, UA_Variant *var) {

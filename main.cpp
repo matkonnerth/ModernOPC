@@ -10,7 +10,7 @@
 #include "MyDataSource.h"
 #include "NodeId.h"
 #include "Server.h"
-#include "Types.h"
+#include "AppTypes.h"
 
 auto
 add(int a, int b, double c) {
@@ -113,7 +113,7 @@ main() {
     s->addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, "source1Var"), "source1Var", 12,
                        std::make_unique<opc::NodeMetaInfo>("source1"));
 
-    opc::types::Range r{0.1, 9.9};
+    app::types::Range2 r{0.1, 9.9};
     s->addVariableNode(opc::NodeId(0,85), opc::NodeId(1, "range"), "range", r);
 
     // loading of a xml nodeset
