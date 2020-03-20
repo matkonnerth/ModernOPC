@@ -237,6 +237,7 @@ importNodesCallback(void *userContext, const TNode *node) {
                         attr.arrayDimensions = &arrayDimensions[0];
                     }
                     attr.arrayDimensions[0] = static_cast<UA_UInt32>(varnode->value->arrayCnt);
+                    attr.valueRank=1;
                 }
                 else
                 {

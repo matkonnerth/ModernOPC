@@ -1,6 +1,7 @@
 #include <Server.h>
 #include <Variant.h>
 #include <gtest/gtest.h>
+#include <Types.h>
 
 std::string path = "";
 
@@ -14,46 +15,22 @@ TEST(import, namespaceZeroValues) {
     ASSERT_TRUE(var.get<double>()-3.14 < 0.01);
     ASSERT_TRUE(server.readValue(opc::NodeId(2, 1004), var));
     ASSERT_TRUE(var.get<std::vector<uint>>()[2]==140);
-
-    /*
-
-        
-        // extension object with nested struct
-        retval = UA_Server_readValue(server, UA_NODEID_NUMERIC(nsIdx, 1005), &var);
-        ck_assert_uint_eq(retval, UA_STATUSCODE_GOOD);
-        ck_assert(var.type->typeIndex == UA_TYPES_SERVERSTATUSDATATYPE);
-        ck_assert_int_eq(((UA_ServerStatusDataType *)var.data)->state, 5);
-        UA_Variant_clear(&var);
-        // array of extension object with nested struct
-        retval = UA_Server_readValue(server, UA_NODEID_NUMERIC(nsIdx, 1006), &var);
-        ck_assert_uint_eq(retval, UA_STATUSCODE_GOOD);
-        ck_assert(var.type->typeIndex == UA_TYPES_SERVERSTATUSDATATYPE);
-        ck_assert_int_eq(((UA_ServerStatusDataType *)var.data)[1].state, 3);
-        UA_Variant_clear(&var);
-        // LocalizedText
-        retval = UA_Server_readValue(server, UA_NODEID_NUMERIC(nsIdx, 1007), &var);
-        ck_assert_uint_eq(retval, UA_STATUSCODE_GOOD);
-        ck_assert(var.type->typeIndex == UA_TYPES_LOCALIZEDTEXT);
-        UA_String s = UA_STRING("en");
-        ck_assert(UA_String_equal(&((UA_LocalizedText *)var.data)->locale, &s));
-        UA_Variant_clear(&var);
-        // LocalizedTextArray
-        retval = UA_Server_readValue(server, UA_NODEID_NUMERIC(nsIdx, 1008), &var);
-        ck_assert_uint_eq(retval, UA_STATUSCODE_GOOD);
-        ck_assert(var.type->typeIndex == UA_TYPES_LOCALIZEDTEXT);
-        ck_assert_int_eq(var.arrayLength, 2);
-        s = UA_STRING("griasEich!");
-        ck_assert(UA_String_equal(&((UA_LocalizedText *)var.data)->text, &s));
-        s = UA_STRING("Hi!");
-        ck_assert(UA_String_equal(&((UA_LocalizedText *)var.data)[1].text, &s));
-        UA_Variant_clear(&var);
-        // QualifiedName
-        retval = UA_Server_readValue(server, UA_NODEID_NUMERIC(nsIdx, 1009), &var);
-        ck_assert_uint_eq(retval, UA_STATUSCODE_GOOD);
-        ck_assert(var.type->typeIndex == UA_TYPES_QUALIFIEDNAME);
-        ck_assert_uint_eq(((UA_QualifiedName *)var.data)->namespaceIndex, 2);
-        UA_Variant_clear(&var);
-    */
+    ASSERT_TRUE(server.readValue(opc::NodeId(2, 1005), var));
+    ASSERT_TRUE(var.getUAVariant()->type->typeIndex ==
+                    UA_TYPES_SERVERSTATUSDATATYPE);
+    ASSERT_TRUE(static_cast<UA_ServerStatusDataType*>(var.getUAVariant()->data)->state == 5);
+    ASSERT_TRUE(server.readValue(opc::NodeId(2, 1006), var));
+    ASSERT_TRUE(static_cast<UA_ServerStatusDataType *>(var.getUAVariant()->data)[1].state == 3);
+    ASSERT_TRUE(server.readValue(opc::NodeId(2, 1007), var));
+    ASSERT_TRUE(var.get<opc::types::LocalizedText>().text() == "someText@42");
+    ASSERT_TRUE(var.get<opc::types::LocalizedText>().locale() == "en");
+    ASSERT_TRUE(server.readValue(opc::NodeId(2, 1008), var));
+    ASSERT_TRUE(var.get<std::vector<opc::types::LocalizedText>>()[0].text() == "griasEich!");
+    ASSERT_TRUE(var.get<std::vector<opc::types::LocalizedText>>()[1].text() ==
+                "Hi!");
+    ASSERT_TRUE(server.readValue(opc::NodeId(2, 1009), var));
+    ASSERT_TRUE(var.get<opc::types::QualifiedName>().namespaceIndex() == 2);
+    ASSERT_TRUE(var.get<opc::types::QualifiedName>().name() == "qualifiedName");
 }
 
 int

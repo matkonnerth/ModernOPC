@@ -28,6 +28,8 @@ class Variant {
 
     void copyToUaVariant(UA_Variant* var);
 
+    const UA_Variant* getUAVariant();
+
   private:
     UA_Variant *variant{nullptr};
     bool owned = false;

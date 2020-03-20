@@ -83,20 +83,23 @@ template <>
 std::vector<uint> toStdType(UA_Variant *variant)
 {
     return std::vector<uint>{static_cast<uint *>(variant->data),
-                            static_cast<uint *>(variant->data) +
-                                variant->arrayLength};
+                             static_cast<uint *>(variant->data) +
+                                 variant->arrayLength};
+}
+
+std::string fromUAString(const UA_String *s)
+{
+    if (s->length > 0)
+    {
+        return std::string{reinterpret_cast<char *>(s->data), s->length};
+    }
+    return std::string{};
 }
 
 template <>
 std::string toStdType(UA_Variant *variant)
 {
-    UA_String *s = (UA_String *)variant->data;
-    if (s->length > 0)
-    {
-        std::string stdString{reinterpret_cast<char *>(s->data), s->length};
-        return stdString;
-    }
-    return std::string{};
+    return fromUAString(static_cast<UA_String *>(variant->data));
 }
 
 template <>
@@ -106,17 +109,45 @@ std::vector<std::string> toStdType(UA_Variant *variant)
     for (size_t i = 0; i < variant->arrayLength; i++)
     {
         UA_String *s = ((UA_String *)variant->data) + i;
-        if (s->length > 0)
-        {
-            std::string stdString{reinterpret_cast<char *>(s->data), s->length};
-            vec.push_back(stdString);
-        }
-        else
-        {
-            vec.push_back(std::string{});
-        }
+        vec.emplace_back(fromUAString(s));
     }
     return vec;
+}
+
+types::LocalizedText fromUALocalizedText(const UA_LocalizedText *lt)
+{
+    std::string locale{reinterpret_cast<char *>(lt->locale.data),
+                       lt->locale.length};
+    std::string text{reinterpret_cast<char *>(lt->text.data), lt->text.length};
+    return types::LocalizedText(locale, text);
+}
+
+template <>
+types::LocalizedText toStdType(UA_Variant *variant)
+{
+    return fromUALocalizedText(static_cast<UA_LocalizedText *>(variant->data));
+}
+
+template<>
+std::vector<types::LocalizedText> toStdType(UA_Variant* var)
+{
+    std::vector<types::LocalizedText> vec;
+    for (size_t i = 0; i < var->arrayLength; i++)
+    {
+        vec.emplace_back(fromUALocalizedText(&static_cast<UA_LocalizedText*>(var->data)[i]));
+    }
+    return vec;
+}
+
+types::QualifiedName fromUAQualifiedName(const UA_QualifiedName* qn)
+{
+    return types::QualifiedName(qn->namespaceIndex, fromUAString(&qn->name));
+}
+
+template <>
+types::QualifiedName toStdType(UA_Variant* variant)
+{
+    return fromUAQualifiedName(static_cast<UA_QualifiedName*>(variant->data));
 }
 
 opc::NodeId fromUaNodeId(const UA_NodeId &id)
@@ -164,4 +195,4 @@ UA_NodeId fromNodeId(const opc::NodeId &nodeId)
     return id;
 }
 
-}
+} // namespace opc
