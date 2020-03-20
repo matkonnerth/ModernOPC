@@ -21,7 +21,7 @@ Variant::~Variant() {
     }
 }
 
-Variant::Variant(Variant &&other) {
+Variant::Variant(Variant &&other) noexcept {
     owned = other.owned;
     variant = other.variant;
     other.owned=false;
@@ -29,7 +29,7 @@ Variant::Variant(Variant &&other) {
 }
 
 Variant &
-Variant::operator=(Variant &&other) {
+Variant::operator=(Variant &&other) noexcept {
     if(owned) {
         UA_Variant_delete(variant);
     }
@@ -38,6 +38,21 @@ Variant::operator=(Variant &&other) {
     other.owned=false;
     other.variant=nullptr;
     return *this;
+}
+
+void Variant::set(UA_Variant* var)
+{
+    if (variant && owned)
+    {
+        UA_Variant_delete(variant);
+    }
+    variant = var;
+    owned = true;
+}
+
+void Variant::copyToUaVariant(UA_Variant* var)
+{
+    UA_Variant_copy(variant, var);
 }
 
 /* setters */

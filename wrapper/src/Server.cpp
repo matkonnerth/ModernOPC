@@ -84,7 +84,7 @@ Server::internalMethodCallback(UA_Server *server, const UA_NodeId *sessionId,
             outputSize=outputArgs.size();
             if(outputSize==1)
             {
-                UA_Variant_copy(outputArgs[0].data(), output);
+                outputArgs[0].copyToUaVariant(output); 
             }
             return UA_STATUSCODE_GOOD;
         }
@@ -133,6 +133,13 @@ Server::internalWrite(UA_Server *server, const UA_NodeId *sessionId,
 
 bool Server::readValue(const NodeId id, Variant& var)
 {
-    return (UA_STATUSCODE_GOOD == UA_Server_readValue(server, fromNodeId(id), var.data()));
+    UA_Variant* v = UA_Variant_new();
+    if(UA_STATUSCODE_GOOD== UA_Server_readValue(server, fromNodeId(id), v))
+    {
+        var.set(v);
+        return true;
+    }
+    UA_Variant_delete(v);
+    return false;
 }
 }

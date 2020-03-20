@@ -12,9 +12,9 @@ class Variant {
     Variant(const Variant &other) = delete;
     Variant &
     operator=(const Variant &other) = delete;
-    Variant(Variant &&other);
+    Variant(Variant &&other) noexcept;
     Variant &
-    operator=(Variant &&other);
+    operator=(Variant &&other) noexcept;
 
     template <typename T>
     void
@@ -24,15 +24,9 @@ class Variant {
     T
     get() const;
 
-    UA_Variant *
-    data() {
-        return variant;
-    }
+    void set(UA_Variant* var);
 
-    const UA_Variant *
-    data() const {
-        return variant;
-    }
+    void copyToUaVariant(UA_Variant* var);
 
   private:
     UA_Variant *variant{nullptr};
