@@ -78,9 +78,8 @@ static UA_NodeId getReferenceTypeId(const Reference *ref)
     }
     return UA_NODEID_NULL;
 }
-UA_NodeId getReferenceTarget(const Reference *ref);
 
-UA_NodeId getReferenceTarget(const Reference *ref)
+static UA_NodeId getReferenceTarget(const Reference *ref)
 {
     if (!ref)
     {
@@ -89,9 +88,9 @@ UA_NodeId getReferenceTarget(const Reference *ref)
     return getNodeIdFromChars(ref->target);
 }
 
-Reference *getHierachicalInverseReference(const TNode *node);
+static Reference *getHierachicalInverseReference(const TNode *node);
 
-Reference *getHierachicalInverseReference(const TNode *node)
+static Reference *getHierachicalInverseReference(const TNode *node)
 {
 
     Reference *hierachicalRef = node->hierachicalRefs;
@@ -106,7 +105,7 @@ Reference *getHierachicalInverseReference(const TNode *node)
     return nullptr;
 }
 
-UA_NodeId getParentId(const TNode *node, UA_NodeId &parentRefId)
+static UA_NodeId getParentId(const TNode *node, UA_NodeId &parentRefId)
 {
     UA_NodeId parentId = UA_NODEID_NULL;
     if (node->nodeClass == NODECLASS_OBJECT)
@@ -128,7 +127,7 @@ UA_NodeId getParentId(const TNode *node, UA_NodeId &parentRefId)
     return parentId;
 }
 
-void handleObjectNode(const TObjectNode *node, UA_NodeId &id,
+static void handleObjectNode(const TObjectNode *node, UA_NodeId &id,
                       const UA_NodeId &parentId,
                       const UA_NodeId &parentReferenceId, const UA_LocalizedText& lt, UA_Server *server)
 {
@@ -142,7 +141,7 @@ void handleObjectNode(const TObjectNode *node, UA_NodeId &id,
                             oAttr, nullptr, nullptr);
 }
 
-void handleMethodNode(const TMethodNode *node, UA_NodeId &id,
+static void handleMethodNode(const TMethodNode *node, UA_NodeId &id,
                       const UA_NodeId &parentId,
                       const UA_NodeId &parentReferenceId,
                       const UA_LocalizedText &lt, UA_Server *server)
@@ -157,7 +156,7 @@ void handleMethodNode(const TMethodNode *node, UA_NodeId &id,
                             nullptr, 0, nullptr, 0, nullptr, nullptr, nullptr);
 }
 
-void handleVariableNode(const TVariableNode *node, UA_NodeId &id,
+static void handleVariableNode(const TVariableNode *node, UA_NodeId &id,
                         const UA_NodeId &parentId,
                         const UA_NodeId &parentReferenceId,
                         const UA_LocalizedText &lt, UA_Server *server)
@@ -209,7 +208,7 @@ void handleVariableNode(const TVariableNode *node, UA_NodeId &id,
     Value_delete(&((TVariableNode *)node)->value);
 }
 
-void handleObjectTypeNode(const TObjectTypeNode *node, UA_NodeId &id,
+static void handleObjectTypeNode(const TObjectTypeNode *node, UA_NodeId &id,
                           const UA_NodeId &parentId,
                           const UA_NodeId &parentReferenceId,
                           const UA_LocalizedText &lt, UA_Server *server)
@@ -222,7 +221,7 @@ void handleObjectTypeNode(const TObjectTypeNode *node, UA_NodeId &id,
                                 nullptr, nullptr);
 }
 
-void handleReferenceTypeNode(const TReferenceTypeNode *node, UA_NodeId &id,
+static void handleReferenceTypeNode(const TReferenceTypeNode *node, UA_NodeId &id,
                              const UA_NodeId &parentId,
                              const UA_NodeId &parentReferenceId,
                              const UA_LocalizedText &lt, UA_Server *server)
@@ -236,7 +235,7 @@ void handleReferenceTypeNode(const TReferenceTypeNode *node, UA_NodeId &id,
                                    nullptr, nullptr);
 }
 
-void handleVariableTypeNode(const TVariableTypeNode *node, UA_NodeId &id,
+static void handleVariableTypeNode(const TVariableTypeNode *node, UA_NodeId &id,
                             const UA_NodeId &parentId,
                             const UA_NodeId &parentReferenceId,
                             const UA_LocalizedText &lt, UA_Server *server)
@@ -263,7 +262,7 @@ void handleVariableTypeNode(const TVariableTypeNode *node, UA_NodeId &id,
                                   typeDefId, attr, nullptr, nullptr);
 }
 
-void handleDataTypeNode(const TDataTypeNode *node, UA_NodeId &id,
+static void handleDataTypeNode(const TDataTypeNode *node, UA_NodeId &id,
                         const UA_NodeId &parentId,
                         const UA_NodeId &parentReferenceId,
                         const UA_LocalizedText &lt, UA_Server *server)

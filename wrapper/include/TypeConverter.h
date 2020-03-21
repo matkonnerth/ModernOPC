@@ -5,6 +5,7 @@
 #include <open62541/server.h>
 #include <vector>
 #include <cassert>
+#include <Types.h>
 
 namespace opc
 {
@@ -147,5 +148,7 @@ T toStdType(UA_Variant *variant);
 
 opc::NodeId fromUaNodeId(const UA_NodeId &id);
 UA_NodeId fromNodeId(const opc::NodeId &nodeId);
+
+types::LocalizedText fromUALocalizedText(const UA_LocalizedText *lt);
 
 } // namespace TypeConverter

@@ -43,6 +43,11 @@ TypeList_pop(TypeList *stack) {
 Value *
 Value_new(const TNode *node) {
     if(!(node->nodeClass == NODECLASS_VARIABLE)) {
+        if(node->nodeClass==NODECLASS_VARIABLETYPE)
+        {
+            printf("Values on variable types are not handled\n");
+            return nullptr;
+        }
         assert(false && "Value_new on node that is not a variable node\n");
     }
     auto *val = static_cast<Value*>(UA_calloc(1, sizeof(Value)));
@@ -87,6 +92,8 @@ isBuiltinSpecialType(Value *val) {
 
 void
 Value_start(Value *val, const char *localname) {
+    if(!val)
+        return;
     switch(val->state) {
         case VALUE_STATE_ERROR:
             break;
@@ -279,6 +286,8 @@ nextType(Value *val) {
 
 void
 Value_end(Value *val, const char *localname, char *value) {
+    if(!val)
+        return;
     switch(val->state) {
         case VALUE_STATE_BUILTIN:
             setScalarValue(val, val->typestack->type, value);
@@ -336,6 +345,10 @@ Value_end(Value *val, const char *localname, char *value) {
 
 void
 Value_finish(Value *val) {
+    if(!val)
+    {
+        return;
+    }
     if(VALUE_STATE_FINISHED != val->state) {
         printf("Warning: value finish called while value state != finished\n");
     }
@@ -354,5 +367,5 @@ Value_delete(Value **val) {
     }
     UA_free(v->value);
     UA_free(v);
-    *val=NULL;
+    *val=nullptr;
 }

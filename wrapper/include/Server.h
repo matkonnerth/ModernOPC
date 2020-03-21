@@ -7,6 +7,7 @@
 #include <map>
 #include <open62541/server.h>
 #include <open62541/server_config.h>
+#include <Types.h>
 
 struct UA_Server;
 namespace opc
@@ -111,7 +112,9 @@ class Server
 
     auto &getDataSources() { return datasources; }
 
-    bool readValue(const NodeId id, Variant &var);
+    bool readValue(const NodeId& id, Variant &var);
+
+    types::LocalizedText readDisplayName(const NodeId& id);
 
     uint16_t getNamespaceIndex(const std::string& uri);
 

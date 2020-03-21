@@ -21,6 +21,13 @@ TEST(import, notFound)
     ASSERT_FALSE(server.loadNodeset("someNotExisting.xml"));
 }
 
+TEST(import, displayname)
+{
+    opc::Server server;
+    ASSERT_TRUE(server.loadNodeset(path + "/" + "Displayname.xml"));
+    ASSERT_TRUE(server.readDisplayName(opc::NodeId(2, 6567)).text() == "<GroupIdentifier>");
+}
+
 int main(int argc, char**argv)
 {
 
