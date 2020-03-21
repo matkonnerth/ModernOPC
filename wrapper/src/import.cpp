@@ -130,10 +130,10 @@ UA_NodeId getParentId(const TNode *node, UA_NodeId &parentRefId)
 
 void handleObjectNode(const TObjectNode *node, UA_NodeId &id,
                       const UA_NodeId &parentId,
-                      const UA_NodeId &parentReferenceId, UA_Server *server)
+                      const UA_NodeId &parentReferenceId, const UA_LocalizedText& lt, UA_Server *server)
 {
     UA_ObjectAttributes oAttr = UA_ObjectAttributes_default;
-    oAttr.displayName = UA_LOCALIZEDTEXT((char *)"en-US", node->displayName);
+    oAttr.displayName = lt;
 
     UA_NodeId typeDefId = getTypeDefinitionIdFromChars2((const TNode *)node);
 
@@ -144,12 +144,13 @@ void handleObjectNode(const TObjectNode *node, UA_NodeId &id,
 
 void handleMethodNode(const TMethodNode *node, UA_NodeId &id,
                       const UA_NodeId &parentId,
-                      const UA_NodeId &parentReferenceId, UA_Server *server)
+                      const UA_NodeId &parentReferenceId,
+                      const UA_LocalizedText &lt, UA_Server *server)
 {
     UA_MethodAttributes attr = UA_MethodAttributes_default;
     attr.executable = true;
     attr.userExecutable = true;
-    attr.displayName = UA_LOCALIZEDTEXT((char *)"", node->displayName);
+    attr.displayName = lt;
 
     UA_Server_addMethodNode(server, id, parentId, parentReferenceId,
                             UA_QUALIFIEDNAME(1, node->browseName), attr,
@@ -157,10 +158,12 @@ void handleMethodNode(const TMethodNode *node, UA_NodeId &id,
 }
 
 void handleVariableNode(const TVariableNode *node, UA_NodeId &id,
-                      const UA_NodeId &parentId,
-                      const UA_NodeId &parentReferenceId, UA_Server *server)
+                        const UA_NodeId &parentId,
+                        const UA_NodeId &parentReferenceId,
+                        const UA_LocalizedText &lt, UA_Server *server)
 {
     UA_VariableAttributes attr = UA_VariableAttributes_default;
+    attr.displayName = lt;
     attr.dataType = getNodeIdFromChars(node->datatype);
     attr.valueRank = atoi(node->valueRank);
     if (attr.valueRank >= 0)
@@ -178,8 +181,7 @@ void handleVariableNode(const TVariableNode *node, UA_NodeId &id,
         if (node->value->isArray)
         {
             UA_Variant_setArray(&attr.value, node->value->value,
-                                node->value->arrayCnt,
-                                node->value->datatype);
+                                node->value->arrayCnt, node->value->datatype);
             if (!attr.arrayDimensions)
             {
                 attr.arrayDimensionsSize = 1;
@@ -198,49 +200,49 @@ void handleVariableNode(const TVariableNode *node, UA_NodeId &id,
                                  node->value->datatype);
         }
     }
-    UA_NodeId typeDefId = getTypeDefinitionIdFromChars2((const TNode*)node);
-    UA_StatusCode retval = UA_Server_addVariableNode(
-        server, id, parentId, parentReferenceId, UA_QUALIFIEDNAME(0, node->browseName),
-        typeDefId, attr, nullptr, nullptr);
-    if (retval != UA_STATUSCODE_GOOD)
-    {
-        printf("adding variable node %s failed\n", node->id.idString);
-    }
+    UA_NodeId typeDefId = getTypeDefinitionIdFromChars2((const TNode *)node);
+    UA_Server_addVariableNode(server, id, parentId, parentReferenceId,
+                                  UA_QUALIFIEDNAME(0, node->browseName),
+                                  typeDefId, attr, nullptr, nullptr);
+
     // value is copied in addVariableNode
-    Value_delete(&((TVariableNode*)node)->value);
+    Value_delete(&((TVariableNode *)node)->value);
 }
 
 void handleObjectTypeNode(const TObjectTypeNode *node, UA_NodeId &id,
-                      const UA_NodeId &parentId,
-                      const UA_NodeId &parentReferenceId, UA_Server *server)
+                          const UA_NodeId &parentId,
+                          const UA_NodeId &parentReferenceId,
+                          const UA_LocalizedText &lt, UA_Server *server)
 {
     UA_ObjectTypeAttributes oAttr = UA_ObjectTypeAttributes_default;
-    oAttr.displayName = UA_LOCALIZEDTEXT((char *)"en-US", node->displayName);
+    oAttr.displayName = lt;
 
-    UA_Server_addObjectTypeNode(
-        server, id, parentId, parentReferenceId, UA_QUALIFIEDNAME(1, node->browseName),
-        oAttr, nullptr, nullptr);
+    UA_Server_addObjectTypeNode(server, id, parentId, parentReferenceId,
+                                UA_QUALIFIEDNAME(1, node->browseName), oAttr,
+                                nullptr, nullptr);
 }
 
 void handleReferenceTypeNode(const TReferenceTypeNode *node, UA_NodeId &id,
-                          const UA_NodeId &parentId,
-                          const UA_NodeId &parentReferenceId, UA_Server *server)
+                             const UA_NodeId &parentId,
+                             const UA_NodeId &parentReferenceId,
+                             const UA_LocalizedText &lt, UA_Server *server)
 {
     UA_ReferenceTypeAttributes attr = UA_ReferenceTypeAttributes_default;
     attr.symmetric = true;
-    attr.displayName = UA_LOCALIZEDTEXT((char *)"en-US", node->displayName);
+    attr.displayName = lt;
 
-    UA_Server_addReferenceTypeNode(
-        server, id, parentId, parentReferenceId, UA_QUALIFIEDNAME(1, node->browseName),
-        attr, nullptr, nullptr);
+    UA_Server_addReferenceTypeNode(server, id, parentId, parentReferenceId,
+                                   UA_QUALIFIEDNAME(1, node->browseName), attr,
+                                   nullptr, nullptr);
 }
 
 void handleVariableTypeNode(const TVariableTypeNode *node, UA_NodeId &id,
-                             const UA_NodeId &parentId,
-                             const UA_NodeId &parentReferenceId,
-                             UA_Server *server)
+                            const UA_NodeId &parentId,
+                            const UA_NodeId &parentReferenceId,
+                            const UA_LocalizedText &lt, UA_Server *server)
 {
     UA_VariableTypeAttributes attr = UA_VariableTypeAttributes_default;
+    attr.displayName = lt;
     attr.valueRank = atoi(node->valueRank);
     attr.isAbstract = node->isAbstract;
     if (attr.valueRank >= 0)
@@ -254,26 +256,25 @@ void handleVariableTypeNode(const TVariableTypeNode *node, UA_NodeId &id,
         }
     }
 
-    UA_NodeId typeDefId = getTypeDefinitionIdFromChars2((const TNode*)node);
+    UA_NodeId typeDefId = getTypeDefinitionIdFromChars2((const TNode *)node);
 
-    UA_Server_addVariableTypeNode(
-        server, id, parentId, parentReferenceId, UA_QUALIFIEDNAME(1, node->browseName),
-        typeDefId, attr, nullptr, nullptr);
+    UA_Server_addVariableTypeNode(server, id, parentId, parentReferenceId,
+                                  UA_QUALIFIEDNAME(1, node->browseName),
+                                  typeDefId, attr, nullptr, nullptr);
 }
 
 void handleDataTypeNode(const TDataTypeNode *node, UA_NodeId &id,
-                            const UA_NodeId &parentId,
-                            const UA_NodeId &parentReferenceId,
-                            UA_Server *server)
+                        const UA_NodeId &parentId,
+                        const UA_NodeId &parentReferenceId,
+                        const UA_LocalizedText &lt, UA_Server *server)
 {
     UA_DataTypeAttributes attr = UA_DataTypeAttributes_default;
-    attr.displayName = UA_LOCALIZEDTEXT((char *)"", node->displayName);
+    attr.displayName = lt;
 
-    UA_Server_addDataTypeNode(
-        server, id, parentId, parentReferenceId, UA_QUALIFIEDNAME(1, node->browseName),
-        attr, nullptr, nullptr);
+    UA_Server_addDataTypeNode(server, id, parentId, parentReferenceId,
+                              UA_QUALIFIEDNAME(1, node->browseName), attr,
+                              nullptr, nullptr);
 }
-
 
 void importNodesCallback(void *userContext, const TNode *node)
 {
@@ -281,36 +282,41 @@ void importNodesCallback(void *userContext, const TNode *node)
     UA_NodeId id = getNodeIdFromChars(node->id);
     UA_NodeId parentReferenceId = UA_NODEID_NULL;
     UA_NodeId parentId = getParentId(node, parentReferenceId);
+    UA_LocalizedText lt = UA_LOCALIZEDTEXT((char *)"", node->displayName);
     switch (node->nodeClass)
     {
     case NODECLASS_OBJECT:
         handleObjectNode((const TObjectNode *)node, id, parentId,
-                         parentReferenceId, server);
+                         parentReferenceId, lt, server);
         break;
 
     case NODECLASS_METHOD:
         handleMethodNode((const TMethodNode *)node, id, parentId,
-                         parentReferenceId, server);
+                         parentReferenceId, lt, server);
         break;
 
     case NODECLASS_OBJECTTYPE:
-        handleObjectTypeNode((const TObjectTypeNode*)node, id, parentId, parentReferenceId, server);
+        handleObjectTypeNode((const TObjectTypeNode *)node, id, parentId,
+                             parentReferenceId, lt, server);
         break;
 
     case NODECLASS_REFERENCETYPE:
-        handleReferenceTypeNode((const TReferenceTypeNode*)node, id, parentId, parentReferenceId, server);
+        handleReferenceTypeNode((const TReferenceTypeNode *)node, id, parentId,
+                                parentReferenceId, lt, server);
         break;
 
     case NODECLASS_VARIABLETYPE:
-        handleVariableTypeNode((const TVariableTypeNode*)node, id, parentId, parentReferenceId, server);
-    break;
+        handleVariableTypeNode((const TVariableTypeNode *)node, id, parentId,
+                               parentReferenceId, lt, server);
+        break;
 
     case NODECLASS_VARIABLE:
         handleVariableNode((const TVariableNode *)node, id, parentId,
-                         parentReferenceId, server);
+                           parentReferenceId, lt, server);
         break;
     case NODECLASS_DATATYPE:
-        handleDataTypeNode((const TDataTypeNode*)node, id, parentId, parentReferenceId, server);
+        handleDataTypeNode((const TDataTypeNode *)node, id, parentId,
+                           parentReferenceId, lt, server);
     }
 }
 
