@@ -113,6 +113,8 @@ class Server
 
     bool readValue(const NodeId id, Variant &var);
 
+    uint16_t getNamespaceIndex(const std::string& uri);
+
   private:
     UA_Server *server{nullptr};
     UA_DataSource internalSrc{internalRead, internalWrite};

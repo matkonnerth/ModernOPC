@@ -1,16 +1,17 @@
 #include "Server.h"
-#include <open62541/server.h>
-#include <open62541/server_config_default.h>
+#include "TypeConverter.h"
+#include "import.h"
+#include "nodesetLoader.h"
+#include "value.h"
 #include <NodeId.h>
 #include <NodeMetaInfo.h>
-#include "nodesetLoader.h"
-#include "import.h"
-#include "value.h"
-#include "TypeConverter.h"
+#include <open62541/server.h>
+#include <open62541/server_config_default.h>
 
-
-namespace opc {
-Server::Server() : isRunning{true} {
+namespace opc
+{
+Server::Server() : isRunning{true}
+{
     server = UA_Server_new();
     UA_ServerConfig_setDefault(UA_Server_getConfig(server));
     sServer = this;
@@ -18,15 +19,13 @@ Server::Server() : isRunning{true} {
 
 Server::~Server() { UA_Server_delete(server); }
 
-void
-Server::run() {
-    UA_Server_run(server, &isRunning);
-}
+void Server::run() { UA_Server_run(server, &isRunning); }
 
-void
-Server::registerDataSource(const std::string &key,
-                           std::function<void(const NodeId &id, Variant &var)> read,
-                           std::function<void(const NodeId &id, Variant &var)> write) {
+void Server::registerDataSource(
+    const std::string &key,
+    std::function<void(const NodeId &id, Variant &var)> read,
+    std::function<void(const NodeId &id, Variant &var)> write)
+{
     datasources.push_back(std::make_unique<DataSource>(key, read, write));
 }
 
@@ -40,7 +39,7 @@ bool Server::loadNodeset(const std::string &path)
     handler.file = path.c_str();
 
     ValueInterface valIf;
-    valIf.userData=nullptr;
+    valIf.userData = nullptr;
     valIf.newValue = Value_new;
     valIf.start = Value_start;
     valIf.end = Value_end;
@@ -50,41 +49,65 @@ bool Server::loadNodeset(const std::string &path)
     return loadFile(&handler);
 }
 
-bool
-Server::call(const NodeId& id, const std::vector<Variant>& inputArgs, std::vector<Variant>& outputArgs) {
+uint16_t Server::getNamespaceIndex(const std::string &uri)
+{
+    UA_Variant v;
+    if (UA_STATUSCODE_GOOD !=
+        UA_Server_readValue(
+            server, UA_NODEID_NUMERIC(0, UA_NS0ID_SERVER_NAMESPACEARRAY), &v))
+    {
+        return 0;
+    }
+    std::vector<UA_String> namespaces{static_cast<UA_String *>(v.data),
+                                        static_cast<UA_String *>(v.data) +
+                                            v.arrayLength};
+    for (size_t i = 0; i < namespaces.size(); i++)
+    {
+        std::string s{reinterpret_cast<char *>(namespaces[i].data),
+                      namespaces[i].length};
+        if (uri.compare(s) == 0)
+        {
+            return static_cast<uint16_t>(i);
+        }
+    }
+    return 0;
+}
+
+bool Server::call(const NodeId &id, const std::vector<Variant> &inputArgs,
+                  std::vector<Variant> &outputArgs)
+{
     ICallable *c = callbacks.at(id).get();
-    if(c) {
+    if (c)
+    {
         return c->call(inputArgs, outputArgs);
     }
     return false;
 }
 
-UA_StatusCode
-Server::internalMethodCallback(UA_Server *server, const UA_NodeId *sessionId,
-                       void *sessionContext, const UA_NodeId *methodId,
-                       void *methodContext, const UA_NodeId *objectId,
-                       void *objectContext, size_t inputSize, const UA_Variant *input,
-                       size_t outputSize, UA_Variant *output)
+UA_StatusCode Server::internalMethodCallback(
+    UA_Server *server, const UA_NodeId *sessionId, void *sessionContext,
+    const UA_NodeId *methodId, void *methodContext, const UA_NodeId *objectId,
+    void *objectContext, size_t inputSize, const UA_Variant *input,
+    size_t outputSize, UA_Variant *output)
 {
-    opc::Server *s {nullptr};
-    UA_Server_getNodeContext(
-        server, *methodId, (void**)&s);
+    opc::Server *s{nullptr};
+    UA_Server_getNodeContext(server, *methodId, (void **)&s);
 
-    if(s)
+    if (s)
     {
         std::vector<Variant> inputArgs;
         std::vector<Variant> outputArgs;
-        for(size_t i=0; i< inputSize; i++)
+        for (size_t i = 0; i < inputSize; i++)
         {
-            Variant v{const_cast<UA_Variant*>(&input[i])};
+            Variant v{const_cast<UA_Variant *>(&input[i])};
             inputArgs.push_back(std::move(v));
         }
         if (s->call(opc::fromUaNodeId(*methodId), inputArgs, outputArgs))
         {
-            outputSize=outputArgs.size();
-            if(outputSize==1)
+            outputSize = outputArgs.size();
+            if (outputSize == 1)
             {
-                outputArgs[0].copyToUaVariant(output); 
+                outputArgs[0].copyToUaVariant(output);
             }
             return UA_STATUSCODE_GOOD;
         }
@@ -95,17 +118,18 @@ Server::internalMethodCallback(UA_Server *server, const UA_NodeId *sessionId,
 
 UA_StatusCode
 Server::internalRead(UA_Server *server, const UA_NodeId *sessionId,
-                         void *sessionContext, const UA_NodeId *nodeId, void *nodeContext,
-                         UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range,
-                         UA_DataValue *value) {
+                     void *sessionContext, const UA_NodeId *nodeId,
+                     void *nodeContext, UA_Boolean includeSourceTimeStamp,
+                     const UA_NumericRange *range, UA_DataValue *value)
+{
 
-    if(!nodeContext)
+    if (!nodeContext)
         return UA_STATUSCODE_BADNODATA;
 
-    auto info = static_cast<NodeMetaInfo*>(nodeContext);
-    for(auto &ds : static_cast<Server *>(sServer)->getDataSources())
+    auto info = static_cast<NodeMetaInfo *>(nodeContext);
+    for (auto &ds : static_cast<Server *>(sServer)->getDataSources())
     {
-        if(info->getDataSourceKey().compare(ds->getKey())==0)
+        if (info->getDataSourceKey().compare(ds->getKey()) == 0)
         {
             Variant var{&value->value};
             ds->read(opc::fromUaNodeId(*nodeId), var);
@@ -115,12 +139,14 @@ Server::internalRead(UA_Server *server, const UA_NodeId *sessionId,
     return UA_STATUSCODE_BADNODATA;
 }
 
-UA_StatusCode
-Server::internalWrite(UA_Server *server, const UA_NodeId *sessionId,
-                          void *sessionContext, const UA_NodeId *nodeId,
-                          void *nodeContext, const UA_NumericRange *range,
-                          const UA_DataValue *value) {
-    //if(!nodeContext)
+UA_StatusCode Server::internalWrite(UA_Server *server,
+                                    const UA_NodeId *sessionId,
+                                    void *sessionContext,
+                                    const UA_NodeId *nodeId, void *nodeContext,
+                                    const UA_NumericRange *range,
+                                    const UA_DataValue *value)
+{
+    // if(!nodeContext)
     //    return UA_STATUSCODE_BADNODATA;
     auto &ds = static_cast<Server *>(sServer)->getDataSources().at(0);
     // TODO: can we avoid this copy?
@@ -130,11 +156,10 @@ Server::internalWrite(UA_Server *server, const UA_NodeId *sessionId,
     return UA_STATUSCODE_GOOD;
 }
 
-
-bool Server::readValue(const NodeId id, Variant& var)
+bool Server::readValue(const NodeId id, Variant &var)
 {
-    UA_Variant* v = UA_Variant_new();
-    if(UA_STATUSCODE_GOOD== UA_Server_readValue(server, fromNodeId(id), v))
+    UA_Variant *v = UA_Variant_new();
+    if (UA_STATUSCODE_GOOD == UA_Server_readValue(server, fromNodeId(id), v))
     {
         var.set(v);
         return true;
@@ -142,4 +167,4 @@ bool Server::readValue(const NodeId id, Variant& var)
     UA_Variant_delete(v);
     return false;
 }
-}
+} // namespace opc
