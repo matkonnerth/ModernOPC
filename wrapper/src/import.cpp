@@ -1,6 +1,8 @@
 #include "nodesetLoader.h"
 #include "value.h"
 #include <open62541/server.h>
+#include <string>
+#include <vector>
 
 static UA_NodeId getNodeIdFromChars(TNodeId id)
 {
@@ -157,6 +159,35 @@ static void handleMethodNode(const TMethodNode *node, UA_NodeId &id,
                             nullptr, 0, nullptr, 0, nullptr, nullptr, nullptr);
 }
 
+static std::vector<uint32_t> getArrayDimensions(const char* s)
+{
+    std::string dim{s};
+    std::vector<uint32_t> arrDims;
+    if(dim.length()==0)
+    {
+        return arrDims;
+    }    
+    size_t idx = 0;
+    //add the first one
+    int val = atoi(s);
+    arrDims.push_back(static_cast<uint32_t>(val));
+    while(idx < dim.length())
+    {
+        size_t cur = dim.find(';', idx);
+        if(cur!= std::string::npos)
+        {
+            int val = atoi(s+cur+1);
+            arrDims.push_back(static_cast<uint32_t>(val));
+            idx=cur+1;
+        }
+        else
+        {
+            break;
+        }
+    }
+    return arrDims;
+}
+
 static void handleVariableNode(const TVariableNode *node, UA_NodeId &id,
                                const UA_NodeId &parentId,
                                const UA_NodeId &parentReferenceId,
@@ -167,33 +198,23 @@ static void handleVariableNode(const TVariableNode *node, UA_NodeId &id,
     attr.displayName = lt;
     attr.dataType = getNodeIdFromChars(node->datatype);
     attr.valueRank = atoi(node->valueRank);
-    if (attr.valueRank >= 0)
-    {
-        if (!strcmp(node->arrayDimensions, "1"))
-        {
-            attr.arrayDimensionsSize = 1;
-            UA_UInt32 arrayDimensions[1];
-            arrayDimensions[0] = 1;
-            attr.arrayDimensions = &arrayDimensions[0];
-        }
-    }
+    std::vector<uint32_t> arrDims = getArrayDimensions(node->arrayDimensions);
+    attr.arrayDimensionsSize = arrDims.size();
+    attr.arrayDimensions = arrDims.data();
+    
     if (node->value)
     {
         if (node->value->isArray)
         {
             UA_Variant_setArray(&attr.value, node->value->value,
                                 node->value->arrayCnt, node->value->datatype);
-            if (!attr.arrayDimensions)
+            //todo: is this really necessary??
+            if(!attr.arrayDimensions)
             {
+                attr.arrayDimensions = UA_UInt32_new();
+                *attr.arrayDimensions = (UA_UInt32)node->value->arrayCnt;
                 attr.arrayDimensionsSize = 1;
-                attr.arrayDimensionsSize = 1;
-                UA_UInt32 arrayDimensions[1];
-                arrayDimensions[0] = 1;
-                attr.arrayDimensions = &arrayDimensions[0];
             }
-            attr.arrayDimensions[0] =
-                static_cast<UA_UInt32>(node->value->arrayCnt);
-            attr.valueRank = 1;
         }
         else
         {
