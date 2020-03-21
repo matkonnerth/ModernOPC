@@ -201,6 +201,14 @@ static void handleVariableNode(const TVariableNode *node, UA_NodeId &id,
     std::vector<uint32_t> arrDims = getArrayDimensions(node->arrayDimensions);
     attr.arrayDimensionsSize = arrDims.size();
     attr.arrayDimensions = arrDims.data();
+    // todo: is this really necessary??
+    UA_UInt32 dims = 0;
+    if(!attr.arrayDimensions && node->value && node->value->isArray)
+    {
+        dims = (UA_UInt32)node->value->arrayCnt;
+        attr.arrayDimensions = &dims;
+        attr.arrayDimensionsSize = 1;
+    }
     
     if (node->value)
     {
@@ -208,13 +216,6 @@ static void handleVariableNode(const TVariableNode *node, UA_NodeId &id,
         {
             UA_Variant_setArray(&attr.value, node->value->value,
                                 node->value->arrayCnt, node->value->datatype);
-            //todo: is this really necessary??
-            if(!attr.arrayDimensions)
-            {
-                attr.arrayDimensions = UA_UInt32_new();
-                *attr.arrayDimensions = (UA_UInt32)node->value->arrayCnt;
-                attr.arrayDimensionsSize = 1;
-            }
         }
         else
         {

@@ -67,9 +67,11 @@ uint16_t Server::getNamespaceIndex(const std::string &uri)
                       namespaces[i].length};
         if (uri.compare(s) == 0)
         {
+            UA_Variant_clear(&v);
             return static_cast<uint16_t>(i);
         }
     }
+    UA_Variant_clear(&v);
     return 0;
 }
 
@@ -172,7 +174,9 @@ types::LocalizedText Server::readDisplayName(const NodeId& id)
 {
     UA_LocalizedText lt;
     UA_Server_readDisplayName(server, fromNodeId(id), &lt);
-    return fromUALocalizedText(&lt);
+    types::LocalizedText localized = fromUALocalizedText(&lt);
+    UA_LocalizedText_clear(&lt);
+    return localized;
 }
 
 
