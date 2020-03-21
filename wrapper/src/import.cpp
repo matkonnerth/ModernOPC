@@ -26,12 +26,12 @@ getNodeIdFromChars(TNodeId id) {
 
 static UA_NodeId
 getTypeDefinitionIdFromChars2(const TNode *node) {
-    Reference *hierachicalRef = node->hierachicalRefs;
-    while(hierachicalRef) {
-        if(!strcmp("HasTypeDefinition", hierachicalRef->refType.idString)) {
-            return getNodeIdFromChars(hierachicalRef->target);
+    Reference *ref = node->nonHierachicalRefs;
+    while(ref) {
+        if(!strcmp("HasTypeDefinition", ref->refType.idString)) {
+            return getNodeIdFromChars(ref->target);
         }
-        hierachicalRef = hierachicalRef->next;
+        ref = ref->next;
     }
     return UA_NODEID_NULL;
 }
