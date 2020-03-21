@@ -27,7 +27,7 @@ class Server
 
     bool loadNodeset(const std::string &path);
     template <typename R, typename... ARGS>
-    void addMethod(const std::string &name, std::function<R(ARGS...)> fn)
+    void addMethod(const NodeId& parentId, const std::string &name, std::function<R(ARGS...)> fn)
     {
         std::vector<UA_Argument> inputArgs =
             MethodTraits<decltype(fn)>::getInputArguments();
@@ -41,7 +41,7 @@ class Server
         UA_NodeId newId;
         UA_Server_addMethodNode(
             server, UA_NODEID_NULL,
-            UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER),
+            fromNodeId(parentId),
             UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
             UA_QUALIFIEDNAME(1, const_cast<char *>(name.c_str())), methAttr,
             nullptr, MethodTraits<decltype(fn)>::getNumArgs(), inputArgs.data(),

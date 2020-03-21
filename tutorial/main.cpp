@@ -57,17 +57,7 @@ NodesetLoader_unload(std::vector<std::string> s1) {
     return "test";
 }
 
-opc::Server *s;
 
-void
-createServer() {
-    s = new opc::Server();
-}
-
-void
-run() {
-    s->run();
-}
 
 class MethodObject {
   public:
@@ -79,64 +69,59 @@ class MethodObject {
 
 int
 main() {
-    createServer();
-    s->addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, 233),
+    opc::Server s;
+    s.addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, 233),
                        "demoNode" + std::to_string(233), 42);
 
-    // wild west
-    // server is accessed from multiple threads
-    using namespace std::chrono_literals;
-    std::this_thread::sleep_for(0s);
+
     std::vector<float> fVector{1.1f, 2.2f, 3.3f};
 
     MyDataSource source1{"source1"};
 
-    s->registerDataSource("simpleVal", getValue, setValue);
-    s->registerDataSource("vectorDataSource", getVectorValue,
+    s.registerDataSource("simpleVal", getValue, setValue);
+    s.registerDataSource("vectorDataSource", getVectorValue,
                           [](const opc::NodeId &, opc::Variant &) {});
 
-    s->registerDataSource(
+    s.registerDataSource(
         source1.getKey(),
         [&](const opc::NodeId &id, opc::Variant &var) { source1.read(id, var); },
         [&](const opc::NodeId &id, opc::Variant &var) { source1.write(id, var); });
 
     // adding of variable nodes
-    s->addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, "demoVector"), "demoVector",
+    s.addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, "demoVector"), "demoVector",
                        fVector, std::make_unique<opc::NodeMetaInfo>("vectorDataSource"));
-    s->addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, "demoArray"), "demoArray",
+    s.addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, "demoArray"), "demoArray",
                        std::array<int, 3>{12, 13, 14});
-    s->addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, "demoInt"), "demoInt", 23,
+    s.addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, "demoInt"), "demoInt", 23,
                        std::make_unique<opc::NodeMetaInfo>("simpleVal"));
-    s->addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, "IntVector"), "IntVector",
+    s.addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, "IntVector"), "IntVector",
                        test);
-    s->addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, "source1Var"), "source1Var", 12,
+    s.addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, "source1Var"), "source1Var", 12,
                        std::make_unique<opc::NodeMetaInfo>("source1"));
 
     // loading of a xml nodeset
-    s->loadNodeset("../models/serviceobject.xml");
-    s->loadNodeset("/home/matzy/Dokumente/opc_ua/models/types.xml");
-    std::function load = [&](std::string path) { s->loadNodeset(path); };
+    s.loadNodeset("../models/serviceobject.xml");
+    s.loadNodeset("/home/matzy/Dokumente/opc_ua/models/types.xml");
+    std::function load = [&](std::string path) { s.loadNodeset(path); };
 
     // bind opc ua methods to business logic
-    s->bindMethodNode(opc::NodeId(2, 7003), load);
-    s->bindMethodNode(opc::NodeId(2, 7004), std::function{NodesetLoader_unload});
+    s.bindMethodNode(opc::NodeId(2, 7003), load);
+    s.bindMethodNode(opc::NodeId(2, 7004), std::function{NodesetLoader_unload});
 
     std::function f = [](int a, int b) { return std::vector<int>{a, b}; };
-    s->addMethod("addMethod2", f);
+    s.addMethod(opc::NodeId(0, 85), "addMethod2", f);
 
-    // not really useful now, lacks parent node id
-    s->addMethod("addMethod", std::function{add});
+
+    s.addMethod(opc::NodeId(0,85), "addMethod", std::function{add});
 
     MethodObject obj1;
 
     std::function m = [&](int a) { obj1.call(a); };
-    s->addMethod("ob1", m);
+    s.addMethod(opc::NodeId(0, 85) ,"ob1", m);
 
     FileService fs;
     std::function open = [&](std::string path) { return fs.open(path); };
-    s->addMethod("open", open);
+    s.addMethod(opc::NodeId(0, 85), "open", open);
 
-    // std::thread serverThread{run};
-    run();
-    // serverThread.join();
+    s.run();
 }

@@ -13,7 +13,6 @@ There can be several instances of the service
   Solution 2) generate the conversion functions
 * refactor Variant handling
   * hack in open library is necessary to forward declare UA_Variant in Variant.h
-* tests for nodeset import
 * benchmark tests
 * calculate test coverage
 * provide callback for reading Localized Text from database
