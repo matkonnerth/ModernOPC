@@ -7,6 +7,7 @@
 #include <NodeMetaInfo.h>
 #include <open62541/server.h>
 #include <open62541/server_config_default.h>
+#include "import/Extension.h"
 
 namespace opc
 {
@@ -46,6 +47,14 @@ bool Server::loadNodeset(const std::string &path)
     valIf.finish = Value_finish;
     valIf.deleteValue = Value_delete;
     handler.valueHandling = &valIf;
+
+    ExtensionInterface extIf;
+    extIf.userData = nullptr;
+    extIf.newExtension = Extension_new;
+    extIf.start = Extension_start;
+    extIf.end = Extension_end;
+    extIf.finish = Extension_finish;
+    handler.extensionHandling = &extIf;
     return loadFile(&handler);
 }
 

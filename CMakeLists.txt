@@ -16,6 +16,7 @@ add_library(wrapper SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Server.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/import/import.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/import/value.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/import/Extension.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Variant.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/TypeConverter.cpp)
 target_include_directories(wrapper
