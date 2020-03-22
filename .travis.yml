@@ -20,11 +20,11 @@ matrix:
             - valgrind
       env:
         - GCC_MEMCHECK=true
-    - os: linux
-      dist: bionic
-      compiler: clang-7.0
-      env:
-        - USE_CLANG=true
+#    - os: linux
+#      dist: bionic
+#      compiler: clang-7.0
+#      env:
+#        - USE_CLANG=true
 
 
 
