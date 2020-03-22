@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UANodeSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:uax="http://opcfoundation.org/UA/2008/02/Types.xsd" xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd" xmlns:s1="http://yourorganisation.org/importReferences/Types.xsd" xmlns:ua="http://unifiedautomation.com/Configuration/NodeSet.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <NamespaceUris>
+        <Uri>http://yourorganisation.org/importReferences/</Uri>
+    </NamespaceUris>
+    <Aliases>
+        <Alias Alias="HasTypeDefinition">i=40</Alias>
+        <Alias Alias="HasSubtype">i=45</Alias>
+        <Alias Alias="HasSpecialComponent">ns=1;i=4002</Alias>
+    </Aliases>
+    <Extensions>
+        <Extension>
+            <ua:ModelInfo Tool="UaModeler" Hash="OCgG1l+COHu6r+OF3BvA4Q==" Version="1.6.2"/>
+        </Extension>
+    </Extensions>
+    <UAReferenceType NodeId="ns=1;i=4002" BrowseName="1:HasSpecialComponent">
+        <DisplayName>HasSpecialComponent</DisplayName>
+        <References>
+            <Reference ReferenceType="HasSubtype" IsForward="false">i=47</Reference>
+        </References>
+        <InverseName>IsASpecialComponent</InverseName>
+    </UAReferenceType>
+    <UAObject NodeId="ns=1;i=5002" BrowseName="1:ComponentA">
+        <DisplayName>ComponentA</DisplayName>
+        <References>
+            <Reference ReferenceType="HasTypeDefinition">i=58</Reference>
+            <Reference ReferenceType="HasSpecialComponent" IsForward="false">i=85</Reference>
+        </References>
+    </UAObject>
+</UANodeSet>
