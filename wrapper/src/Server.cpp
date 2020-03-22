@@ -179,6 +179,9 @@ types::LocalizedText Server::readDisplayName(const NodeId& id)
     return localized;
 }
 
-
+UA_Server *Server::getUAServer()
+{
+    return server;
+}
 
 } // namespace opc

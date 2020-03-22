@@ -1,6 +1,7 @@
 #include <Server.h>
 #include <gtest/gtest.h>
 #include <iostream>
+#include <open62541/server.h>
 
 std::string path = "";
 
@@ -11,6 +12,14 @@ TEST(import, nodeclass)
 
     opc::Variant var;
     ASSERT_TRUE(server.readValue(opc::NodeId(2, 6005), var));
+
+    UA_Byte accessLevel=0;
+    UA_Server_readAccessLevel(server.getUAServer(), UA_NODEID_NUMERIC(2,6005), &accessLevel);
+    ASSERT_TRUE(accessLevel==3);
+    UA_Boolean exec = false;
+    UA_Server_readExecutable(server.getUAServer(), UA_NODEID_NUMERIC(2, 7005),
+                              &exec);
+    ASSERT_TRUE(exec);
 }
 
 int main(int argc, char **argv)

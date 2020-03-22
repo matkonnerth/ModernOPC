@@ -28,7 +28,7 @@
             <Field DataType="Double" Name="z"/>
         </Definition>
     </UADataType>
-    <UAVariable DataType="String" ParentNodeId="ns=1;i=6001" NodeId="ns=1;i=6005" BrowseName="1:Point" AccessLevel="3">
+    <UAVariable DataType="String" ParentNodeId="ns=1;i=6001" NodeId="ns=1;i=6005" BrowseName="1:Point" AccessLevel="3" UserAccessLevel="1">
         <DisplayName>Point</DisplayName>
         <References>
             <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=6001</Reference>
@@ -116,4 +116,11 @@
             <Reference ReferenceType="HasComponent" IsForward="false">i=85</Reference>
         </References>
     </UAObject>
+    <UAMethod ParentNodeId="ns=1;i=6001" NodeId="ns=1;i=7005" BrowseName="Suspend" MethodDeclarationId="i=2427" Executable="true">
+        <DisplayName>Suspend</DisplayName>
+        <Description>Causes the Program to transition from the Running state to the Suspended state.</Description>
+        <References>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=6001</Reference>
+        </References>
+    </UAMethod>
 </UANodeSet>

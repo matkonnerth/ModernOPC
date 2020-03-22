@@ -159,6 +159,8 @@ class Server
 
     uint16_t getNamespaceIndex(const std::string &uri);
 
+    UA_Server* getUAServer();
+
   private:
     UA_Server *server{nullptr};
     UA_DataSource internalSrc{internalRead, internalWrite};
