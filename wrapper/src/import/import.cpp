@@ -3,32 +3,7 @@
 #include <open62541/server.h>
 #include <string>
 #include <vector>
-
-static UA_NodeId getNodeIdFromChars(TNodeId id)
-{
-    if (!id.id)
-    {
-        return UA_NODEID_NULL;
-    }
-    auto nsidx = static_cast<UA_UInt16>(id.nsIdx);
-
-    switch (id.id[0])
-    {
-    // integer
-    case 'i':
-    {
-        auto nodeId = static_cast<UA_UInt32>(atoi(&id.id[2]));
-        return UA_NODEID_NUMERIC(nsidx, nodeId);
-        break;
-    }
-    case 's':
-    {
-        return UA_NODEID_STRING_ALLOC(nsidx, &id.id[2]);
-        break;
-    }
-    }
-    return UA_NODEID_NULL;
-}
+#include "conversion.h"
 
 static UA_NodeId getTypeDefinitionIdFromChars2(const TNode *node)
 {
@@ -150,8 +125,8 @@ static void handleMethodNode(const TMethodNode *node, UA_NodeId &id,
                              const UA_QualifiedName &qn, UA_Server *server)
 {
     UA_MethodAttributes attr = UA_MethodAttributes_default;
-    attr.executable = true;
-    attr.userExecutable = true;
+    attr.executable = isTrue(node->executable);
+    attr.userExecutable = isTrue(node->userExecutable);
     attr.displayName = lt;
 
     UA_Server_addMethodNode(server, id, parentId, parentReferenceId,
@@ -201,6 +176,8 @@ static void handleVariableNode(const TVariableNode *node, UA_NodeId &id,
     std::vector<uint32_t> arrDims = getArrayDimensions(node->arrayDimensions);
     attr.arrayDimensionsSize = arrDims.size();
     attr.arrayDimensions = arrDims.data();
+    attr.accessLevel = static_cast<UA_Byte>(atoi(node->accessLevel));
+    attr.userAccessLevel = static_cast<UA_Byte>(atoi(node->userAccessLevel));
     // todo: is this really necessary??
     UA_UInt32 dims = 0;
     if(!attr.arrayDimensions && node->value && node->value->isArray)
@@ -254,7 +231,7 @@ static void handleReferenceTypeNode(const TReferenceTypeNode *node,
                                     UA_Server *server)
 {
     UA_ReferenceTypeAttributes attr = UA_ReferenceTypeAttributes_default;
-    attr.symmetric = true;
+    attr.symmetric = isTrue(node->symmetric);
     attr.displayName = lt;
 
     UA_Server_addReferenceTypeNode(server, id, parentId, parentReferenceId,

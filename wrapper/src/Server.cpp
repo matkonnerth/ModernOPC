@@ -1,8 +1,8 @@
 #include "Server.h"
 #include "TypeConverter.h"
-#include "import.h"
+#include "import/import.h"
 #include "nodesetLoader.h"
-#include "value.h"
+#include "import/value.h"
 #include <NodeId.h>
 #include <NodeMetaInfo.h>
 #include <open62541/server.h>

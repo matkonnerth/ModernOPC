@@ -14,8 +14,8 @@ add_subdirectory(nodesetLoader)
 
 add_library(wrapper SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Server.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/import.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/value.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/import/import.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/import/value.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Variant.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/TypeConverter.cpp)
 target_include_directories(wrapper
@@ -23,8 +23,8 @@ target_include_directories(wrapper
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include>
     PRIVATE 
-        ${CMAKE_CURRENT_SOURCE_DIR}/wrapper
         ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/import
     )
 
 target_link_libraries(wrapper PRIVATE open62541 xmlImport)
