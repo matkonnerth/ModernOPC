@@ -18,9 +18,13 @@ matrix:
           packages:
             - cmake
             - valgrind
+      env:
+        - GCC_MEMCHECK=true
     - os: linux
       dist: bionic
       compiler: clang-7.0
+      env:
+        - USE_CLANG=true
 
 
 
@@ -34,13 +38,7 @@ install:
 - conan user
 
 script:
-- mkdir -p build
-- cd build
-- conan install -s compiler.libcxx=libstdc++11 ..
-- cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .. 
-- make  - 
-- make test
-- ctest --overwrite MemoryCheckCommandOptions="--leak-check=full --error-exitcode=100" -T memcheck
+  sh ./travis_script.sh
 
 after_success:
 - echo == Build success ==
