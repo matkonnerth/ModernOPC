@@ -5,7 +5,7 @@
 
 std::string path = "";
 
-TEST(import, nodeclass)
+TEST(import, reference)
 {
     opc::Server server;
     ASSERT_TRUE(server.loadNodeset(path + "/" + "importreferences.xml"));
