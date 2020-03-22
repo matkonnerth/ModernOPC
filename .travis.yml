@@ -14,13 +14,13 @@ matrix:
 # doc, cert, cross-mingw32, cross-mingw64, cross-linux32, cross-raspi, linux64,
     - os: linux
       dist: bionic
-      compiler: gcc
+      compiler: 
+        - gcc
+        - clang
       addons:
         apt:
           packages:
             - cmake
-            # tests
-            # - python3
             - valgrind
       env:
         - DEBIAN=true
@@ -29,7 +29,6 @@ matrix:
 
 before_install:
 - pyenv versions
-#- pyenv install 3.6.0
 - pyenv global 3.8
 
 install:
