@@ -1,13 +1,13 @@
 #pragma once
-#include <DataSource.h>
 #include "Method.h"
+#include <DataSource.h>
 #include <MethodWrapper.h>
 #include <NodeId.h>
 #include <NodeMetaInfo.h>
+#include <Types.h>
 #include <map>
 #include <open62541/server.h>
 #include <open62541/server_config.h>
-#include <Types.h>
 
 struct UA_Server;
 namespace opc
@@ -27,7 +27,8 @@ class Server
 
     bool loadNodeset(const std::string &path);
     template <typename R, typename... ARGS>
-    void addMethod(const NodeId& parentId, const std::string &name, std::function<R(ARGS...)> fn)
+    void addMethod(const NodeId &parentId, const std::string &name,
+                   std::function<R(ARGS...)> fn)
     {
         std::vector<UA_Argument> inputArgs =
             MethodTraits<decltype(fn)>::getInputArguments();
@@ -40,8 +41,7 @@ class Server
 
         UA_NodeId newId;
         UA_Server_addMethodNode(
-            server, UA_NODEID_NULL,
-            fromNodeId(parentId),
+            server, UA_NODEID_NULL, fromNodeId(parentId),
             UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
             UA_QUALIFIEDNAME(1, const_cast<char *>(name.c_str())), methAttr,
             nullptr, MethodTraits<decltype(fn)>::getNumArgs(), inputArgs.data(),
@@ -51,8 +51,52 @@ class Server
         UA_Server_setNodeContext(server, newId, this);
 
         callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
+            fromUaNodeId(newId), std::make_unique<Call<void, R, ARGS...>>(fn)));
+    }
+
+    template <typename M>
+    void addMethod(const NodeId &parentId, const std::string &name,
+                   const M &memberFn, void *context)
+    {
+        UA_NodeId objId = UA_NODEID_NULL;
+        if (context)
+        {
+            UA_ObjectAttributes oAttr = UA_ObjectAttributes_default;
+            oAttr.displayName = UA_LOCALIZEDTEXT((char*)"de", (char*)"ThisPointer");
+
+            UA_Server_addObjectNode(
+                server, UA_NODEID_NULL, fromNodeId(parentId),
+                UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                UA_QUALIFIEDNAME(1, (char*)"ThisPointer"),
+                UA_NODEID_NUMERIC(0, UA_NS0ID_BASEOBJECTTYPE), oAttr, context,
+                &objId);
+        }
+
+        std::vector<UA_Argument> inputArgs =
+            MethodTraits<M>::getInputArguments();
+        std::vector<UA_Argument> outputArgs =
+            MethodTraits<M>::getOutputArguments();
+
+        UA_MethodAttributes methAttr = UA_MethodAttributes_default;
+        methAttr.executable = true;
+        methAttr.userExecutable = true;
+
+        UA_NodeId newId;
+        UA_Server_addMethodNode(
+            server, UA_NODEID_NULL, objId,
+            UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+            UA_QUALIFIEDNAME(1, const_cast<char *>(name.c_str())), methAttr,
+            nullptr, MethodTraits<M>::getNumArgs(), inputArgs.data(), 1,
+            outputArgs.data(), nullptr, &newId);
+
+        UA_Server_setMethodNode_callback(server, newId, internalMethodCallback);
+        UA_Server_setNodeContext(server, newId, this);
+
+        callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
             fromUaNodeId(newId),
-            std::make_unique<Call<R, ARGS...>>(fn)));
+            std::make_unique<Call<typename MethodTraits<M>::ThisPointerType,
+                                  typename MethodTraits<M>::ReturnType>>(
+                memberFn)));
     }
 
     template <typename R, typename... ARGS>
@@ -61,11 +105,12 @@ class Server
         UA_Server_setMethodNode_callback(server, fromNodeId(id),
                                          internalMethodCallback);
         callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
-            id, std::make_unique<Call<R, ARGS...>>(fn)));
+            id, std::make_unique<Call<void, R, ARGS...>>(fn)));
         UA_Server_setNodeContext(server, fromNodeId(id), this);
     }
 
-    bool call(const NodeId &id, const std::vector<Variant> &inputArgs,
+    bool call(void *objectContext, const NodeId &id,
+              const std::vector<Variant> &inputArgs,
               std::vector<Variant> &outputArgs);
 
     template <typename T>
@@ -74,31 +119,27 @@ class Server
                          std::unique_ptr<NodeMetaInfo> info)
     {
         // memleak with info.release()!!
-        UA_VariableAttributes attr =
-            getVariableAttributes(initialValue);
+        UA_VariableAttributes attr = getVariableAttributes(initialValue);
         attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
         UA_Server_addVariableNode(
-            server, fromNodeId(requestedId),
-            fromNodeId(parentId),
+            server, fromNodeId(requestedId), fromNodeId(parentId),
             UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
             UA_QUALIFIEDNAME(1, (char *)browseName.c_str()),
             UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), attr,
             info.release(), nullptr);
 
-        UA_Server_setVariableNode_dataSource(
-            server, fromNodeId(requestedId), internalSrc);
+        UA_Server_setVariableNode_dataSource(server, fromNodeId(requestedId),
+                                             internalSrc);
     }
 
     template <typename T>
     void addVariableNode(const NodeId &parentId, const NodeId &requestedId,
                          const std::string &browseName, T initialValue)
     {
-        UA_VariableAttributes attr =
-            getVariableAttributes(initialValue);
+        UA_VariableAttributes attr = getVariableAttributes(initialValue);
         attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
         UA_Server_addVariableNode(
-            server, fromNodeId(requestedId),
-            fromNodeId(parentId),
+            server, fromNodeId(requestedId), fromNodeId(parentId),
             UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
             UA_QUALIFIEDNAME(1, (char *)browseName.c_str()),
             UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), attr, nullptr,
@@ -112,11 +153,11 @@ class Server
 
     auto &getDataSources() { return datasources; }
 
-    bool readValue(const NodeId& id, Variant &var);
+    bool readValue(const NodeId &id, Variant &var);
 
-    types::LocalizedText readDisplayName(const NodeId& id);
+    types::LocalizedText readDisplayName(const NodeId &id);
 
-    uint16_t getNamespaceIndex(const std::string& uri);
+    uint16_t getNamespaceIndex(const std::string &uri);
 
   private:
     UA_Server *server{nullptr};

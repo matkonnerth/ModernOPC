@@ -123,5 +123,20 @@ main() {
     std::function open = [&](std::string path) { return fs.open(path); };
     s.addMethod(opc::NodeId(0, 85), "open", open);
 
+    struct Callable
+    {
+        Callable(const std::string s):state{s}{}
+        int run() { std::cout << state << std::endl;return 12; }
+        private:
+            std::string state;
+    };
+  
+    Callable c1{"Hello"};
+    Callable c2{"world"};
+
+    // std::function<int(Callable*)> memberFn = &Callable::run;
+    s.addMethod(opc::NodeId(0, 85), "run", &Callable::run, &c1);
+    s.addMethod(opc::NodeId(0, 85), "run", &Callable::run, &c2);
+
     s.run();
 }

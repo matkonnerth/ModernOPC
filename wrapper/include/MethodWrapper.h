@@ -26,17 +26,49 @@ namespace opc
 class ICallable
 {
   public:
-    virtual bool call(const std::vector<Variant> &inputArguments,
+    virtual bool call(void* obj, const std::vector<Variant> &inputArguments,
                       std::vector<Variant> &outputArguments) = 0;
     virtual ~ICallable() = default;
 };
 
-template <typename R, typename... INARGS>
+template <typename ClassType, typename R, typename... INARGS>
 class Call : public ICallable
 {
   public:
+    
+    Call(std::function<R(ClassType*)>f) : m_f(f) {}
+    virtual bool call(void* obj, const std::vector<Variant> &inputArguments,
+                      std::vector<Variant> &outputArguments) override
+    {
+      /*
+        std::tuple<INARGS...> inputArgs;
+        size_t i = 0;
+
+        for_each(inputArgs, [&](auto &x) {
+            x = inputArguments[i]
+                    .get<typename std::remove_reference<decltype(x)>::type>();
+            i++;
+        });
+        R result = std::apply(m_f, inputArgs);*/
+
+        R result = m_f(static_cast<ClassType*>(obj));
+
+        Variant var;
+        var(result);
+        outputArguments.push_back(std::move(var));
+        return true;
+    }
+
+  private:
+    std::function<R(ClassType*)> m_f{};
+};
+
+template <typename R, typename... INARGS>
+class Call<void, R, INARGS...> : public ICallable
+{
+  public:
     Call(std::function<R(INARGS...)> f) : m_f(f) {}
-    virtual bool call(const std::vector<Variant> &inputArguments,
+    virtual bool call(void *obj, const std::vector<Variant> &inputArguments,
                       std::vector<Variant> &outputArguments) override
     {
         std::tuple<INARGS...> inputArgs;
@@ -59,11 +91,11 @@ class Call : public ICallable
 };
 
 template <typename... INARGS>
-class Call<void, INARGS...> : public ICallable
+class Call<void, void, INARGS...> : public ICallable
 {
   public:
     Call(std::function<void(INARGS...)> f) : m_f(f) {}
-    virtual bool call(const std::vector<Variant> &inputArguments,
+    virtual bool call(void* obj, const std::vector<Variant> &inputArguments,
                       std::vector<Variant> &outputArguments) override
     {
         std::tuple<INARGS...> inputArgs;

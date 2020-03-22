@@ -75,13 +75,13 @@ uint16_t Server::getNamespaceIndex(const std::string &uri)
     return 0;
 }
 
-bool Server::call(const NodeId &id, const std::vector<Variant> &inputArgs,
+bool Server::call(void* objectContext, const NodeId &id, const std::vector<Variant> &inputArgs,
                   std::vector<Variant> &outputArgs)
 {
     ICallable *c = callbacks.at(id).get();
     if (c)
     {
-        return c->call(inputArgs, outputArgs);
+        return c->call(objectContext, inputArgs, outputArgs);
     }
     return false;
 }
@@ -104,7 +104,7 @@ UA_StatusCode Server::internalMethodCallback(
             Variant v{const_cast<UA_Variant *>(&input[i])};
             inputArgs.push_back(std::move(v));
         }
-        if (s->call(opc::fromUaNodeId(*methodId), inputArgs, outputArgs))
+        if (s->call(objectContext, opc::fromUaNodeId(*methodId), inputArgs, outputArgs))
         {
             outputSize = outputArgs.size();
             if (outputSize == 1)

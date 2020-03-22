@@ -8,7 +8,7 @@ include(CTest)
 enable_testing()
 
 set(DO_CLANG_TIDY clang-tidy -checks=-*,modernize-*,performance-*,boost-*)
-set(COMPILER_OPTIONS -Werror -Wall -Wextra -pedantic-errors -Wconversion -Wsign-conversion -Wpedantic -Weffc++ -Wno-unused-parameter)
+set(COMPILER_OPTIONS -Wall -Wextra -pedantic-errors -Wconversion -Wsign-conversion -Wpedantic -Weffc++ -Wno-unused-parameter)
 add_subdirectory(open62541)
 add_subdirectory(nodesetLoader)
 
@@ -30,7 +30,7 @@ target_include_directories(wrapper
 target_link_libraries(wrapper PRIVATE open62541 xmlImport)
 target_compile_features(wrapper PRIVATE cxx_std_17)
 target_compile_options(wrapper PRIVATE ${COMPILER_OPTIONS})
-set_target_properties(wrapper PROPERTIES CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
+#set_target_properties(wrapper PROPERTIES CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
 
 add_subdirectory(tests)
 add_subdirectory(tutorial)

@@ -93,4 +93,12 @@ struct MethodTraits<std::function<R(Args...)>>
 {
 };
 
+template <typename R, typename ClassType, typename... Args>
+    struct MethodTraits<R (ClassType::*)(Args...)> : MethodTraitsBase<ClassType, R, Args...>
+{
+    using ReturnType = R;
+    using ThisPointerType = ClassType;
+    //using A = ...Args;
+};
+
 } // namespace opc
