@@ -19,6 +19,7 @@ matrix:
             - cmake
             - valgrind
     - os: linux
+      dist: bionic
       compiler: clang-7.0
 
 
