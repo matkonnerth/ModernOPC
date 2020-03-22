@@ -13,11 +13,13 @@ TEST(import, reference)
     UA_QualifiedName objectName;
     UA_Server_readBrowseName(server.getUAServer(), UA_NODEID_NUMERIC(2,5002), &objectName);
     ASSERT_TRUE(objectName.namespaceIndex==2);
+    UA_QualifiedName_clear(&objectName);
 
     UA_QualifiedName refName;
     UA_Server_readBrowseName(server.getUAServer(), UA_NODEID_NUMERIC(2, 4002),
                              &refName);
     ASSERT_TRUE(refName.namespaceIndex == 2);
+    UA_QualifiedName_clear(&refName);
 }
 
 int main(int argc, char **argv)
