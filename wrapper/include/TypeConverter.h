@@ -82,6 +82,13 @@ inline const UA_DataType *getDataType<std::string>()
     return &UA_TYPES[UA_TYPES_STRING];
 }
 
+template <>
+inline const UA_DataType *getDataType<std::vector<std::string>>()
+{
+    return &UA_TYPES[UA_TYPES_STRING];
+}
+
+
 template <typename T>
 void toUAVariant(T val, UA_Variant *var)
 {

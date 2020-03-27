@@ -54,6 +54,12 @@ UA_NodeId getUADataTypeId<std::string>()
 }
 
 template <>
+UA_NodeId getUADataTypeId<std::vector<std::string>>()
+{
+    return getUADataTypeId<std::string>();
+}
+
+template <>
 bool toStdType(UA_Variant *variant)
 {
     return *static_cast<bool *>(variant->data);

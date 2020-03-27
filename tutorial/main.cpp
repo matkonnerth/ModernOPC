@@ -120,8 +120,8 @@ main() {
     s.addMethod(opc::NodeId(0, 85) ,"ob1", m);
 
     FileService fs;
-    std::function open = [&](std::string path) { return fs.open(path); };
-    s.addMethod(opc::NodeId(0, 85), "open", open);
+    std::function browse = [&](std::string path) { return fs.browse(path); };
+    s.addMethod(opc::NodeId(0, 85), "browse", browse);
 
     struct Callable
     {

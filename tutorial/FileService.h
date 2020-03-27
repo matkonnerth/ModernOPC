@@ -6,9 +6,8 @@
 class FileService
 {
 public:
-    uintptr_t open(const std::string& path);
-    void close(uintptr_t handle);
+    std::vector<std::string> browse(const std::string&path);
 
 private:
-  std::vector<uintptr_t> openHandles{};
+  //std::vector<uintptr_t> openHandles{};
 };

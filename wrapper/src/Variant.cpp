@@ -94,6 +94,12 @@ void Variant::operator()(std::string val)
     toUAVariant(std::move(val), variant);
 }
 
+template <>
+void Variant::operator()(std::vector<std::string> val)
+{
+    toUAVariant(std::move(val), variant);
+}
+
 /*getters*/
 template <>
 bool Variant::get<bool>() const

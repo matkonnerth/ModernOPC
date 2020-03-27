@@ -1,30 +1,14 @@
 #include <FileService.h>
-#include <cstdio>
+#include <filesystem>
 
-struct FileHandle
+namespace fs = std::filesystem;
+
+std::vector<std::string> FileService::browse(const std::string &path)
 {
-    FILE* f;
-};
-
-uintptr_t FileService::open(const std::string &path)
-{
-    FILE *f = fopen(path.c_str(), "r");
-    if(f)
+    std::vector<std::string> files;
+    for(auto& p : fs::directory_iterator(path))
     {
-
-        openHandles.push_back((uintptr_t)f);
-        return (uintptr_t)f;
+        files.emplace_back(p.path());
     }
-    return 0;
-}
-
-void
-FileService::close(uintptr_t handle) {
-    for(auto hdl : openHandles)
-    {
-        if(handle==hdl)
-        {
-            fclose((FILE*)hdl);
-        }
-    }
+    return files;
 }
