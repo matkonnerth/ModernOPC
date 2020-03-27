@@ -1,0 +1,4 @@
+tasks:
+  - init: pyenv global 3.7.7
+    command: pip install conan
+    command: mkdir build
