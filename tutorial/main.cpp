@@ -1,6 +1,5 @@
 #include <DataSource.h>
 #include <Variant.h>
-#include <array>
 #include <chrono>
 #include <functional>
 #include <iostream>
@@ -90,8 +89,6 @@ main() {
     // adding of variable nodes
     s.addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, "demoVector"), "demoVector",
                        fVector, std::make_unique<opc::NodeMetaInfo>("vectorDataSource"));
-    s.addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, "demoArray"), "demoArray",
-                       std::array<int, 3>{12, 13, 14});
     s.addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, "demoInt"), "demoInt", 23,
                        std::make_unique<opc::NodeMetaInfo>("simpleVal"));
     s.addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, "IntVector"), "IntVector",

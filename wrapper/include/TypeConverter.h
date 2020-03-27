@@ -107,14 +107,6 @@ void toUAVariant(T val, UA_Variant *var)
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
 
-template <typename T, size_t N>
-void toUAVariant(std::array<T, N> &arr, UA_Variant *var)
-{
-    UA_Variant_init(var);
-    UA_Variant_setArrayCopy(var, arr.data(), N, getDataType<T>());
-    var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
-}
-
 template <typename T>
 void toUAVariant(std::vector<T> v, UA_Variant *var)
 {
