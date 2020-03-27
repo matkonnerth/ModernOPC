@@ -1,4 +1,7 @@
-tasks:
-  - init: pyenv global 3.7.7
-    command: pip install conan
-    command: mkdir build
+image:
+  file: .gitpod.Dockerfile
+
+# List the start up tasks. You can start them in parallel in multiple terminals. See https://www.gitpod.io/docs/config-start-tasks/
+#tasks:
+#  - init: echo 'init script' # runs during prebuild
+#    command: echo 'start script'
