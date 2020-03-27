@@ -4,11 +4,13 @@
 #include <iostream>
 #include <open62541/server.h>
 #include <open62541/types.h>
+#include <type_traits>
 #include <typeinfo>
 #include <vector>
 
 namespace opc
 {
+
 
 
 template <typename ClassType, typename ReturnType, typename... Args>
@@ -42,20 +44,17 @@ struct MethodTraitsBase
         UA_NodeId id = getUADataTypeId<T>();
         UA_Argument inputArgument;
         UA_Argument_init(&inputArgument);
-        // create n-th argument with name "Arg" + number
         inputArgument.description =
             UA_LOCALIZEDTEXT((char *)"", (char *)"Method Argument");
         inputArgument.name = UA_STRING_NULL;
         inputArgument.dataType = id;
         inputArgument.valueRank = UA_VALUERANK_SCALAR;
-        // return
         return inputArgument;
     }
 
     inline static std::vector<UA_Argument> getOutputArguments()
     {
 
-        // return std::vector<UA_Argument>();
         return {getOutputArgument<ReturnType>()};
     }
 
@@ -66,13 +65,19 @@ struct MethodTraitsBase
         UA_NodeId id = getUADataTypeId<T>();
         UA_Argument inputArgument;
         UA_Argument_init(&inputArgument);
-        // create n-th argument with name "Arg" + number
         inputArgument.description =
             UA_LOCALIZEDTEXT((char *)"", (char *)"Method Argument");
         inputArgument.name = UA_STRING_NULL;
         inputArgument.dataType = id;
-        inputArgument.valueRank = UA_VALUERANK_SCALAR;
-        // return
+        if constexpr (is_vector<T>::value)
+        {
+            inputArgument.valueRank = UA_VALUERANK_ONE_DIMENSION;
+
+        }
+        else
+        {
+            inputArgument.valueRank = UA_VALUERANK_SCALAR;
+        }
         return inputArgument;
     }
 };
@@ -94,11 +99,11 @@ struct MethodTraits<std::function<R(Args...)>>
 };
 
 template <typename R, typename ClassType, typename... Args>
-    struct MethodTraits<R (ClassType::*)(Args...)> : MethodTraitsBase<ClassType, R, Args...>
+struct MethodTraits<R (ClassType::*)(Args...)>
+    : MethodTraitsBase<ClassType, R, Args...>
 {
     using ReturnType = R;
     using ThisPointerType = ClassType;
-    //using A = ...Args;
 };
 
 } // namespace opc
