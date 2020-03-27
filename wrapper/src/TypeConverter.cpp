@@ -6,6 +6,25 @@ namespace opc
 {
 
 template <>
+void toUAVariant(std::vector<std::string> v, UA_Variant *var)
+{
+    UA_Variant_init(var);
+    UA_String *strings = static_cast<UA_String *>(
+        UA_Array_new(v.size(), getDataType<std::string>()));
+    size_t i = 0;
+    for (auto &s : v)
+    {
+        strings[i].length = s.length();
+        strings[i].data = reinterpret_cast<UA_Byte *>(s.data());
+        i++;
+    }
+    UA_Variant_setArrayCopy(var, strings, v.size(),
+                            getDataType<std::string>());
+    var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
+    //UA_Array_delete(strings, v.size(), getDataType<std::string>());
+}
+
+template <>
 UA_NodeId getUADataTypeId<bool>()
 {
     return UA_NODEID_NUMERIC(0, UA_NS0ID_BOOLEAN);

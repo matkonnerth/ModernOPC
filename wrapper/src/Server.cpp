@@ -15,6 +15,7 @@ Server::Server() : isRunning{true}
 {
     server = UA_Server_new();
     UA_ServerConfig_setDefault(UA_Server_getConfig(server));
+    UA_ServerConfig_addNetworkLayerWS(UA_Server_getConfig(server), 7681, 0, 0);
     sServer = this;
 }
 

@@ -4,3 +4,4 @@ cmake
 [requires]
 gtest/1.10.0
 libxml2/2.9.9
+libwebsockets/3.2.2@bincrafters/stable
