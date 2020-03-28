@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 struct UA_Variant;
 
 namespace opc {
@@ -29,6 +30,10 @@ class Variant {
     void copyToUaVariant(UA_Variant* var);
 
     const UA_Variant* getUAVariant();
+
+    bool isScalar();
+    template <typename T>
+    bool is_a();
 
   private:
     UA_Variant *variant{nullptr};

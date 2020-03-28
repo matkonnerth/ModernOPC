@@ -129,18 +129,6 @@ UA_VariableAttributes getVariableAttributes(T val)
     return attr;
 }
 
-template <typename T, size_t N>
-UA_VariableAttributes getVariableAttributes(std::array<T, N> &arr)
-{
-    UA_VariableAttributes attr = UA_VariableAttributes_default;
-    toUAVariant(arr, &attr.value);
-    attr.dataType = getUADataTypeId<T>();
-    attr.valueRank = 1;
-    attr.arrayDimensionsSize = 1;
-    attr.arrayDimensions = new UA_UInt32{static_cast<UA_UInt32>(arr.size())};
-    return attr;
-}
-
 template <typename T>
 UA_VariableAttributes getVariableAttributes(std::vector<T> &v)
 {
