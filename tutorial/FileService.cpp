@@ -1,12 +1,16 @@
 #include <FileService.h>
-#include <filesystem>
+#include <experimental/filesystem>
 #include <iostream>
 
-namespace fs = std::filesystem;
+namespace fs = std::experimental::filesystem;
 
 std::vector<std::string> FileService::browse(const std::string &path)
 {
     std::vector<std::string> files;
+    if(!fs::exists(path))
+    {
+        return files;
+    }
     for(auto& p : fs::directory_iterator(path))
     {
         files.emplace_back(p.path());
