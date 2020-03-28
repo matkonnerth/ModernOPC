@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "conversion.h"
+#include <iostream>
 
 static UA_NodeId getTypeDefinitionIdFromChars2(const TNode *node)
 {
@@ -48,6 +49,10 @@ static UA_NodeId getReferenceTypeId(const Reference *ref)
     else if (!strcmp(ref->refType.idString, "HasEncoding"))
     {
         return UA_NODEID_NUMERIC(0, UA_NS0ID_HASENCODING);
+    }
+    else if(!strcmp(ref->refType.idString, "HasModellingRule"))
+    {
+        return UA_NODEID_NUMERIC(0, UA_NS0ID_HASMODELLINGRULE);
     }
     else
     {
@@ -132,6 +137,18 @@ static void handleMethodNode(const TMethodNode *node, UA_NodeId &id,
     UA_Server_addMethodNode(server, id, parentId, parentReferenceId,
                             qn, attr,
                             nullptr, 0, nullptr, 0, nullptr, nullptr, nullptr);
+
+    auto ref = node->nonHierachicalRefs;
+    while(ref)
+    {
+        UA_NodeId refId = getReferenceTypeId(ref);
+        UA_ExpandedNodeId eid;
+        eid.nodeId = getReferenceTarget(ref);
+        eid.namespaceUri = UA_STRING_NULL;
+        eid.serverIndex = 0;
+        UA_Server_addReference(server, id, refId, eid, ref->isForward);
+        ref = ref->next;
+    }
 }
 
 static std::vector<uint32_t> getArrayDimensions(const char* s)

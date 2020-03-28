@@ -1,11 +1,11 @@
 #pragma once
 #include <NodeId.h>
+#include <Types.h>
 #include <array>
+#include <cassert>
 #include <memory>
 #include <open62541/server.h>
 #include <vector>
-#include <cassert>
-#include <Types.h>
 
 namespace opc
 {
@@ -98,7 +98,6 @@ inline const UA_DataType *getDataType<std::vector<std::string>>()
     return &UA_TYPES[UA_TYPES_STRING];
 }
 
-
 template <typename T>
 void toUAVariant(T val, UA_Variant *var)
 {
@@ -114,7 +113,6 @@ void toUAVariant(std::vector<T> v, UA_Variant *var)
     UA_Variant_setArrayCopy(var, v.data(), v.size(), getDataType<T>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
-
 
 template <typename T>
 UA_NodeId getUADataTypeId();
@@ -149,4 +147,4 @@ UA_NodeId fromNodeId(const opc::NodeId &nodeId);
 
 types::LocalizedText fromUALocalizedText(const UA_LocalizedText *lt);
 
-} // namespace TypeConverter
+} // namespace opc

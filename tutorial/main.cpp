@@ -5,7 +5,6 @@
 #include <iostream>
 #include <thread>
 #include <vector>
-#include "FileService.h"
 #include "MyDataSource.h"
 #include "NodeId.h"
 #include "Server.h"
@@ -116,10 +115,6 @@ main() {
     std::function m = [&](int a) { obj1.call(a); };
     s.addMethod(opc::NodeId(0, 85) ,"ob1", m);
 
-    FileService fs;
-    std::function browse = [&](std::string path) { return fs.browse(path); };
-    s.addMethod(opc::NodeId(0, 85), "browse", browse);
-
     struct Callable
     {
         Callable(const std::string s):state{s}{}
@@ -132,8 +127,8 @@ main() {
     Callable c2{"world"};
 
     // std::function<int(Callable*)> memberFn = &Callable::run;
-    s.addMethod(opc::NodeId(0, 85), "run", &Callable::run, &c1);
-    s.addMethod(opc::NodeId(0, 85), "run", &Callable::run, &c2);
+    //s.addMethod(opc::NodeId(0, 85), "run", &Callable::run, &c1);
+    //s.addMethod(opc::NodeId(0, 85), "run", &Callable::run, &c2);
 
     s.run();
 }

@@ -1,13 +1,13 @@
 #include "Server.h"
 #include "TypeConverter.h"
+#include "import/Extension.h"
 #include "import/import.h"
-#include "nodesetLoader.h"
 #include "import/value.h"
+#include "nodesetLoader.h"
 #include <NodeId.h>
 #include <NodeMetaInfo.h>
 #include <open62541/server.h>
 #include <open62541/server_config_default.h>
-#include "import/Extension.h"
 
 namespace opc
 {
@@ -15,7 +15,8 @@ Server::Server() : isRunning{true}
 {
     server = UA_Server_new();
     UA_ServerConfig_setDefault(UA_Server_getConfig(server));
-    //UA_ServerConfig_addNetworkLayerWS(UA_Server_getConfig(server), 7681, 0, 0);
+    // UA_ServerConfig_addNetworkLayerWS(UA_Server_getConfig(server), 7681, 0,
+    // 0);
     sServer = this;
 }
 
@@ -69,8 +70,8 @@ uint16_t Server::getNamespaceIndex(const std::string &uri)
         return 0;
     }
     std::vector<UA_String> namespaces{static_cast<UA_String *>(v.data),
-                                        static_cast<UA_String *>(v.data) +
-                                            v.arrayLength};
+                                      static_cast<UA_String *>(v.data) +
+                                          v.arrayLength};
     for (size_t i = 0; i < namespaces.size(); i++)
     {
         std::string s{reinterpret_cast<char *>(namespaces[i].data),
@@ -85,7 +86,8 @@ uint16_t Server::getNamespaceIndex(const std::string &uri)
     return 0;
 }
 
-bool Server::call(void* objectContext, const NodeId &id, const std::vector<Variant> &inputArgs,
+bool Server::call(void *objectContext, const NodeId &id,
+                  const std::vector<Variant> &inputArgs,
                   std::vector<Variant> &outputArgs)
 {
     ICallable *c = callbacks.at(id).get();
@@ -114,7 +116,8 @@ UA_StatusCode Server::internalMethodCallback(
             Variant v{const_cast<UA_Variant *>(&input[i])};
             inputArgs.push_back(std::move(v));
         }
-        if (s->call(objectContext, opc::fromUaNodeId(*methodId), inputArgs, outputArgs))
+        if (s->call(objectContext, opc::fromUaNodeId(*methodId), inputArgs,
+                    outputArgs))
         {
             outputSize = outputArgs.size();
             if (outputSize == 1)
@@ -168,7 +171,7 @@ UA_StatusCode Server::internalWrite(UA_Server *server,
     return UA_STATUSCODE_GOOD;
 }
 
-bool Server::readValue(const NodeId& id, Variant &var)
+bool Server::readValue(const NodeId &id, Variant &var)
 {
     UA_Variant *v = UA_Variant_new();
     if (UA_STATUSCODE_GOOD == UA_Server_readValue(server, fromNodeId(id), v))
@@ -180,7 +183,7 @@ bool Server::readValue(const NodeId& id, Variant &var)
     return false;
 }
 
-types::LocalizedText Server::readDisplayName(const NodeId& id)
+types::LocalizedText Server::readDisplayName(const NodeId &id)
 {
     UA_LocalizedText lt;
     UA_Server_readDisplayName(server, fromNodeId(id), &lt);
@@ -189,9 +192,19 @@ types::LocalizedText Server::readDisplayName(const NodeId& id)
     return localized;
 }
 
-UA_Server *Server::getUAServer()
+UA_Server *Server::getUAServer() { return server; }
+
+bool Server::addObject(const NodeId &parentId, const NodeId &requestedId,
+               const NodeId &typeId, const std::string &browseName, void* context)
 {
-    return server;
+    UA_ObjectAttributes attr = UA_ObjectAttributes_default;
+    UA_StatusCode status = UA_Server_addObjectNode(
+        server, fromNodeId(requestedId), fromNodeId(parentId),
+        UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+        UA_QUALIFIEDNAME(requestedId.getNsIdx(), (char*)browseName.c_str()), fromNodeId(typeId), attr,
+        nullptr, nullptr);
+    UA_Server_setNodeContext(server, fromNodeId(requestedId), context);
+    return UA_STATUSCODE_GOOD==status;
 }
 
 } // namespace opc

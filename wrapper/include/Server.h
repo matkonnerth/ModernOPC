@@ -62,12 +62,13 @@ class Server
         if (context)
         {
             UA_ObjectAttributes oAttr = UA_ObjectAttributes_default;
-            oAttr.displayName = UA_LOCALIZEDTEXT((char*)"de", (char*)"ThisPointer");
+            oAttr.displayName =
+                UA_LOCALIZEDTEXT((char *)"de", (char *)"ThisPointer");
 
             UA_Server_addObjectNode(
                 server, UA_NODEID_NULL, fromNodeId(parentId),
                 UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-                UA_QUALIFIEDNAME(1, (char*)"ThisPointer"),
+                UA_QUALIFIEDNAME(1, (char *)"ThisPointer"),
                 UA_NODEID_NUMERIC(0, UA_NS0ID_BASEOBJECTTYPE), oAttr, context,
                 &objId);
         }
@@ -109,6 +110,21 @@ class Server
         UA_Server_setNodeContext(server, fromNodeId(id), this);
     }
 
+    template <typename M>
+    void bindMethodNode(const NodeId &id, const M &memberFn)
+    {
+        UA_Server_setMethodNode_callback(server, fromNodeId(id),
+                                         internalMethodCallback);
+
+        callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
+            id,
+            std::make_unique<Call<typename MethodTraits<M>::ThisPointerType,
+                                  typename MethodTraits<M>::ReturnType, typename MethodTraits<M>::Argument1>>(
+                memberFn)));
+
+        UA_Server_setNodeContext(server, fromNodeId(id), this);
+    }
+
     bool call(void *objectContext, const NodeId &id,
               const std::vector<Variant> &inputArgs,
               std::vector<Variant> &outputArgs);
@@ -146,6 +162,9 @@ class Server
             nullptr);
     }
 
+    bool addObject(const NodeId &parentId, const NodeId &requestedId,
+                   const NodeId &typeId, const std::string &browseName, void* context);
+
     void registerDataSource(
         const std::string &key,
         std::function<void(const NodeId &id, Variant &var)> read,
@@ -159,7 +178,7 @@ class Server
 
     uint16_t getNamespaceIndex(const std::string &uri);
 
-    UA_Server* getUAServer();
+    UA_Server *getUAServer();
 
   private:
     UA_Server *server{nullptr};

@@ -9,16 +9,16 @@ class NodeId
 {
 
   public:
-    NodeId(int nsIdx, int id)
+    NodeId(uint16_t nsIdx, int id)
         : nsIdx(nsIdx), type(NodeId::IdentifierType::NUMERIC), i(id)
     {
     }
-    NodeId(int nsIdx, const std::string &id)
+    NodeId(uint16_t nsIdx, const std::string &id)
         : nsIdx(nsIdx), type(NodeId::IdentifierType::STRING), i(id)
     {
     }
 
-    int getNsIdx() const { return nsIdx; }
+    uint16_t getNsIdx() const { return nsIdx; }
 
     auto getIdType() const { return type; }
 
@@ -55,7 +55,7 @@ class NodeId
     };
 
   private:
-    int nsIdx{0};
+    uint16_t nsIdx{0};
     IdentifierType type{IdentifierType::NUMERIC};
     std::variant<int, std::string> i{0};
 };
