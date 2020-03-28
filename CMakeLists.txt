@@ -38,3 +38,4 @@ target_compile_options(wrapper PRIVATE ${COMPILER_OPTIONS})
 
 add_subdirectory(tests)
 add_subdirectory(tutorial)
+add_subdirectory(benchmarks)
