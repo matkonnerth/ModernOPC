@@ -2,6 +2,7 @@
 
 # todos
 * add support for Events
+* support binding to specific interface / port
 * support user defined datatypes:
   * structures
   * enumerations
@@ -12,6 +13,7 @@
 * calculate test coverage
 * provide callback for reading Localized Text from database
 * is linking against open62541 in the application really needed?
+* security
 
 # tutorials
 * suppport creating Objects from Object types

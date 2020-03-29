@@ -18,7 +18,7 @@ TEST(variant, baseTypes)
 }
 
 TEST(variant, arrays)
-{
+{   
     UA_Variant v;
     UA_Int32 arr[3] = {1, 2, 3};
     UA_Variant_setArray(&v, &arr, 3, &UA_TYPES[UA_TYPES_INT32]);
@@ -53,4 +53,21 @@ TEST(variant, ownership2)
     ASSERT_EQ(vec[0], 1);
     ASSERT_EQ(vec[1], 2);
     ASSERT_EQ(vec[2], 3);
+}
+
+TEST(variant, setPerReference)
+{
+    opc::Variant var;
+    std::string s{"myString"};
+    const std::string& sref=s;
+    var(s);
+}
+
+TEST(variant, getPerRef)
+{
+    opc::Variant var;
+    std::string s{"myString"};
+    var(s);
+    
+    auto s2 = var.get<std::string>();
 }
