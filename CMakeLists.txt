@@ -7,7 +7,7 @@ conan_basic_setup(TARGETS)
 include(CTest)
 enable_testing()
 
-option(ENABLE_ASAN on "enable address sanitizer")
+option(ENABLE_ASAN off "enable address sanitizer")
 
 set(DO_CLANG_TIDY clang-tidy -checks=-*,modernize-*,performance-*,boost-*)
 set(COMPILER_OPTIONS -Wall -Wextra -pedantic-errors -Wconversion -Wsign-conversion -Wpedantic -Weffc++ -Wno-unused-parameter)
