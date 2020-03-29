@@ -24,3 +24,25 @@ TEST(Methods, memberFunction)
     std::function<int(Callable*)> memberFn = &Callable::run;
     s.addMethod(opc::NodeId(0,85), "run", &Callable::run);
 }
+
+void freeVoidVoid()
+{
+
+}
+
+TEST(Methods, freeVoidVoid)
+{
+    opc::Server s;
+    s.addMethod(opc::NodeId(0, 85), "open", &freeVoidVoid);
+}
+
+void freeVoidConstStdString(const std::string& test)
+{
+    (void)test;
+}
+
+TEST(Methods, freeVoidConstString)
+{
+    opc::Server s;
+    s.addMethod(opc::NodeId(0, 85), "open", &freeVoidConstStdString);
+}

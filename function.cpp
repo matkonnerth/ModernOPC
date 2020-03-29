@@ -1,5 +1,6 @@
 #include <functional>
 #include <iostream>
+#include <memory>
 
 template <typename T>
 struct MethodTraits;
@@ -32,11 +33,18 @@ template<typename M>
 void getMemberFunctionInfo(const M& fn)
 {
     typename MethodTraits<M>::type test{fn};
-    new Call<decltype(test)>(test);
+    std::make_unique<Call<decltype(test)>>(test);
 }
+
+
+
 
 int main() {
     //MethodTraits<decltype(&Service::run)>::type test{&Service::run};
     //new Call<decltype(test)>(test);
+
+    using t1 = const std::string&;
+
+    std::tuple<int, std::remove_reference_t<t1>> t;
     getMemberFunctionInfo(&Service::run);
  }

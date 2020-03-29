@@ -11,22 +11,11 @@
 namespace opc
 {
 
-
-
 template <typename ClassType, typename ReturnType, typename... Args>
 struct MethodTraitsBase
 {
 
     inline static size_t getNumArgs() { return sizeof...(Args); }
-
-    template <typename T>
-    inline static int getTypeName()
-    {
-        std::cout << typeid(T).name() << std::endl;
-        return 0;
-    }
-
-    inline static void getArgumentsName() { auto x = {getTypeName<Args>()...}; }
 
     inline static std::vector<UA_Argument> getInputArguments()
     {
@@ -41,11 +30,9 @@ struct MethodTraitsBase
     inline static UA_Argument getInputArgument(const int &iArg = 0)
     {
 
-        UA_NodeId id = getUADataTypeId<T>();
+        UA_NodeId id = getUADataTypeId<std::remove_const_t<std::remove_reference_t<T>>>();
         UA_Argument inputArgument;
         UA_Argument_init(&inputArgument);
-        inputArgument.description =
-            UA_LOCALIZEDTEXT((char *)"", (char *)"Method Argument");
         inputArgument.name = UA_STRING_NULL;
         inputArgument.dataType = id;
         inputArgument.valueRank = UA_VALUERANK_SCALAR;
@@ -65,8 +52,6 @@ struct MethodTraitsBase
         UA_NodeId id = getUADataTypeId<T>();
         UA_Argument inputArgument;
         UA_Argument_init(&inputArgument);
-        inputArgument.description =
-            UA_LOCALIZEDTEXT((char *)"", (char *)"Method Argument");
         inputArgument.name = UA_STRING_NULL;
         inputArgument.dataType = id;
         if constexpr (is_vector<T>::value)
@@ -81,13 +66,6 @@ struct MethodTraitsBase
         return inputArgument;
     }
 };
-
-/*
-template <typename T>
-struct MethodTraits : MethodTraits<decltype(&T::operator())>
-{
-};
-*/
 
 template <typename T>
 struct MethodTraits

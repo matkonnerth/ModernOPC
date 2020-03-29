@@ -4,7 +4,7 @@
 
 namespace fs = std::experimental::filesystem;
 
-std::vector<std::string> FileService::browse(std::string path)
+std::vector<std::string> FileService::browse(const std::string& path)
 {
     std::vector<std::string> files;
     if(!fs::exists(path))
@@ -19,7 +19,7 @@ std::vector<std::string> FileService::browse(std::string path)
     return files;
 }
 
-std::vector<std::string> FileService::getBrowsedPaths(std::string filter)
+std::vector<std::string> FileService::getBrowsedPaths(const std::string& filter)
 {
     return knownPaths;
 }

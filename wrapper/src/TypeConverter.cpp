@@ -25,6 +25,17 @@ void toUAVariant(std::vector<std::string> v, UA_Variant *var)
 }
 
 template <>
+void toUAVariant(std::string v, UA_Variant *var)
+{
+    UA_Variant_init(var);
+    UA_String s;
+    s.length = v.length();
+    s.data = reinterpret_cast<UA_Byte *>(v.data());
+    UA_Variant_setScalarCopy(var, &s, getDataType<std::string>());
+    var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
+}
+
+template <>
 UA_NodeId getUADataTypeId<bool>()
 {
     return UA_NODEID_NUMERIC(0, UA_NS0ID_BOOLEAN);

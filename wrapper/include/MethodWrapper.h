@@ -26,50 +26,45 @@ namespace opc
 class ICallable
 {
   public:
-    virtual bool call(void* obj, const std::vector<Variant> &inputArguments,
+    virtual bool call(void *obj, const std::vector<Variant> &inputArguments,
                       std::vector<Variant> &outputArguments) = 0;
     virtual ~ICallable() = default;
 };
 
-template<typename T>
+template <typename T>
 class Call;
 
 template <typename ClassType, typename R, typename... INARGS>
 class Call<std::function<R(ClassType *, INARGS...)>> : public ICallable
 {
   public:
-    
-    Call(std::function<R(ClassType*, INARGS...)>f) : m_f(f) {}
-    virtual bool call(void* obj, const std::vector<Variant> &inputArguments,
+    Call(std::function<R(ClassType *, INARGS...)> f) : m_f(f) {}
+    virtual bool call(void *obj, const std::vector<Variant> &inputArguments,
                       std::vector<Variant> &outputArguments) override
     {
-      
-        std::tuple<INARGS...> inputArgs;
+
+        std::tuple<std::remove_const_t<std::remove_reference_t<INARGS>>...>
+            inputArgs;
         size_t i = 0;
 
+        for_each(inputArgs, [&](auto &x) {
+            x = inputArguments[i]
+                    .get<typename std::remove_reference<decltype(x)>::type>();
+            i++;
+        });
 
+        auto t1 = std::make_tuple(static_cast<ClassType *>(obj));
+        auto t2 = std::tuple_cat(t1, inputArgs);
+        R result = std::apply(m_f, t2);
 
-            for_each(inputArgs, [&](auto &x) {
-                x = inputArguments[i]
-                        .get<typename std::remove_reference<decltype(
-                            x)>::type>();
-                i++;
-            });
-
-            auto t1 = std::make_tuple(static_cast<ClassType *>(obj));
-            auto t2 = std::tuple_cat(t1, inputArgs);
-            R result = std::apply(m_f, t2);
-
-            // R result = m_f(inputArgs);
-
-            Variant var;
-            var(result);
-            outputArguments.push_back(std::move(var));
-            return true;
+        Variant var;
+        var(result);
+        outputArguments.push_back(std::move(var));
+        return true;
     }
 
   private:
-    std::function<R(ClassType*, INARGS...)> m_f{};
+    std::function<R(ClassType *, INARGS...)> m_f{};
 };
 
 template <typename R, typename... INARGS>
@@ -80,7 +75,8 @@ class Call<std::function<R(INARGS...)>> : public ICallable
     virtual bool call(void *obj, const std::vector<Variant> &inputArguments,
                       std::vector<Variant> &outputArguments) override
     {
-        std::tuple<INARGS...> inputArgs;
+        std::tuple<std::remove_const_t<std::remove_reference_t<INARGS>>...>
+            inputArgs;
         size_t i = 0;
 
         for_each(inputArgs, [&](auto &x) {
@@ -88,7 +84,7 @@ class Call<std::function<R(INARGS...)>> : public ICallable
                     .get<typename std::remove_reference<decltype(x)>::type>();
             i++;
         });
-        if constexpr(std::is_void_v<R>)
+        if constexpr (std::is_void_v<R>)
         {
             std::apply(m_f, inputArgs);
         }
@@ -105,57 +101,4 @@ class Call<std::function<R(INARGS...)>> : public ICallable
   private:
     std::function<R(INARGS...)> m_f{};
 };
-/*
-template <typename R, typename... INARGS>
-class Call<void, R, INARGS...> : public ICallable
-{
-  public:
-    Call(std::function<R(INARGS...)> f) : m_f(f) {}
-    virtual bool call(void *obj, const std::vector<Variant> &inputArguments,
-                      std::vector<Variant> &outputArguments) override
-    {
-        std::tuple<INARGS...> inputArgs;
-        size_t i = 0;
-
-        for_each(inputArgs, [&](auto &x) {
-            x = inputArguments[i]
-                    .get<typename std::remove_reference<decltype(x)>::type>();
-            i++;
-        });
-        R result = std::apply(m_f, inputArgs);
-        Variant var;
-        var(result);
-        outputArguments.push_back(std::move(var));
-        return true;
-    }
-
-  private:
-    std::function<R(INARGS...)> m_f{};
-};
-
-template <typename... INARGS>
-class Call<void, void, INARGS...> : public ICallable
-{
-  public:
-    Call(std::function<void(INARGS...)> f) : m_f(f) {}
-    virtual bool call(void* obj, const std::vector<Variant> &inputArguments,
-                      std::vector<Variant> &outputArguments) override
-    {
-        std::tuple<INARGS...> inputArgs;
-        size_t i = 0;
-
-        for_each(inputArgs, [&](auto &x) {
-            x = inputArguments[i]
-                    .get<typename std::remove_reference<decltype(x)>::type>();
-            i++;
-        });
-        std::apply(m_f, inputArgs);
-        return true;
-    }
-
-  private:
-    std::function<void(INARGS...)> m_f{};
-};
-*/
-
 } // namespace opc

@@ -1,5 +1,5 @@
 add_executable(tutorial_nodesets nodeset.cpp)
 target_include_directories(tutorial_nodesets PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(tutorial_nodesets PRIVATE wrapper open62541)
+target_link_libraries(tutorial_nodesets PRIVATE ${LIB_ASAN} wrapper open62541)
 target_compile_features(tutorial_nodesets PRIVATE cxx_std_17)
 target_compile_options(tutorial_nodesets PRIVATE ${COMPILER_OPTIONS})
