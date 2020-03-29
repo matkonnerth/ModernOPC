@@ -14,6 +14,7 @@
 * provide callback for reading Localized Text from database
 * is linking against open62541 in the application really needed?
 * security
+* Support for base node Ids, node Types (Objectsfolder)
 
 # tutorials
 * suppport creating Objects from Object types
