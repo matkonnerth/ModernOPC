@@ -1,0 +1,5 @@
+add_executable(tutorial_methods methods.cpp)
+target_include_directories(tutorial_methods PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(tutorial_methods PRIVATE wrapper open62541)
+target_compile_features(tutorial_methods PRIVATE cxx_std_17)
+target_compile_options(tutorial_methods PRIVATE ${COMPILER_OPTIONS})

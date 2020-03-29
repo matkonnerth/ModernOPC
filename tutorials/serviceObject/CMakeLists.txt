@@ -1,0 +1,5 @@
+add_executable(tutorial_fileService main.cpp FileService.cpp)
+target_include_directories(tutorial_fileService PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(tutorial_fileService PRIVATE stdc++fs wrapper open62541)
+target_compile_features(tutorial_fileService PRIVATE cxx_std_17)
+target_compile_options(tutorial_fileService PRIVATE ${COMPILER_OPTIONS})

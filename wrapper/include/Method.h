@@ -82,29 +82,37 @@ struct MethodTraitsBase
     }
 };
 
+/*
 template <typename T>
 struct MethodTraits : MethodTraits<decltype(&T::operator())>
 {
+};
+*/
+
+template <typename T>
+struct MethodTraits
+{
+
 };
 
 template <typename R, typename... Args>
 struct MethodTraits<R (*)(Args...)> : MethodTraitsBase<void, R, Args...>
 {
+    using type = std::function<R(Args...)>;
+};
+
+template <typename R, typename ClassType, typename...Args>
+struct MethodTraits<R (ClassType::*)(Args...)>
+    : MethodTraitsBase<ClassType, R, Args...>
+{
+    using type = std::function<R(ClassType *, Args...)>;
 };
 
 template <typename R, typename... Args>
 struct MethodTraits<std::function<R(Args...)>>
     : MethodTraitsBase<void, R, Args...>
 {
-};
-
-template <typename R, typename ClassType, typename Arg1>
-struct MethodTraits<R (ClassType::*)(Arg1)>
-    : MethodTraitsBase<ClassType, R, Arg1>
-{
-    using ReturnType = R;
-    using ThisPointerType = ClassType;
-    using Argument1 = Arg1;
+    using type = std::function<R(Args...)>;
 };
 
 } // namespace opc

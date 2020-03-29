@@ -21,6 +21,6 @@ TEST(Methods, memberFunction)
     std::function fn = [&]() { return c.run(); };
     s.addMethod(opc::NodeId(0, 85), "open", fn);
 
-    //std::function<int(Callable*)> memberFn = &Callable::run;
-    //s.addMethod(opc::NodeId(0,85), "run", &Callable::run);
+    std::function<int(Callable*)> memberFn = &Callable::run;
+    s.addMethod(opc::NodeId(0,85), "run", &Callable::run);
 }

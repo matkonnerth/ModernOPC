@@ -26,6 +26,8 @@ class Server
     void run();
 
     bool loadNodeset(const std::string &path);
+
+    
     template <typename R, typename... ARGS>
     void addMethod(const NodeId &parentId, const std::string &name,
                    std::function<R(ARGS...)> fn)
@@ -51,28 +53,16 @@ class Server
         UA_Server_setNodeContext(server, newId, this);
 
         callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
-            fromUaNodeId(newId), std::make_unique<Call<void, R, ARGS...>>(fn)));
+            fromUaNodeId(newId), std::make_unique<Call<decltype(fn)>>(fn)));
     }
+    
+
 
     template <typename M>
     void addMethod(const NodeId &parentId, const std::string &name,
-                   const M &memberFn, void *context)
+                   const M &memberFn)
     {
-        UA_NodeId objId = UA_NODEID_NULL;
-        if (context)
-        {
-            UA_ObjectAttributes oAttr = UA_ObjectAttributes_default;
-            oAttr.displayName =
-                UA_LOCALIZEDTEXT((char *)"de", (char *)"ThisPointer");
-
-            UA_Server_addObjectNode(
-                server, UA_NODEID_NULL, fromNodeId(parentId),
-                UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-                UA_QUALIFIEDNAME(1, (char *)"ThisPointer"),
-                UA_NODEID_NUMERIC(0, UA_NS0ID_BASEOBJECTTYPE), oAttr, context,
-                &objId);
-        }
-
+        typename MethodTraits<M>::type fn{memberFn};
         std::vector<UA_Argument> inputArgs =
             MethodTraits<M>::getInputArguments();
         std::vector<UA_Argument> outputArgs =
@@ -84,7 +74,7 @@ class Server
 
         UA_NodeId newId;
         UA_Server_addMethodNode(
-            server, UA_NODEID_NULL, objId,
+            server, UA_NODEID_NULL, fromNodeId(parentId),
             UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
             UA_QUALIFIEDNAME(1, const_cast<char *>(name.c_str())), methAttr,
             nullptr, MethodTraits<M>::getNumArgs(), inputArgs.data(), 1,
@@ -94,10 +84,22 @@ class Server
         UA_Server_setNodeContext(server, newId, this);
 
         callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
-            fromUaNodeId(newId),
-            std::make_unique<Call<typename MethodTraits<M>::ThisPointerType,
-                                  typename MethodTraits<M>::ReturnType>>(
-                memberFn)));
+            fromUaNodeId(newId), std::make_unique<Call<decltype(fn)>>(fn)));
+    }
+
+
+    template <typename M>
+    void bindMethodNode(const NodeId &id, const M &memberFn)
+    {
+        typename MethodTraits<M>::type fn{memberFn};
+        UA_Server_setMethodNode_callback(server, fromNodeId(id),
+                                         internalMethodCallback);
+        callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
+            id,
+            std::make_unique<Call<decltype(fn)>>(
+                fn)));
+
+        UA_Server_setNodeContext(server, fromNodeId(id), this);
     }
 
     template <typename R, typename... ARGS>
@@ -106,21 +108,7 @@ class Server
         UA_Server_setMethodNode_callback(server, fromNodeId(id),
                                          internalMethodCallback);
         callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
-            id, std::make_unique<Call<void, R, ARGS...>>(fn)));
-        UA_Server_setNodeContext(server, fromNodeId(id), this);
-    }
-
-    template <typename M>
-    void bindMethodNode(const NodeId &id, const M &memberFn)
-    {
-        UA_Server_setMethodNode_callback(server, fromNodeId(id),
-                                         internalMethodCallback);
-
-        callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
-            id,
-            std::make_unique<Call<typename MethodTraits<M>::ThisPointerType,
-                                  typename MethodTraits<M>::ReturnType, typename MethodTraits<M>::Argument1>>(
-                memberFn)));
+            id, std::make_unique<Call<decltype(fn)>>(fn)));
 
         UA_Server_setNodeContext(server, fromNodeId(id), this);
     }

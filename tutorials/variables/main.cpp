@@ -45,26 +45,6 @@ setVectorValue(const opc::NodeId &id, opc::Variant &var) {
     }
 }
 
-std::string
-NodesetLoader_unload(std::vector<std::string> s1) {
-    for(auto &s : s1) {
-        std::cout << s;
-        std::cout << std::endl;
-    }
-    // std::cout << s2 << s3 << f << std::endl;
-    return "test";
-}
-
-
-
-class MethodObject {
-  public:
-    void
-    call(int a) {
-        std::cout << "called " << a << std::endl;
-    }
-};
-
 int
 main() {
     opc::Server s;
@@ -95,40 +75,5 @@ main() {
     s.addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, "source1Var"), "source1Var", 12,
                        std::make_unique<opc::NodeMetaInfo>("source1"));
 
-    // loading of a xml nodeset
-    s.loadNodeset("../models/serviceobject.xml");
-    s.loadNodeset("/home/matzy/Dokumente/opc_ua/models/types.xml");
-    std::function load = [&](std::string path) { s.loadNodeset(path); };
-
-    // bind opc ua methods to business logic
-    s.bindMethodNode(opc::NodeId(2, 7003), load);
-    s.bindMethodNode(opc::NodeId(2, 7004), std::function{NodesetLoader_unload});
-
-    std::function f = [](int a, int b) { return std::vector<int>{a, b}; };
-    s.addMethod(opc::NodeId(0, 85), "addMethod2", f);
-
-
-    s.addMethod(opc::NodeId(0,85), "addMethod", std::function{add});
-
-    MethodObject obj1;
-
-    std::function m = [&](int a) { obj1.call(a); };
-    s.addMethod(opc::NodeId(0, 85) ,"ob1", m);
-
-    struct Callable
-    {
-        Callable(const std::string s):state{s}{}
-        int run() { std::cout << state << std::endl;return 12; }
-        private:
-            std::string state;
-    };
-  
-    Callable c1{"Hello"};
-    Callable c2{"world"};
-
-    // std::function<int(Callable*)> memberFn = &Callable::run;
-    //s.addMethod(opc::NodeId(0, 85), "run", &Callable::run, &c1);
-    //s.addMethod(opc::NodeId(0, 85), "run", &Callable::run, &c2);
-
-    s.run();
+   
 }

@@ -37,5 +37,7 @@ target_compile_options(wrapper PRIVATE ${COMPILER_OPTIONS})
 #set_target_properties(wrapper PROPERTIES CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
 
 add_subdirectory(tests)
-add_subdirectory(tutorial)
+add_subdirectory(tutorials)
 add_subdirectory(benchmarks)
+
+add_executable(functions function.cpp)
