@@ -65,9 +65,9 @@ TEST(variant, setPerReference)
 
 TEST(variant, getPerRef)
 {
-    opc::Variant var;
-    std::string s{"myString"};
-    var(s);
     
+    std::string s{"myString"};
+    opc::Variant var;
+    var(s);    
     auto s2 = var.get<std::string>();
 }
