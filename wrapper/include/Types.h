@@ -19,9 +19,9 @@ class LocalizedText
     {
     }
 
-    const std::string &locale() { return loc; }
+    std::string locale() const { return loc; }
 
-    const std::string &text() { return txt; }
+    std::string text() const { return txt; }
 
   private:
     std::string loc{};
@@ -36,8 +36,9 @@ class QualifiedName
     {
     }
 
-    uint16_t namespaceIndex() { return nsIdx; }
-    const std::string &name() { return n; }
+    uint16_t namespaceIndex() const { return nsIdx; }
+    const std::string &name() const { return n; }
+    //const std::string name() const {return n;}
 
   private:
     uint16_t nsIdx;

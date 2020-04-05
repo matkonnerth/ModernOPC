@@ -29,7 +29,7 @@ class Variant {
 
     void copyToUaVariant(UA_Variant* var);
 
-    const UA_Variant* getUAVariant();
+    const UA_Variant* getUAVariant() const;
 
     bool isScalar();
     template <typename T>

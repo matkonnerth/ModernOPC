@@ -8,6 +8,9 @@
 #include <NodeMetaInfo.h>
 #include <open62541/server.h>
 #include <open62541/server_config_default.h>
+#include <open62541/plugin/log_stdout.h>
+#include <BaseEventType.h>
+#include "Variant.h"
 
 namespace opc
 {
@@ -195,16 +198,89 @@ types::LocalizedText Server::readDisplayName(const NodeId &id)
 UA_Server *Server::getUAServer() { return server; }
 
 bool Server::addObject(const NodeId &parentId, const NodeId &requestedId,
-               const NodeId &typeId, const std::string &browseName, void* context)
+                       const NodeId &typeId, const std::string &browseName,
+                       void *context)
 {
     UA_ObjectAttributes attr = UA_ObjectAttributes_default;
     UA_StatusCode status = UA_Server_addObjectNode(
         server, fromNodeId(requestedId), fromNodeId(parentId),
         UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-        UA_QUALIFIEDNAME(requestedId.getNsIdx(), (char*)browseName.c_str()), fromNodeId(typeId), attr,
-        nullptr, nullptr);
+        UA_QUALIFIEDNAME(requestedId.getNsIdx(), (char *)browseName.c_str()),
+        fromNodeId(typeId), attr, nullptr, nullptr);
     UA_Server_setNodeContext(server, fromNodeId(requestedId), context);
-    return UA_STATUSCODE_GOOD==status;
+    return UA_STATUSCODE_GOOD == status;
+}
+
+UA_StatusCode Server::setUpEvent(UA_NodeId *outId, const BaseEventType& event)
+{
+    UA_StatusCode retval = UA_Server_createEvent(server, fromNodeId(event.getEventType()), outId);
+    if (retval != UA_STATUSCODE_GOOD)
+    {
+        UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_SERVER,
+                       "createEvent failed. StatusCode %s",
+                       UA_StatusCode_name(retval));
+        return retval;
+    }
+
+    /* Set the Event Attributes */
+    /* Setting the Time is required or else the event will not show up in
+     * UAExpert! */
+    UA_DateTime eventTime = UA_DateTime_now();
+    UA_Server_writeObjectProperty_scalar(
+        server, *outId, UA_QUALIFIEDNAME(0, (char*)"Time"), &eventTime,
+        &UA_TYPES[UA_TYPES_DATETIME]);
+
+    UA_UInt16 eventSeverity = 100;
+    UA_Server_writeObjectProperty_scalar(
+        server, *outId, UA_QUALIFIEDNAME(0, (char *)"Severity"), &eventSeverity,
+        &UA_TYPES[UA_TYPES_UINT16]);
+
+    UA_LocalizedText eventMessage =
+        UA_LOCALIZEDTEXT(nullptr, (char*)"An event has been generated.");
+    UA_Server_writeObjectProperty_scalar(
+        server, *outId, UA_QUALIFIEDNAME(0, (char *)"Message"), &eventMessage,
+        &UA_TYPES[UA_TYPES_LOCALIZEDTEXT]);
+
+    UA_String eventSourceName = UA_STRING((char*)"Server");
+    UA_Server_writeObjectProperty_scalar(
+        server, *outId, UA_QUALIFIEDNAME(0, (char *)"SourceName"),
+        &eventSourceName, &UA_TYPES[UA_TYPES_STRING]);
+
+    //UA_Server_writeObjectProperty
+    for(const auto& field : event.getEventFields())
+    {
+        auto status = UA_Server_writeObjectProperty(server, *outId, fromQualifiedName(field.first), *field.second.getUAVariant());
+        if(status!=UA_STATUSCODE_GOOD)
+        {
+            UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+                           "WritingObjectPropertyFailed. StatusCode %s",
+                           UA_StatusCode_name(retval));
+        }
+    }
+
+    return UA_STATUSCODE_GOOD;
+}
+
+void Server::setEvent(const BaseEventType &event)
+{
+    UA_NodeId eventNodeId;
+    UA_StatusCode retval = setUpEvent(&eventNodeId, event);
+    if (retval != UA_STATUSCODE_GOOD)
+    {
+        UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+                       "Creating event failed. StatusCode %s",
+                       UA_StatusCode_name(retval));
+    }
+
+    retval = UA_Server_triggerEvent(server, eventNodeId,
+                                    UA_NODEID_NUMERIC(0, UA_NS0ID_SERVER),
+                                    nullptr, UA_TRUE);
+    if (retval != UA_STATUSCODE_GOOD)
+    {
+        UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+                       "Trigger event failed. StatusCode %s",
+                       UA_StatusCode_name(retval));
+    }
 }
 
 } // namespace opc

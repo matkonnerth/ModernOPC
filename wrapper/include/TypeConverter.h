@@ -98,6 +98,12 @@ inline const UA_DataType *getDataType<std::vector<std::string>>()
     return &UA_TYPES[UA_TYPES_STRING];
 }
 
+template <>
+inline const UA_DataType *getDataType<opc::types::LocalizedText>()
+{
+    return &UA_TYPES[UA_TYPES_LOCALIZEDTEXT];
+}
+
 template <typename T>
 void toUAVariant(T val, UA_Variant *var)
 {
@@ -146,5 +152,8 @@ opc::NodeId fromUaNodeId(const UA_NodeId &id);
 UA_NodeId fromNodeId(const opc::NodeId &nodeId);
 
 types::LocalizedText fromUALocalizedText(const UA_LocalizedText *lt);
+
+UA_QualifiedName fromQualifiedName(const opc::types::QualifiedName& qn);
+UA_LocalizedText fromLocalizedText(const opc::types::LocalizedText &lt);
 
 } // namespace opc

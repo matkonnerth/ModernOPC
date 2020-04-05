@@ -61,7 +61,7 @@ void Variant::copyToUaVariant(UA_Variant *var)
     UA_Variant_copy(variant, var);
 }
 
-const UA_Variant *Variant::getUAVariant() { return variant; }
+const UA_Variant *Variant::getUAVariant() const { return variant; }
 
 bool Variant::isScalar()
 {

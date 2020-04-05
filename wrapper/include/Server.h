@@ -8,10 +8,13 @@
 #include <map>
 #include <open62541/server.h>
 #include <open62541/server_config.h>
+#include <open62541/types.h>
 
 struct UA_Server;
+
 namespace opc
 {
+class BaseEventType;
 
 class Server
 {
@@ -27,7 +30,6 @@ class Server
 
     bool loadNodeset(const std::string &path);
 
-    
     template <typename R, typename... ARGS>
     void addMethod(const NodeId &parentId, const std::string &name,
                    std::function<R(ARGS...)> fn)
@@ -55,8 +57,6 @@ class Server
         callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
             fromUaNodeId(newId), std::make_unique<Call<decltype(fn)>>(fn)));
     }
-    
-
 
     template <typename M>
     void addMethod(const NodeId &parentId, const std::string &name,
@@ -87,7 +87,6 @@ class Server
             fromUaNodeId(newId), std::make_unique<Call<decltype(fn)>>(fn)));
     }
 
-
     template <typename M>
     void bindMethodNode(const NodeId &id, const M &memberFn)
     {
@@ -95,9 +94,7 @@ class Server
         UA_Server_setMethodNode_callback(server, fromNodeId(id),
                                          internalMethodCallback);
         callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
-            id,
-            std::make_unique<Call<decltype(fn)>>(
-                fn)));
+            id, std::make_unique<Call<decltype(fn)>>(fn)));
 
         UA_Server_setNodeContext(server, fromNodeId(id), this);
     }
@@ -151,7 +148,8 @@ class Server
     }
 
     bool addObject(const NodeId &parentId, const NodeId &requestedId,
-                   const NodeId &typeId, const std::string &browseName, void* context);
+                   const NodeId &typeId, const std::string &browseName,
+                   void *context);
 
     void registerDataSource(
         const std::string &key,
@@ -167,6 +165,8 @@ class Server
     uint16_t getNamespaceIndex(const std::string &uri);
 
     UA_Server *getUAServer();
+
+    void setEvent(const BaseEventType &event);
 
   private:
     UA_Server *server{nullptr};
@@ -193,5 +193,7 @@ class Server
                   void *sessionContext, const UA_NodeId *nodeId,
                   void *nodeContext, const UA_NumericRange *range,
                   const UA_DataValue *value);
+
+    UA_StatusCode setUpEvent(UA_NodeId *outId, const BaseEventType& event);
 };
 } // namespace opc

@@ -9,8 +9,8 @@ template <>
 void toUAVariant(std::vector<std::string> v, UA_Variant *var)
 {
     UA_Variant_init(var);
-    UA_String *strings = static_cast<UA_String *>(
-        UA_calloc(v.size(), sizeof(UA_String)));
+    auto strings =
+        static_cast<UA_String *>(UA_calloc(v.size(), sizeof(UA_String)));
     size_t i = 0;
     for (auto &s : v)
     {
@@ -18,8 +18,7 @@ void toUAVariant(std::vector<std::string> v, UA_Variant *var)
         strings[i].data = reinterpret_cast<UA_Byte *>(s.data());
         i++;
     }
-    UA_Variant_setArrayCopy(var, strings, v.size(),
-                            getDataType<std::string>());
+    UA_Variant_setArrayCopy(var, strings, v.size(), getDataType<std::string>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
     UA_free(strings);
 }
@@ -32,6 +31,14 @@ void toUAVariant(std::string v, UA_Variant *var)
     s.length = v.length();
     s.data = reinterpret_cast<UA_Byte *>(v.data());
     UA_Variant_setScalarCopy(var, &s, getDataType<std::string>());
+    var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
+}
+
+template<>
+void toUAVariant(opc::types::LocalizedText m, UA_Variant* var)
+{
+    UA_LocalizedText lt= fromLocalizedText(m);
+    UA_Variant_setScalarCopy(var, &lt, getDataType<opc::types::LocalizedText>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
 
@@ -63,6 +70,12 @@ template <>
 UA_NodeId getUADataTypeId<std::vector<int>>()
 {
     return getUADataTypeId<int>();
+}
+
+template <>
+UA_NodeId getUADataTypeId<opc::types::LocalizedText>()
+{
+    return UA_NODEID_NUMERIC(0, UA_NS0ID_LOCALIZEDTEXT);
 }
 
 template <>
@@ -164,26 +177,27 @@ types::LocalizedText toStdType(UA_Variant *variant)
     return fromUALocalizedText(static_cast<UA_LocalizedText *>(variant->data));
 }
 
-template<>
-std::vector<types::LocalizedText> toStdType(UA_Variant* var)
+template <>
+std::vector<types::LocalizedText> toStdType(UA_Variant *var)
 {
     std::vector<types::LocalizedText> vec;
     for (size_t i = 0; i < var->arrayLength; i++)
     {
-        vec.emplace_back(fromUALocalizedText(&static_cast<UA_LocalizedText*>(var->data)[i]));
+        vec.emplace_back(fromUALocalizedText(
+            &static_cast<UA_LocalizedText *>(var->data)[i]));
     }
     return vec;
 }
 
-types::QualifiedName fromUAQualifiedName(const UA_QualifiedName* qn)
+types::QualifiedName fromUAQualifiedName(const UA_QualifiedName *qn)
 {
     return types::QualifiedName(qn->namespaceIndex, fromUAString(&qn->name));
 }
 
 template <>
-types::QualifiedName toStdType(UA_Variant* variant)
+types::QualifiedName toStdType(UA_Variant *variant)
 {
-    return fromUAQualifiedName(static_cast<UA_QualifiedName*>(variant->data));
+    return fromUAQualifiedName(static_cast<UA_QualifiedName *>(variant->data));
 }
 
 opc::NodeId fromUaNodeId(const UA_NodeId &id)
@@ -229,6 +243,16 @@ UA_NodeId fromNodeId(const opc::NodeId &nodeId)
         break;
     }
     return id;
+}
+
+UA_QualifiedName fromQualifiedName(const opc::types::QualifiedName &qn)
+{
+    return UA_QUALIFIEDNAME_ALLOC(qn.namespaceIndex(), (char *)qn.name().c_str());
+}
+
+UA_LocalizedText fromLocalizedText(const opc::types::LocalizedText &lt)
+{
+    return UA_LOCALIZEDTEXT_ALLOC((char*)lt.locale().c_str(), (char*)lt.text().c_str());
 }
 
 } // namespace opc

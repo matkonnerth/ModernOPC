@@ -18,7 +18,7 @@ void Variant::operator()(int val)
 template <>
 void Variant::operator()(std::vector<int> val)
 {
-    toUAVariant(val, variant);
+    toUAVariant(std::move(val), variant);
 }
 
 template <>
@@ -38,4 +38,11 @@ void Variant::operator()(std::vector<std::string> val)
 {
     toUAVariant(std::move(val), variant);
 }
+
+template<>
+void Variant::operator()(types::LocalizedText val)
+{
+    toUAVariant(std::move(val), variant);
+}
+
 }
