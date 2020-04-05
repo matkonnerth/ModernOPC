@@ -17,6 +17,7 @@ class BaseEventType
         : eventType{eventTypeId}
     {
     }
+    virtual ~BaseEventType()=default;
     using EventFieldsType =
         std::vector<std::pair<std::vector<QualifiedName>, Variant>>;
     void setMessage(const LocalizedText &m)

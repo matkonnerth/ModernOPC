@@ -1,13 +1,13 @@
-#include <opc/Server.h>
-#include <opc/Conversion.h>
-#include <opc/Variant.h>
 #include <import/Extension.h>
 #include <import/import.h>
 #include <import/value.h>
-#include "nodesetLoader.h"
-#include <opc/events/BaseEventType.h>
+#include <nodesetLoader/nodesetLoader.h>
+#include <opc/Conversion.h>
 #include <opc/NodeId.h>
 #include <opc/NodeMetaInfo.h>
+#include <opc/Server.h>
+#include <opc/Variant.h>
+#include <opc/events/BaseEventType.h>
 #include <open62541/plugin/log_stdout.h>
 #include <open62541/server.h>
 #include <open62541/server_config_default.h>
@@ -215,7 +215,7 @@ UA_StatusCode Server::getNodeIdForPath(const UA_NodeId objectId,
                                        const std::vector<QualifiedName> &qn,
                                        UA_NodeId *outId)
 {
-    UA_RelativePathElement *elements = static_cast<UA_RelativePathElement *>(
+    auto *elements = static_cast<UA_RelativePathElement *>(
         calloc(qn.size(), sizeof(UA_RelativePathElement)));
     std::vector<UA_RelativePathElement> pathElements{elements,
                                                      elements + qn.size()};
