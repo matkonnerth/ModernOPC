@@ -1,4 +1,4 @@
-#include <Server.h>
+#include <opc/Server.h>
 #include <gtest/gtest.h>
 
 TEST(Methods, std_function)

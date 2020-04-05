@@ -1,6 +1,6 @@
-#include <Server.h>
-#include <Types.h>
-#include <Variant.h>
+#include <opc/Server.h>
+#include <opc/Types.h>
+#include <opc/Variant.h>
 #include <gtest/gtest.h>
 
 std::string path = "";

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <Server.h>
+#include <opc/Server.h>
 #include <iostream>
-#include <Variant.h>
+#include <opc/Variant.h>
 
 std::string path = "";
 

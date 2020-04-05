@@ -1,6 +1,6 @@
-#include "Server.h"
+#include <opc/Server.h>
 #include <functional>
-#include "BaseEventType.h"
+#include <opc/events/BaseEventType.h>
 
 using namespace std::string_literals;
 

@@ -1,5 +1,5 @@
-#include <TypeConverter.h>
-#include <Variant.h>
+#include <opc/Conversion.h>
+#include <opc/Variant.h>
 
 namespace opc
 {

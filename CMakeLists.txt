@@ -28,15 +28,9 @@ add_library(wrapper SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Variant_is_a.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Variant_get.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Variant_set.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/TypeConverter.cpp)
-target_include_directories(wrapper
-    PUBLIC 
-        $<INSTALL_INTERFACE:include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include>
-    PRIVATE 
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/import
-    )
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Conversion.cpp)
+target_include_directories(wrapper PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
+target_include_directories(wrapper PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src)
 
 target_link_libraries(wrapper PRIVATE open62541 xmlImport)
 target_compile_features(wrapper PRIVATE cxx_std_17)

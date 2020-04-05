@@ -1,6 +1,8 @@
 #pragma once
 #include <iostream>
 #include <string>
+#include <vector>
+#include <opc/Variant.h>
 
 namespace opc {
 class NodeId;

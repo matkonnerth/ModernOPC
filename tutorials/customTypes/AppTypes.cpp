@@ -1,6 +1,6 @@
 #include <AppTypes.h>
-#include <TypeConverter.h>
-#include <Variant.h>
+#include <opc/Conversion.h>
+#include <opc/Variant.h>
 
 // more or less an extension to the wrapper
 namespace opc

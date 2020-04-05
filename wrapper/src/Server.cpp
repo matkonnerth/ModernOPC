@@ -1,13 +1,13 @@
-#include "Server.h"
-#include "TypeConverter.h"
-#include "Variant.h"
-#include "import/Extension.h"
-#include "import/import.h"
-#include "import/value.h"
+#include <opc/Server.h>
+#include <opc/Conversion.h>
+#include <opc/Variant.h>
+#include <import/Extension.h>
+#include <import/import.h>
+#include <import/value.h>
 #include "nodesetLoader.h"
-#include <BaseEventType.h>
-#include <NodeId.h>
-#include <NodeMetaInfo.h>
+#include <opc/events/BaseEventType.h>
+#include <opc/NodeId.h>
+#include <opc/NodeMetaInfo.h>
 #include <open62541/plugin/log_stdout.h>
 #include <open62541/server.h>
 #include <open62541/server_config_default.h>
@@ -290,13 +290,8 @@ UA_StatusCode Server::setUpEvent(UA_NodeId *outId, const BaseEventType &event)
         server, *outId, UA_QUALIFIEDNAME(0, (char *)"SourceName"),
         &eventSourceName, &UA_TYPES[UA_TYPES_STRING]);
 
-    // UA_Server_writeObjectProperty
     for (const auto &field : event.getEventFields())
     {
-        // auto status = UA_Server_writeObjectProperty(server, *outId,
-        // fromQualifiedName(field.first), *field.second.getUAVariant());
-       
-
         UA_NodeId pathId;
         auto status = getNodeIdForPath(*outId, field.first, &pathId);
         if (status != UA_STATUSCODE_GOOD)

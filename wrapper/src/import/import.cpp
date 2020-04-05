@@ -1,9 +1,9 @@
 #include "nodesetLoader.h"
-#include "value.h"
+#include "import/value.h"
 #include <open62541/server.h>
 #include <string>
 #include <vector>
-#include "conversion.h"
+#include <import/conversion.h>
 #include <iostream>
 
 static UA_NodeId getTypeDefinitionIdFromChars2(const TNode *node)
