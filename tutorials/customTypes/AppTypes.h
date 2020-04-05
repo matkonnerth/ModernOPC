@@ -1,4 +1,5 @@
 #pragma once
+#include <opc/Conversion.h>
 
 
 namespace app
@@ -12,4 +13,10 @@ namespace app
               double max;
         };
     }
+}
+struct UA_Variant;
+namespace opc
+{
+    template <>
+    void toUAVariant(app::types::Range2 m, UA_Variant *var);
 }

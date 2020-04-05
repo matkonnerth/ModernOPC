@@ -107,6 +107,7 @@ inline const UA_DataType *getDataType<opc::types::LocalizedText>()
 template <typename T>
 void toUAVariant(T val, UA_Variant *var)
 {
+    static_assert(std::is_arithmetic_v<T>, "Type not integral");
     UA_Variant_init(var);
     UA_Variant_setScalarCopy(var, &val, getDataType<T>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
@@ -115,10 +116,20 @@ void toUAVariant(T val, UA_Variant *var)
 template <typename T>
 void toUAVariant(std::vector<T> v, UA_Variant *var)
 {
+    static_assert(std::is_arithmetic_v<T>, "Type not integral");
     UA_Variant_init(var);
     UA_Variant_setArrayCopy(var, v.data(), v.size(), getDataType<T>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
+
+template <>
+void toUAVariant(std::string v, UA_Variant *var);
+
+template <>
+void toUAVariant(opc::types::LocalizedText m, UA_Variant *var);
+
+template <>
+void toUAVariant(std::vector<std::string> v, UA_Variant *var);
 
 template <typename T>
 UA_NodeId getUADataTypeId();

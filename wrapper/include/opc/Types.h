@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <iostream>
 
 namespace opc
 {
@@ -19,8 +20,28 @@ class LocalizedText
     {
     }
 
-    std::string locale() const { return loc; }
+    LocalizedText(const LocalizedText& other) {
+        loc = other.loc;
+        txt = other.txt;
+        std::cout << "copy ctor called\n";
+    }
 
+    LocalizedText& operator=(const LocalizedText& other)
+    {
+      if(&other==this)
+      {
+        return *this;
+      }
+      loc = other.loc;
+      txt = other.txt;
+      std::cout << "copy assign called\n";
+      return *this;
+    }
+
+    LocalizedText(LocalizedText&& other) = default;
+    LocalizedText& operator=(LocalizedText&& other)=default;
+
+    std::string locale() const { return loc; }
     std::string text() const { return txt; }
 
   private:

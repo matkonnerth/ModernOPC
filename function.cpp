@@ -1,50 +1,69 @@
-#include <functional>
+#include <string>
+#include <type_traits>
 #include <iostream>
-#include <memory>
+#include <vector>
 
-template <typename T>
-struct MethodTraits;
+//std::string fooImpl(int i) { return "int!"; }
 
-template <typename R, typename C, typename... Args>
-struct MethodTraits<R (C::*)(Args...)>
+template <class T>
+struct HasConversionImpl_
 {
-    using type = std::function<R(C*, Args...)>;
-};
-
-class Service
-{
-  public:
-    int run(int arg1, int arg2) { return arg1 + arg2; }
+    template <typename C>
+    static std::true_type test(decltype(conversionImpl(std::declval<C>())) *);
+    template <typename C>
+    static std::false_type test(...);
+    typedef decltype(test<T>(0)) type;
 };
 
 template <typename T>
-class Call;
+using HasConversionImpl = typename HasConversionImpl_<T>::type;
 
-template <typename ClassType, typename R, typename... INARGS>
-class Call<std::function<R(ClassType*, INARGS...)>>
+template <typename T>
+typename std::enable_if<HasConversionImpl<T>::value, void>::type convert(T &&t)
 {
-  public:
-    Call(std::function<R(ClassType *, INARGS...)> f) : m_f(f) {}
+    conversionImpl(std::forward<T>(t));
+}
 
-    std::function<R(ClassType *, INARGS...)> m_f;
+template <typename T>
+typename std::enable_if<!HasConversionImpl<T>::value, void>::type convert(T &&t)
+{
+  //static_assert(std::is_arithmetic<T>::value, "asdf");
+    std::cout << "generic!\n";
+}
+
+struct X
+{
 };
 
-template<typename M>
-void getMemberFunctionInfo(const M& fn)
+template <class T>
+struct S
 {
-    typename MethodTraits<M>::type test{fn};
-    std::make_unique<Call<decltype(test)>>(test);
+};
+
+template <class T>
+void conversionImpl(S<T> const &)
+{
+    std::cout << "convert S<T> \n";
+}
+
+template <typename T>
+void conversionImpl(std::vector<T>&)
+{
+  std::cout << "convert vector\n";
 }
 
 
 
+#include <iostream>
+int main()
+{
+    convert(1);
+    convert("nope");
+    convert(S<unsigned>{});
 
-int main() {
-    //MethodTraits<decltype(&Service::run)>::type test{&Service::run};
-    //new Call<decltype(test)>(test);
+    S<int> s2;
+    convert(std::move(s2));
 
-    using t1 = const std::string&;
-
-    std::tuple<int, std::remove_reference_t<t1>> t;
-    getMemberFunctionInfo(&Service::run);
- }
+    std::vector<int> a{1, 2, 3};
+    convert(a);
+}

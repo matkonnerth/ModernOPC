@@ -1,2 +1,3 @@
 add_executable(variant_bench variant.cpp)
 target_link_libraries(variant_bench PRIVATE wrapper CONAN_PKG::benchmark open62541)
+target_compile_features(variant_bench PRIVATE cxx_std_17)

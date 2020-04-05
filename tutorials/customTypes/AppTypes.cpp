@@ -29,4 +29,14 @@ app::types::Range2 Variant::get<app::types::Range2>() const
 {
     return toStdType<app::types::Range2>(variant);
 }
+
+template <>
+void toUAVariant(app::types::Range2 m, UA_Variant *var)
+{
+    UA_Range range;
+    range.high = m.max;
+    range.low = m.min;
+    UA_Variant_setScalarCopy(var, &range, getDataType<decltype(m)>());
+}
+
 } // namespace opc
