@@ -1,16 +1,16 @@
 #include "Server.h"
 #include "TypeConverter.h"
+#include "Variant.h"
 #include "import/Extension.h"
 #include "import/import.h"
 #include "import/value.h"
 #include "nodesetLoader.h"
+#include <BaseEventType.h>
 #include <NodeId.h>
 #include <NodeMetaInfo.h>
+#include <open62541/plugin/log_stdout.h>
 #include <open62541/server.h>
 #include <open62541/server_config_default.h>
-#include <open62541/plugin/log_stdout.h>
-#include <BaseEventType.h>
-#include "Variant.h"
 
 namespace opc
 {
@@ -211,9 +211,53 @@ bool Server::addObject(const NodeId &parentId, const NodeId &requestedId,
     return UA_STATUSCODE_GOOD == status;
 }
 
-UA_StatusCode Server::setUpEvent(UA_NodeId *outId, const BaseEventType& event)
+UA_StatusCode Server::getNodeIdForPath(const UA_NodeId objectId,
+                                       const std::vector<QualifiedName> &qn,
+                                       UA_NodeId *outId)
 {
-    UA_StatusCode retval = UA_Server_createEvent(server, fromNodeId(event.getEventType()), outId);
+    UA_RelativePathElement *elements = static_cast<UA_RelativePathElement *>(
+        calloc(qn.size(), sizeof(UA_RelativePathElement)));
+    std::vector<UA_RelativePathElement> pathElements{elements,
+                                                     elements + qn.size()};
+
+    std::size_t cnt = 0;
+    for (auto &path : pathElements)
+    {
+        UA_RelativePathElement_init(&path);
+        path.referenceTypeId =
+            UA_NODEID_NUMERIC(0, UA_NS0ID_HIERARCHICALREFERENCES);
+        path.isInverse = false;
+        path.includeSubtypes = true;
+        path.targetName = fromQualifiedName(qn[cnt]);
+        cnt++;
+    }
+
+    UA_BrowsePath bp;
+    UA_BrowsePath_init(&bp);
+    bp.startingNode = objectId;
+    bp.relativePath.elementsSize = qn.size();
+    bp.relativePath.elements = pathElements.data();
+
+    UA_StatusCode retval;
+    UA_BrowsePathResult bpr = UA_Server_translateBrowsePathToNodeIds(server, &bp);
+    if (bpr.statusCode != UA_STATUSCODE_GOOD || bpr.targetsSize < 1)
+    {
+        retval = bpr.statusCode;
+        UA_BrowsePathResult_clear(&bpr);
+        free(elements);
+        return retval;
+    }
+    retval = bpr.statusCode;
+    *outId = bpr.targets[0].targetId.nodeId;
+    UA_BrowsePathResult_clear(&bpr);
+    free(elements);
+    return retval;
+}
+
+UA_StatusCode Server::setUpEvent(UA_NodeId *outId, const BaseEventType &event)
+{
+    UA_StatusCode retval =
+        UA_Server_createEvent(server, fromNodeId(event.getEventType()), outId);
     if (retval != UA_STATUSCODE_GOOD)
     {
         UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_SERVER,
@@ -227,7 +271,7 @@ UA_StatusCode Server::setUpEvent(UA_NodeId *outId, const BaseEventType& event)
      * UAExpert! */
     UA_DateTime eventTime = UA_DateTime_now();
     UA_Server_writeObjectProperty_scalar(
-        server, *outId, UA_QUALIFIEDNAME(0, (char*)"Time"), &eventTime,
+        server, *outId, UA_QUALIFIEDNAME(0, (char *)"Time"), &eventTime,
         &UA_TYPES[UA_TYPES_DATETIME]);
 
     UA_UInt16 eventSeverity = 100;
@@ -236,24 +280,38 @@ UA_StatusCode Server::setUpEvent(UA_NodeId *outId, const BaseEventType& event)
         &UA_TYPES[UA_TYPES_UINT16]);
 
     UA_LocalizedText eventMessage =
-        UA_LOCALIZEDTEXT(nullptr, (char*)"An event has been generated.");
+        UA_LOCALIZEDTEXT(nullptr, (char *)"An event has been generated.");
     UA_Server_writeObjectProperty_scalar(
         server, *outId, UA_QUALIFIEDNAME(0, (char *)"Message"), &eventMessage,
         &UA_TYPES[UA_TYPES_LOCALIZEDTEXT]);
 
-    UA_String eventSourceName = UA_STRING((char*)"Server");
+    UA_String eventSourceName = UA_STRING((char *)"Server");
     UA_Server_writeObjectProperty_scalar(
         server, *outId, UA_QUALIFIEDNAME(0, (char *)"SourceName"),
         &eventSourceName, &UA_TYPES[UA_TYPES_STRING]);
 
-    //UA_Server_writeObjectProperty
-    for(const auto& field : event.getEventFields())
+    // UA_Server_writeObjectProperty
+    for (const auto &field : event.getEventFields())
     {
-        auto status = UA_Server_writeObjectProperty(server, *outId, fromQualifiedName(field.first), *field.second.getUAVariant());
-        if(status!=UA_STATUSCODE_GOOD)
+        // auto status = UA_Server_writeObjectProperty(server, *outId,
+        // fromQualifiedName(field.first), *field.second.getUAVariant());
+       
+
+        UA_NodeId pathId;
+        auto status = getNodeIdForPath(*outId, field.first, &pathId);
+        if (status != UA_STATUSCODE_GOOD)
         {
             UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
-                           "WritingObjectPropertyFailed. StatusCode %s",
+                           "Cannot resolve browsepath. StatusCode %s",
+                           UA_StatusCode_name(retval));
+            continue;
+        }
+
+        status = UA_Server_writeValue(server, pathId, *field.second.getUAVariant());
+        if (status != UA_STATUSCODE_GOOD)
+        {
+            UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+                           "Writing Event property failed. StatusCode %s",
                            UA_StatusCode_name(retval));
         }
     }

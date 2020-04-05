@@ -193,7 +193,10 @@ class Server
                   void *sessionContext, const UA_NodeId *nodeId,
                   void *nodeContext, const UA_NumericRange *range,
                   const UA_DataValue *value);
+    UA_StatusCode setUpEvent(UA_NodeId *outId, const BaseEventType &event);
 
-    UA_StatusCode setUpEvent(UA_NodeId *outId, const BaseEventType& event);
+    UA_StatusCode getNodeIdForPath(const UA_NodeId objectId,
+                                   const std::vector<types::QualifiedName> &qn,
+                                   UA_NodeId *outId);
 };
 } // namespace opc
