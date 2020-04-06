@@ -15,6 +15,7 @@
 * security
 * Support for base node Ids, node Types (Objectsfolder)
 * client
+* run tests with valgrind/asan
 
 # tutorials
 * suppport creating Objects from Object types

@@ -79,12 +79,17 @@ class Server
         methAttr.userExecutable = true;
 
         UA_NodeId newId;
+        const UA_Argument* outArgs=nullptr;
+        if(outputArgs.size()>0)
+        {
+            outArgs = outputArgs.data();
+        }
         UA_Server_addMethodNode(
             server, fromNodeId(requestedId), fromNodeId(parentId),
             UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
             UA_QUALIFIEDNAME(1, const_cast<char *>(name.c_str())), methAttr,
-            nullptr, MethodTraits<M>::getNumArgs(), inputArgs.data(), 1,
-            outputArgs.data(), nullptr, &newId);
+            nullptr, MethodTraits<M>::getNumArgs(), inputArgs.data(), outputArgs.size(),
+            outArgs, nullptr, &newId);
 
         UA_Server_setMethodNode_callback(server, newId, internalMethodCallback);
         UA_Server_setNodeContext(server, newId, this);

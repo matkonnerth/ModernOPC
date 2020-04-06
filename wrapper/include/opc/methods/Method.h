@@ -42,7 +42,10 @@ struct MethodTraitsBase
 
     inline static std::vector<UA_Argument> getOutputArguments()
     {
-
+        if constexpr(std::is_void_v<ReturnType>)
+        {
+            return {};
+        }
         return {getOutputArgument<ReturnType>()};
     }
 
