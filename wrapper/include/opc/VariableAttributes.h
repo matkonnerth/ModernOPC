@@ -1,4 +1,5 @@
 #pragma once
+#include <opc/Variant.h>
 
 namespace opc
 {

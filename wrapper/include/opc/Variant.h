@@ -1,12 +1,34 @@
 #pragma once
 #include <vector>
-#include <opc/Conversion.h>
-
+#include <open62541/server.h>
+#include <opc/DataType.h>
 
 namespace opc {
 
 template <typename T>
 T toStdType(UA_Variant *variant);
+
+template<typename T>
+void convertToUAVariantImpl(T val, UA_Variant* var);
+
+template <typename T>
+typename std::enable_if<!std::is_arithmetic_v<T>, void>::type
+convertToUAVariant(T &&t, UA_Variant *var)
+{
+    convertToUAVariantImpl(std::forward<T>(t), var);
+}
+
+template <typename T>
+typename std::enable_if<std::is_arithmetic_v<T>, void>::type
+convertToUAVariant(T &&val, UA_Variant *var)
+{
+    static_assert(std::is_arithmetic_v<std::remove_reference_t<T>>,
+                  "Type not integral");
+    UA_Variant_init(var);
+    UA_Variant_setScalarCopy(var, &val,
+                             getDataType<std::remove_reference_t<T>>());
+    var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
+}
 
 class Variant {
   public:

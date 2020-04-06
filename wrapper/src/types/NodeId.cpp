@@ -1,5 +1,7 @@
-#include <opc/Conversion.h>
+//#include <opc/Conversion.h>
 #include <opc/types/NodeId.h>
+#include <open62541/types.h>
+#include <open62541/types_generated_handling.h>
 
 namespace opc
 {

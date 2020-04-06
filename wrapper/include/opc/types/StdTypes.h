@@ -22,7 +22,7 @@ inline std::string fromUAString(const UA_String *s)
 } // namespace types
 } // namespace opc
 
-namespace std
+namespace opc
 {
 
 template <typename T>

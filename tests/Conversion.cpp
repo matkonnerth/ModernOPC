@@ -1,4 +1,5 @@
-#include <opc/Conversion.h>
+#include <opc/DataType.h>
+#include <open62541/types_generated.h>
 #include <gtest/gtest.h>
 
 TEST(TypeConverter, boolean) {
