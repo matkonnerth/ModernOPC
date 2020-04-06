@@ -7,8 +7,10 @@
 struct Extension
 {
     explicit Extension(const TNode* n) : node{n}{}
+    Extension(const Extension&)=delete;
+    Extension& operator=(const Extension&)=delete;
     const TNode* node;
-    std::map<std::string, std::string> values;
+    std::map<std::string, std::string> values{};
 };
 
 Extension *Extension_new(const TNode *n)
