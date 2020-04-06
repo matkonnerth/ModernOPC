@@ -1,7 +1,7 @@
 #pragma once
 #include <iostream>
-#include <variant>
 #include <open62541/types.h>
+#include <variant>
 namespace opc
 {
 namespace types

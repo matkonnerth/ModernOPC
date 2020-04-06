@@ -1,9 +1,9 @@
 #include <opc/DataType.h>
-#include <open62541/types.h>
-#include <open62541/nodeids.h>
-#include <vector>
-#include <opc/types/Types.h>
 #include <opc/Variant.h>
+#include <opc/types/Types.h>
+#include <open62541/nodeids.h>
+#include <open62541/types.h>
+#include <vector>
 
 namespace opc
 {
@@ -197,7 +197,5 @@ const UA_DataType *getDataType<std::vector<std::string>>()
 {
     return &UA_TYPES[UA_TYPES_STRING];
 }
-
-
 
 } // namespace opc

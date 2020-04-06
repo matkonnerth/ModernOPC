@@ -1,7 +1,7 @@
 #pragma once
+#include <opc/Variant.h>
 #include <opc/types/NodeId.h>
 #include <opc/types/Types.h>
-#include <opc/Variant.h>
 #include <utility>
 #include <vector>
 
@@ -9,8 +9,8 @@ namespace opc
 {
 
 using opc::types::LocalizedText;
-using opc::types::QualifiedName;
 using opc::types::NodeId;
+using opc::types::QualifiedName;
 class BaseEventType
 {
   public:
@@ -18,13 +18,12 @@ class BaseEventType
         : eventType{eventTypeId}
     {
     }
-    virtual ~BaseEventType()=default;
+    virtual ~BaseEventType() = default;
     using EventFieldsType =
         std::vector<std::pair<std::vector<QualifiedName>, Variant>>;
     void setMessage(const LocalizedText &m)
     {
-        Variant var;
-        //var(m);
+        Variant var{m};
         eventFields.emplace_back(std::make_pair(
             std::vector<QualifiedName>{QualifiedName(0, "Message")},
             std::move(var)));
@@ -51,8 +50,7 @@ class TransitionEventType : public BaseEventType
 
     void setTransition(const LocalizedText &transition)
     {
-        Variant var;
-        //var(transition);
+        Variant var{transition};
         eventFields.emplace_back(std::make_pair(
             std::vector<QualifiedName>{QualifiedName(0, "Transition")},
             std::move(var)));

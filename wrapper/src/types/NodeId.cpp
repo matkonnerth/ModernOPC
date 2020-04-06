@@ -1,4 +1,3 @@
-//#include <opc/Conversion.h>
 #include <opc/types/NodeId.h>
 #include <open62541/types.h>
 #include <open62541/types_generated_handling.h>
@@ -18,8 +17,8 @@ opc::types::NodeId fromUaNodeId(const UA_NodeId &id)
         break;
     case UA_NODEIDTYPE_STRING:
         return NodeId(nsIdx, std::string(reinterpret_cast<char *>(
-                                                  id.identifier.string.data),
-                                              id.identifier.string.length));
+                                             id.identifier.string.data),
+                                         id.identifier.string.length));
         break;
     case UA_NODEIDTYPE_BYTESTRING:
     case UA_NODEIDTYPE_GUID:

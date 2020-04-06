@@ -3,7 +3,6 @@
 #include <type_traits>
 #include <string>
 #include <open62541/types.h>
-#include <open62541/server.h>
 #include <opc/DataType.h>
 
 namespace opc

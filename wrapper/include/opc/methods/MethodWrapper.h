@@ -1,6 +1,6 @@
 #pragma once
-#include <opc/Variant.h>
 #include <functional>
+#include <opc/Variant.h>
 #include <tuple>
 #include <vector>
 

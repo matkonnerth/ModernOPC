@@ -1,6 +1,6 @@
-#include <opc/types/Types.h>
 #include <opc/Variant.h>
 #include <opc/types/StdTypes.h>
+#include <opc/types/Types.h>
 #include <ostream>
 
 namespace opc
@@ -12,7 +12,7 @@ const UA_DataType *getDataType<opc::types::LocalizedText>()
     return &UA_TYPES[UA_TYPES_LOCALIZEDTEXT];
 }
 
-template<>
+template <>
 const UA_DataType *getDataType<opc::types::QualifiedName>()
 {
     return &UA_TYPES[UA_TYPES_QUALIFIEDNAME];
@@ -46,20 +46,11 @@ std::vector<types::LocalizedText> toStdType(UA_Variant *var)
 
 namespace types
 {
-void convertToUAVariantImpl(opc::types::LocalizedText m, UA_Variant *var)
+void convertToUAVariantImpl(const opc::types::LocalizedText& m, UA_Variant *var)
 {
     UA_LocalizedText lt = fromLocalizedText(m);
     UA_Variant_setScalarCopy(var, &lt,
                              getDataType<opc::types::LocalizedText>());
-    var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
-    UA_LocalizedText_clear(&lt);
-}
-
-void convertToUAVariantImpl(const opc::types::LocalizedText &m, UA_Variant *var)
-{
-    UA_LocalizedText lt = fromLocalizedText(m);
-    UA_Variant_setScalarCopy(var, &lt,
-                             opc::getDataType<opc::types::LocalizedText>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
     UA_LocalizedText_clear(&lt);
 }
@@ -76,7 +67,6 @@ UA_LocalizedText fromLocalizedText(const opc::types::LocalizedText &lt)
                                   (char *)lt.text().c_str());
 }
 
-
 LocalizedText fromUALocalizedText(const UA_LocalizedText *lt)
 {
     std::string locale{reinterpret_cast<char *>(lt->locale.data),
@@ -87,7 +77,8 @@ LocalizedText fromUALocalizedText(const UA_LocalizedText *lt)
 
 QualifiedName fromUAQualifiedName(const UA_QualifiedName *qn)
 {
-    return QualifiedName(qn->namespaceIndex, opc::types::fromUAString(&qn->name));
+    return QualifiedName(qn->namespaceIndex,
+                         opc::types::fromUAString(&qn->name));
 }
 
 void convertToUAVariantImpl(const opc::types::QualifiedName &qn,
@@ -95,7 +86,7 @@ void convertToUAVariantImpl(const opc::types::QualifiedName &qn,
 {
     UA_QualifiedName n = fromQualifiedName(qn);
     UA_Variant_setScalarCopy(var, &n,
-                            opc::getDataType<opc::types::QualifiedName>());
+                             opc::getDataType<opc::types::QualifiedName>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
     UA_QualifiedName_clear(&n);
 }
