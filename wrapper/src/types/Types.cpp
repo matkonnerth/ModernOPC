@@ -93,13 +93,13 @@ void convertToUAVariantImpl(const opc::types::QualifiedName &qn,
 
 std::ostream &operator<<(std::ostream &os, const QualifiedName &qn)
 {
-    os << "ns: " << qn.namespaceIndex() << " name: " << qn.name();
+    os << "ns=" << qn.namespaceIndex() << ";name=" << qn.name();
     return os;
 }
 
 std::ostream &operator<<(std::ostream &os, const LocalizedText &lt)
 {
-    os << "locale: " << lt.locale() << " text: " << lt.text();
+    os << "locale=" << lt.locale() << ";text=" << lt.text();
     return os;
 }
 

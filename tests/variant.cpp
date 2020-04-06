@@ -2,11 +2,13 @@
 #include <gtest/gtest.h>
 #include <open62541/server.h>
 #include <opc/types/Types.h>
+#include <opc/types/NodeId.h>
 
 using opc::types::LocalizedText;
 using opc::types::QualifiedName;
 using namespace std::string_literals;
 using opc::Variant;
+using opc::types::NodeId;
 
 TEST(variant, baseTypes)
 {
@@ -144,5 +146,14 @@ TEST(variant, qualifiedName)
     Variant var{qn};
     ASSERT_TRUE(var.is_a<QualifiedName>());
     QualifiedName q2 = var.get<QualifiedName>();
-    std::cout << q2 << std::endl;
+    std::cout << q2 << "\n";
+}
+
+TEST(variant, NodeId)
+{
+    NodeId id{2, "stringId"};
+    Variant var {id};
+    ASSERT_TRUE(var.is_a<NodeId>());
+    auto id2 = var.get<NodeId>();
+    std::cout << id2 << "\n";
 }

@@ -1,9 +1,19 @@
 #include <opc/types/NodeId.h>
 #include <open62541/types.h>
 #include <open62541/types_generated_handling.h>
+#include <opc/DataType.h>
+#include <ostream>
+#include <variant>
 
 namespace opc
 {
+
+template <>
+const UA_DataType *getDataType<types::NodeId>()
+{
+    return &UA_TYPES[UA_TYPES_NODEID];
+}
+
 namespace types
 {
 opc::types::NodeId fromUaNodeId(const UA_NodeId &id)
@@ -50,5 +60,38 @@ UA_NodeId fromNodeId(const NodeId &nodeId)
     }
     return id;
 }
+
+void convertToUAVariantImpl(const NodeId &id, UA_Variant *var)
+{
+    UA_NodeId uaId = fromNodeId(id);
+    UA_Variant_setScalarCopy(var, &uaId, opc::getDataType<NodeId>());
+}
+
+std::ostream& operator<<(std::ostream&os, const NodeId& id)
+{
+    os << "ns=" << id.getNsIdx();
+    
+    switch(id.getIdType())
+    {
+        case NodeId::IdentifierType::NUMERIC:
+            os << ";i=" << std::get<int>(id.getIdentifier());
+            break;
+        case NodeId::IdentifierType::STRING:
+            os << ";s=" << std::get<std::string>(id.getIdentifier());
+            break;
+    }
+    
+    return os;
+}
+
+
 } // namespace types
+
+
+template <>
+types::NodeId toStdType(UA_Variant *variant)
+{
+    return types::fromUaNodeId(*static_cast<UA_NodeId *>(variant->data));
+}
+
 } // namespace opc

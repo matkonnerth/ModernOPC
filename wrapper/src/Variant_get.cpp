@@ -1,7 +1,8 @@
 #include <opc/Variant.h>
+#include <opc/types/Types.h>
 #include <string>
 #include <vector>
-#include <opc/types/Types.h>
+#include <opc/types/NodeId.h>
 
 namespace opc
 {
@@ -106,5 +107,11 @@ template <>
 types::QualifiedName Variant::get<types::QualifiedName>() const
 {
     return toStdType<types::QualifiedName>(variant);
+}
+
+template <>
+types::NodeId Variant::get<types::NodeId>() const
+{
+    return toStdType<types::NodeId>(variant);
 }
 } // namespace opc
