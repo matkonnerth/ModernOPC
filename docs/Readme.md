@@ -16,6 +16,7 @@
 * Support for base node Ids, node Types (Objectsfolder)
 * client
 * run tests with valgrind/asan
+* closer look on method template implementation, lots of tuples in binary
 
 # tutorials
 * suppport creating Objects from Object types
