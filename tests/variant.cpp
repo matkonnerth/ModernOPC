@@ -4,7 +4,9 @@
 #include <opc/types/Types.h>
 
 using opc::types::LocalizedText;
+using opc::types::QualifiedName;
 using namespace std::string_literals;
+using opc::Variant;
 
 TEST(variant, baseTypes)
 {
@@ -78,6 +80,8 @@ TEST(variant, localizedText)
     LocalizedText lt{"de", "Hallo"};
     opc::Variant var;
     var(std::move(lt));
+    ASSERT_TRUE(var.is_a<LocalizedText>());
+    std::cout << lt << "\n";
 }
 
 TEST(variant, rvalueVector)
@@ -96,4 +100,49 @@ TEST(variant, stringVectorRValue)
 {
     std::vector v{"1"s, "2"s, "3"s};
     opc::Variant var{std::move(v)};
+}
+
+TEST(variant, primitiveTypes)
+{
+    Variant var;
+    var = true;
+    ASSERT_TRUE(var.is_a<bool>());
+    var = static_cast<int8_t>(127);
+    ASSERT_TRUE(var.is_a<int8_t>());
+    var = static_cast<uint8_t>(255);
+    ASSERT_TRUE(var.is_a<uint8_t>());
+    var = static_cast<int16_t>(123);
+    ASSERT_TRUE(var.is_a<int16_t>());
+    var = static_cast<uint16_t>(2134);
+    ASSERT_TRUE(var.is_a<uint16_t>());
+    var = static_cast<int32_t>(2342);
+    ASSERT_TRUE(var.is_a<int32_t>());
+    var = static_cast<uint32_t>(234234);
+    ASSERT_TRUE(var.is_a<uint32_t>());
+    var = static_cast<int64_t>(23423);
+    ASSERT_TRUE(var.is_a<int64_t>());
+    var = static_cast<uint64_t>(234234);
+    ASSERT_EQ(var.get<uint64_t>(), 234234);
+    ASSERT_TRUE(var.is_a<uint64_t>());
+    var = 1.34f;
+    ASSERT_TRUE(var.is_a<float>());
+    var = 3.1415;
+    ASSERT_TRUE(var.is_a<double>());
+}
+
+TEST(variant, string)
+{
+    Variant var {"helloWorld"s};
+    ASSERT_TRUE(var.is_a<std::string>());
+    std::string s = var.get<std::string>();
+    ASSERT_EQ("helloWorld"s, s);
+}
+
+TEST(variant, qualifiedName)
+{
+    QualifiedName qn {9, "name1"};
+    Variant var{qn};
+    ASSERT_TRUE(var.is_a<QualifiedName>());
+    QualifiedName q2 = var.get<QualifiedName>();
+    std::cout << q2 << std::endl;
 }

@@ -65,6 +65,22 @@ std::vector<int> toStdType(UA_Variant *variant)
 }
 
 template <>
+std::vector<int64_t> toStdType(UA_Variant *variant)
+{
+    return std::vector<int64_t>{static_cast<int64_t *>(variant->data),
+                                static_cast<int64_t *>(variant->data) +
+                                    variant->arrayLength};
+}
+
+template <>
+std::vector<uint64_t> toStdType(UA_Variant *variant)
+{
+    return std::vector<uint64_t>{static_cast<uint64_t *>(variant->data),
+                                 static_cast<uint64_t *>(variant->data) +
+                                     variant->arrayLength};
+}
+
+template <>
 std::vector<uint> toStdType(UA_Variant *variant)
 {
     return std::vector<uint>{static_cast<uint *>(variant->data),
@@ -97,14 +113,63 @@ bool toStdType(UA_Variant *variant)
 }
 
 template <>
+int8_t toStdType(UA_Variant *variant)
+{
+    return *static_cast<int8_t *>(variant->data);
+}
+
+template <>
+uint8_t toStdType(UA_Variant *variant)
+{
+    return *static_cast<uint8_t *>(variant->data);
+}
+
+template <>
+int16_t toStdType(UA_Variant *variant)
+{
+    return *static_cast<int16_t *>(variant->data);
+}
+
+template <>
+uint16_t toStdType(UA_Variant *variant)
+{
+    return *static_cast<uint16_t *>(variant->data);
+}
+
+template <>
+int32_t toStdType(UA_Variant *variant)
+{
+    return *static_cast<int32_t *>(variant->data);
+}
+
+template <>
+uint32_t toStdType(UA_Variant *variant)
+{
+    return *static_cast<uint32_t *>(variant->data);
+}
+
+template <>
+int64_t toStdType(UA_Variant *variant)
+{
+    return *static_cast<int64_t *>(variant->data);
+}
+
+template <>
+uint64_t toStdType(UA_Variant *variant)
+{
+    return *static_cast<uint64_t *>(variant->data);
+}
+
+template <>
+float toStdType(UA_Variant *variant)
+{
+    return *static_cast<float*>(variant->data);
+}
+
+template <>
 double toStdType(UA_Variant *variant)
 {
     return *static_cast<double *>(variant->data);
 }
 
-template <>
-int toStdType(UA_Variant *variant)
-{
-    return *static_cast<int *>(variant->data);
-}
 }

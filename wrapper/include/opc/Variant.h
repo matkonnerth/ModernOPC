@@ -3,6 +3,7 @@
 #include <open62541/server.h>
 #include <opc/DataType.h>
 #include <string>
+#include <opc/util.h>
 
 namespace opc {
 
@@ -82,7 +83,14 @@ class Variant {
 
     bool isScalar();
     template <typename T>
-    bool is_a();
+    bool is_a()
+    {
+        if constexpr(opc::is_vector<T>::value)
+        {
+          return variant->type == getDataType<typename T::value_type>();
+        }
+        return variant->type == getDataType<T>();
+    }
 
   private:
     UA_Variant *variant{nullptr};

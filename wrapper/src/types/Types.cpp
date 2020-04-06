@@ -1,7 +1,7 @@
 #include <opc/types/Types.h>
-//#include <opc/Conversion.h>
 #include <opc/Variant.h>
 #include <opc/types/StdTypes.h>
+#include <ostream>
 
 namespace opc
 {
@@ -10,6 +10,12 @@ template <>
 const UA_DataType *getDataType<opc::types::LocalizedText>()
 {
     return &UA_TYPES[UA_TYPES_LOCALIZEDTEXT];
+}
+
+template<>
+const UA_DataType *getDataType<opc::types::QualifiedName>()
+{
+    return &UA_TYPES[UA_TYPES_QUALIFIEDNAME];
 }
 
 template <>
@@ -46,6 +52,7 @@ void convertToUAVariantImpl(opc::types::LocalizedText m, UA_Variant *var)
     UA_Variant_setScalarCopy(var, &lt,
                              getDataType<opc::types::LocalizedText>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
+    UA_LocalizedText_clear(&lt);
 }
 
 void convertToUAVariantImpl(const opc::types::LocalizedText &m, UA_Variant *var)
@@ -54,6 +61,7 @@ void convertToUAVariantImpl(const opc::types::LocalizedText &m, UA_Variant *var)
     UA_Variant_setScalarCopy(var, &lt,
                              opc::getDataType<opc::types::LocalizedText>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
+    UA_LocalizedText_clear(&lt);
 }
 
 UA_QualifiedName fromQualifiedName(const opc::types::QualifiedName &qn)
@@ -82,6 +90,27 @@ QualifiedName fromUAQualifiedName(const UA_QualifiedName *qn)
     return QualifiedName(qn->namespaceIndex, opc::types::fromUAString(&qn->name));
 }
 
+void convertToUAVariantImpl(const opc::types::QualifiedName &qn,
+                            UA_Variant *var)
+{
+    UA_QualifiedName n = fromQualifiedName(qn);
+    UA_Variant_setScalarCopy(var, &n,
+                            opc::getDataType<opc::types::QualifiedName>());
+    var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
+    UA_QualifiedName_clear(&n);
+}
+
+std::ostream &operator<<(std::ostream &os, const QualifiedName &qn)
+{
+    os << "ns: " << qn.namespaceIndex() << " name: " << qn.name();
+    return os;
+}
+
+std::ostream &operator<<(std::ostream &os, const LocalizedText &lt)
+{
+    os << "locale: " << lt.locale() << " text: " << lt.text();
+    return os;
+}
 
 } // namespace types
 

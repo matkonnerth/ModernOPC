@@ -15,9 +15,39 @@ UA_NodeId getUADataTypeId<bool>()
 }
 
 template <>
-UA_NodeId getUADataTypeId<int>()
+UA_NodeId getUADataTypeId<int8_t>()
+{
+    return UA_NODEID_NUMERIC(0, UA_NS0ID_SBYTE);
+}
+
+template <>
+UA_NodeId getUADataTypeId<uint8_t>()
+{
+    return UA_NODEID_NUMERIC(0, UA_NS0ID_BYTE);
+}
+
+template <>
+UA_NodeId getUADataTypeId<int16_t>()
+{
+    return UA_NODEID_NUMERIC(0, UA_NS0ID_INT16);
+}
+
+template <>
+UA_NodeId getUADataTypeId<uint16_t>()
+{
+    return UA_NODEID_NUMERIC(0, UA_NS0ID_UINT16);
+}
+
+template <>
+UA_NodeId getUADataTypeId<int32_t>()
 {
     return UA_NODEID_NUMERIC(0, UA_NS0ID_INT32);
+}
+
+template <>
+UA_NodeId getUADataTypeId<uint32_t>()
+{
+    return UA_NODEID_NUMERIC(0, UA_NS0ID_UINT32);
 }
 
 template <>
@@ -77,9 +107,45 @@ const UA_DataType *getDataType<bool>()
 }
 
 template <>
+const UA_DataType *getDataType<int8_t>()
+{
+    return &UA_TYPES[UA_TYPES_SBYTE];
+}
+
+template <>
+const UA_DataType *getDataType<uint8_t>()
+{
+    return &UA_TYPES[UA_TYPES_BYTE];
+}
+
+template <>
 const UA_DataType *getDataType<char>()
 {
     return &UA_TYPES[UA_TYPES_SBYTE];
+}
+
+template <>
+const UA_DataType *getDataType<int16_t>()
+{
+    return &UA_TYPES[UA_TYPES_INT16];
+}
+
+template <>
+const UA_DataType *getDataType<uint16_t>()
+{
+    return &UA_TYPES[UA_TYPES_UINT16];
+}
+
+template <>
+const UA_DataType *getDataType<int32_t>()
+{
+    return &UA_TYPES[UA_TYPES_INT32];
+}
+
+template <>
+const UA_DataType *getDataType<uint32_t>()
+{
+    return &UA_TYPES[UA_TYPES_UINT32];
 }
 
 template <>
@@ -105,19 +171,6 @@ const UA_DataType *getDataType<unsigned long>()
     else if (sizeof(unsigned long) == 8)
     {
         return &UA_TYPES[UA_TYPES_UINT64];
-    }
-}
-
-template <>
-const UA_DataType *getDataType<int>()
-{
-    if (sizeof(int) == 4)
-    {
-        return &UA_TYPES[UA_TYPES_INT32];
-    }
-    else if (sizeof(int) == 8)
-    {
-        return &UA_TYPES[UA_TYPES_INT64];
     }
 }
 

@@ -30,7 +30,6 @@ add_library(wrapper SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/import/value.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/import/Extension.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Variant.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Variant_is_a.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Variant_get.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/types/Types.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/types/StdTypes.cpp

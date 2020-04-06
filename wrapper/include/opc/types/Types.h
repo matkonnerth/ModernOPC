@@ -51,7 +51,7 @@ class LocalizedText
     std::string loc{};
     std::string txt{};
 };
-
+std::ostream &operator<<(std::ostream &os, const LocalizedText &qn);
 void convertToUAVariantImpl(const opc::types::LocalizedText &m,
                                 UA_Variant *var);
 opc::types::LocalizedText fromUALocalizedText(const UA_LocalizedText *lt);
@@ -72,6 +72,10 @@ class QualifiedName
     uint16_t nsIdx;
     std::string n;
 };
+
+std::ostream &operator<<(std::ostream &os, const QualifiedName& qn);
+ void convertToUAVariantImpl(
+    const opc::types::QualifiedName &qn, UA_Variant *var);
 QualifiedName fromUAQualifiedName(const UA_QualifiedName *qn);
 UA_QualifiedName fromQualifiedName(const opc::types::QualifiedName &qn);
 
