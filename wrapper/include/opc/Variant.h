@@ -72,7 +72,7 @@ class Variant
     void operator()(T &&val)
     {
         convertToUAVariant(std::forward<T>(val), variant);
-    };
+    }
 
     template <typename T>
     T get() const;

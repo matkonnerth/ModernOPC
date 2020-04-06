@@ -4,6 +4,7 @@
 #include <opc/DataType.h>
 #include <ostream>
 #include <variant>
+#include <cassert>
 
 namespace opc
 {

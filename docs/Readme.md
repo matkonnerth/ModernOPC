@@ -1,7 +1,7 @@
 # open62541 Wrapper [![Build Status](https://travis-ci.org/matkonnerth/openWrapper.svg?branch=master)](https://travis-ci.org/matkonnerth/openWrapper)
 
 # todos
-* add support for Events
+* support for statemachines
 * support binding to specific interface / port
 * support user defined datatypes:
   * structures
@@ -12,9 +12,9 @@
   * hack in open library is necessary to forward declare UA_Variant in Variant.h
 * calculate test coverage
 * provide callback for reading Localized Text from database
-* is linking against open62541 in the application really needed?
 * security
 * Support for base node Ids, node Types (Objectsfolder)
+* client
 
 # tutorials
 * suppport creating Objects from Object types
@@ -22,4 +22,6 @@ As a developer I want to load a nodeset with the ObjectType of a service.
 When I create an instance of this ObjectType, I want to bind it to the service implementation.
 There can be several instances of the service
 -> take a look on tutorial->serviceObject
+
+* add support for Events
 

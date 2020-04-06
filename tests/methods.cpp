@@ -6,7 +6,7 @@ TEST(Methods, std_function)
     using namespace std::string_literals;
     std::function test = []() { return "hello"s; };
     opc::Server s;
-    s.addMethod(opc::NodeId(0, 85), "open", test);
+    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, "doIt"), "open", test);
 }
 
 TEST(Methods, memberFunction)
@@ -19,10 +19,11 @@ TEST(Methods, memberFunction)
     Callable c;
     opc::Server s;
     std::function fn = [&]() { return c.run(); };
-    s.addMethod(opc::NodeId(0, 85), "open", fn);
+    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, "doIt"), "open", fn);
 
     std::function<int(Callable*)> memberFn = &Callable::run;
-    s.addMethod(opc::NodeId(0,85), "run", &Callable::run);
+    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, "doIt"), "run",
+                &Callable::run);
 }
 
 void freeVoidVoid()
@@ -33,7 +34,8 @@ void freeVoidVoid()
 TEST(Methods, freeVoidVoid)
 {
     opc::Server s;
-    s.addMethod(opc::NodeId(0, 85), "open", &freeVoidVoid);
+    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, "doIt"), "open",
+                &freeVoidVoid);
 }
 
 void freeVoidConstStdString(const std::string& test)
@@ -44,7 +46,6 @@ void freeVoidConstStdString(const std::string& test)
 TEST(Methods, freeVoidConstString)
 {
     opc::Server s;
-    s.addMethod(opc::NodeId(0, 85), "open", &freeVoidConstStdString);
-
-    
+    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, "doIt"), "open",
+                &freeVoidConstStdString);
 }

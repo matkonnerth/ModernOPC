@@ -35,6 +35,7 @@ int main()
 
     Callable c1{"Hello", s};
     s.addObject(opc::NodeId(0,85), opc::NodeId(1,"hello"), opc::NodeId(0,0), "Hello", &c1);
-    s.addMethod(opc::NodeId(1, "hello"), "run", &Callable::run);
+    s.addMethod(opc::NodeId(1, "hello"), opc::NodeId(1, "doIt"), "run",
+                &Callable::run);
     s.run();
 }

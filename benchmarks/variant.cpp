@@ -27,10 +27,6 @@ static void StringVectorToVariant(benchmark::State &state)
 
 static void VariantToIntVector(benchmark::State &state)
 {
-    //UA_Variant uavar;
-    //std::vector<int> vec{1000, 99};
-    //UA_Variant_setArrayCopy(&uavar, vec.data(), vec.size(), &UA_TYPES[UA_TYPES_INT32]);
-    //opc::Variant var(&uavar, true);
     opc::Variant var;
     var(std::vector<int>(1000,99));
     for (auto _ : state)
@@ -42,10 +38,6 @@ static void VariantToIntVector(benchmark::State &state)
 
 static void VariantToStringVector(benchmark::State &state)
 {
-    // UA_Variant uavar;
-    // std::vector<int> vec{1000, 99};
-    // UA_Variant_setArrayCopy(&uavar, vec.data(), vec.size(),
-    // &UA_TYPES[UA_TYPES_INT32]); opc::Variant var(&uavar, true);
     opc::Variant var;
     var(std::vector<std::string>(1000, "adsfasdf"));
     for (auto _ : state)
