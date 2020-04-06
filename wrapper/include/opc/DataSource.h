@@ -1,5 +1,6 @@
 #pragma once
 #include <functional>
+#include <opc/Variant.h>
 
 /*
 
@@ -27,7 +28,6 @@ UA_Server_Read(NodeInfo, NodeId, AttributeId, ) ->
 */
 
 namespace opc {
-class Variant;
 namespace types
 {
 class NodeId;

@@ -1,5 +1,6 @@
 #include <opc/types/Types.h>
-#include <opc/Conversion.h>
+//#include <opc/Conversion.h>
+#include <opc/Variant.h>
 #include <opc/types/StdTypes.h>
 
 namespace opc

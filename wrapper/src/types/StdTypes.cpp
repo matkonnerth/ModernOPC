@@ -3,9 +3,9 @@
 #include <vector>
 #include <opc/Variant.h>
 
-namespace std
+namespace opc
 {
-void convertToUAVariantImpl(std::vector<string> v, UA_Variant *var)
+void convertToUAVariantImpl(std::vector<std::string> v, UA_Variant *var)
 {
     UA_Variant_init(var);
     auto strings =
@@ -18,38 +18,38 @@ void convertToUAVariantImpl(std::vector<string> v, UA_Variant *var)
         i++;
     }
     UA_Variant_setArrayCopy(var, strings, v.size(),
-                            opc::getDataType<string>());
+                            opc::getDataType<std::string>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
     UA_free(strings);
 }
 
-void convertToUAVariantImpl(string &v, UA_Variant *var)
+void convertToUAVariantImpl(std::string &v, UA_Variant *var)
 {
     UA_Variant_init(var);
     UA_String s;
     s.length = v.length();
     s.data = (UA_Byte *)(v.data());
-    UA_Variant_setScalarCopy(var, &s, opc::getDataType<string>());
+    UA_Variant_setScalarCopy(var, &s, opc::getDataType<std::string>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
 
-void convertToUAVariantImpl(string &&v, UA_Variant *var)
+void convertToUAVariantImpl(std::string &&v, UA_Variant *var)
 {
     UA_Variant_init(var);
     UA_String s;
     s.length = v.length();
     s.data = (UA_Byte *)(v.data());
-    UA_Variant_setScalarCopy(var, &s, opc::getDataType<string>());
+    UA_Variant_setScalarCopy(var, &s, opc::getDataType<std::string>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
 
-void convertToUAVariantImpl(const string &v, UA_Variant *var)
+void convertToUAVariantImpl(const std::string &v, UA_Variant *var)
 {
     UA_Variant_init(var);
     UA_String s;
     s.length = v.length();
     s.data = (UA_Byte *)(v.data());
-    UA_Variant_setScalarCopy(var, &s, opc::getDataType<string>());
+    UA_Variant_setScalarCopy(var, &s, opc::getDataType<std::string>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
 } // namespace std

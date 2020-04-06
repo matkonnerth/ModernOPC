@@ -48,10 +48,7 @@ add_subdirectory(tests)
 add_subdirectory(tutorials)
 add_subdirectory(benchmarks)
 
-add_executable(functions function.cpp)
-target_link_libraries(functions PRIVATE ${LIB_ASAN})
-
-add_executable(demo test.cpp)
-target_include_directories(demo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
-target_link_libraries(demo PRIVATE open62541)
+add_executable(demo test.cpp) 
+#target_include_directories(demo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
+target_link_libraries(demo PRIVATE wrapper open62541)
 target_compile_features(demo PRIVATE cxx_std_17)

@@ -2,7 +2,6 @@
 #include <import/import.h>
 #include <import/value.h>
 #include <nodesetLoader/nodesetLoader.h>
-#include <opc/Conversion.h>
 #include <opc/types/NodeId.h>
 #include <opc/NodeMetaInfo.h>
 #include <opc/Server.h>

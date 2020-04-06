@@ -3,6 +3,7 @@
 #include <open62541/nodeids.h>
 #include <vector>
 #include <opc/types/Types.h>
+#include <opc/Variant.h>
 
 namespace opc
 {

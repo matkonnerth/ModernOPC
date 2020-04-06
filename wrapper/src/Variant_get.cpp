@@ -1,5 +1,8 @@
-#include <opc/Conversion.h>
+//#include <opc/Conversion.h>
 #include <opc/Variant.h>
+#include <string>
+#include <vector>
+#include <opc/types/Types.h>
 
 namespace opc
 {

@@ -10,6 +10,7 @@
 #include <open62541/server_config.h>
 #include <open62541/types.h>
 #include <opc/VariableAttributes.h>
+#include <memory>
 
 struct UA_Server;
 

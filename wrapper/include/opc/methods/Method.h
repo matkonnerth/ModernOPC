@@ -1,5 +1,5 @@
 #pragma once
-#include <opc/Conversion.h>
+//#include <opc/Conversion.h>
 #include <functional>
 #include <iostream>
 #include <open62541/server.h>
@@ -7,6 +7,8 @@
 #include <type_traits>
 #include <typeinfo>
 #include <vector>
+#include <opc/DataType.h>
+#include <opc/util.h>
 
 namespace opc
 {
