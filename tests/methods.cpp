@@ -45,4 +45,6 @@ TEST(Methods, freeVoidConstString)
 {
     opc::Server s;
     s.addMethod(opc::NodeId(0, 85), "open", &freeVoidConstStdString);
+
+    
 }
