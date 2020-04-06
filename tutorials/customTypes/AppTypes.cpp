@@ -1,5 +1,4 @@
 #include <AppTypes.h>
-#include <opc/Conversion.h>
 #include <opc/Variant.h>
 
 // more or less an extension to the wrapper

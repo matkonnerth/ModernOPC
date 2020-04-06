@@ -1,5 +1,4 @@
 #include <opc/Variant.h>
-#include <opc/Conversion.h>
 
 namespace opc
 {
