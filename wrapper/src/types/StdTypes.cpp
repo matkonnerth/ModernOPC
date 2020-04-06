@@ -89,4 +89,22 @@ std::vector<std::string> toStdType(UA_Variant *variant)
     }
     return vec;
 }
+
+template <>
+bool toStdType(UA_Variant *variant)
+{
+    return *static_cast<bool *>(variant->data);
+}
+
+template <>
+double toStdType(UA_Variant *variant)
+{
+    return *static_cast<double *>(variant->data);
+}
+
+template <>
+int toStdType(UA_Variant *variant)
+{
+    return *static_cast<int *>(variant->data);
+}
 }

@@ -144,22 +144,6 @@ const UA_DataType *getDataType<std::vector<std::string>>()
     return &UA_TYPES[UA_TYPES_STRING];
 }
 
-template <>
-bool toStdType(UA_Variant *variant)
-{
-    return *static_cast<bool *>(variant->data);
-}
 
-template <>
-double toStdType(UA_Variant *variant)
-{
-    return *static_cast<double *>(variant->data);
-}
-
-template <>
-int toStdType(UA_Variant *variant)
-{
-    return *static_cast<int *>(variant->data);
-}
 
 } // namespace opc
