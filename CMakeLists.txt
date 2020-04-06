@@ -32,9 +32,10 @@ add_library(wrapper SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Variant.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Variant_is_a.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Variant_get.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Conversion.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/types/Types.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/types/NodeId.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/types/StdTypes.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/types/NodeId.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/DataType.cpp)
 target_include_directories(wrapper PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
 target_include_directories(wrapper PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src)
 
@@ -49,3 +50,8 @@ add_subdirectory(benchmarks)
 
 add_executable(functions function.cpp)
 target_link_libraries(functions PRIVATE ${LIB_ASAN})
+
+add_executable(demo test.cpp)
+target_include_directories(demo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
+target_link_libraries(demo PRIVATE open62541)
+target_compile_features(demo PRIVATE cxx_std_17)

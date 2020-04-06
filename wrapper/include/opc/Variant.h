@@ -5,6 +5,9 @@
 
 namespace opc {
 
+template <typename T>
+T toStdType(UA_Variant *variant);
+
 class Variant {
   public:
     Variant();

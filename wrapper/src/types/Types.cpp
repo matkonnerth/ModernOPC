@@ -1,16 +1,41 @@
 #include <opc/types/Types.h>
 #include <opc/Conversion.h>
+#include <opc/types/StdTypes.h>
 
 namespace opc
 {
 
 template <>
-inline const UA_DataType *getDataType<opc::types::LocalizedText>()
+const UA_DataType *getDataType<opc::types::LocalizedText>()
 {
     return &UA_TYPES[UA_TYPES_LOCALIZEDTEXT];
 }
 
+template <>
+types::LocalizedText toStdType(UA_Variant *variant)
+{
+    return types::fromUALocalizedText(
+        static_cast<UA_LocalizedText *>(variant->data));
+}
 
+template <>
+types::QualifiedName toStdType(UA_Variant *variant)
+{
+    return types::fromUAQualifiedName(
+        static_cast<UA_QualifiedName *>(variant->data));
+}
+
+template <>
+std::vector<types::LocalizedText> toStdType(UA_Variant *var)
+{
+    std::vector<types::LocalizedText> vec;
+    for (size_t i = 0; i < var->arrayLength; i++)
+    {
+        vec.emplace_back(types::fromUALocalizedText(
+            &static_cast<UA_LocalizedText *>(var->data)[i]));
+    }
+    return vec;
+}
 
 namespace types
 {
@@ -51,14 +76,10 @@ LocalizedText fromUALocalizedText(const UA_LocalizedText *lt)
     return types::LocalizedText(locale, text);
 }
 
-
-
 QualifiedName fromUAQualifiedName(const UA_QualifiedName *qn)
 {
-    return QualifiedName(qn->namespaceIndex, opc::fromUAString(&qn->name));
+    return QualifiedName(qn->namespaceIndex, opc::types::fromUAString(&qn->name));
 }
-
-
 
 
 } // namespace types
