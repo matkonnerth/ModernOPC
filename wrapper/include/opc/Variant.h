@@ -2,6 +2,7 @@
 #include <vector>
 #include <open62541/server.h>
 #include <opc/DataType.h>
+#include <string>
 
 namespace opc {
 
@@ -12,14 +13,29 @@ template<typename T>
 void convertToUAVariantImpl(T val, UA_Variant* var);
 
 template <typename T>
-typename std::enable_if<!std::is_arithmetic_v<T>, void>::type
+void convertToUAVariantImpl(std::vector<T> val, UA_Variant *var)
+{
+    static_assert(std::is_arithmetic_v<T>, "Type not integral");
+    UA_Variant_init(var);
+    UA_Variant_setArrayCopy(var, val.data(), val.size(), opc::getDataType<T>());
+    var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
+}
+
+void convertToUAVariantImpl(std::vector<std::string> v, UA_Variant *var);
+void convertToUAVariantImpl(std::string &v, UA_Variant *var);
+void convertToUAVariantImpl(std::string &&v, UA_Variant *var);
+void convertToUAVariantImpl(const std::string &v, UA_Variant *var);
+
+template <typename T>
+typename std::enable_if<!std::is_arithmetic_v<std::remove_reference_t<T>>, void>::type
 convertToUAVariant(T &&t, UA_Variant *var)
 {
     convertToUAVariantImpl(std::forward<T>(t), var);
 }
 
 template <typename T>
-typename std::enable_if<std::is_arithmetic_v<T>, void>::type
+typename std::enable_if<std::is_arithmetic_v<std::remove_reference_t<T>>,
+                        void>::type
 convertToUAVariant(T &&val, UA_Variant *var)
 {
     static_assert(std::is_arithmetic_v<std::remove_reference_t<T>>,
