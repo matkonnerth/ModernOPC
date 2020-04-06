@@ -8,7 +8,7 @@ TEST(Methods, std_function)
 {
     std::function test = []() { return "hello"s; };
     opc::Server s;
-    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, "doIt"), "open", test);
+    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, 2222), "open", test);
 
     auto server = s.getUAServer();
     UA_StatusCode retval = UA_Server_run_startup(server);
@@ -16,7 +16,7 @@ TEST(Methods, std_function)
     UA_CallMethodRequest req;
     UA_CallMethodRequest_init(&req);
     req.objectId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
-    req.methodId = UA_NODEID_STRING(1, (char*)"doIt");
+    req.methodId = UA_NODEID_NUMERIC(1, 2222);
     req.inputArguments = nullptr;
     req.inputArgumentsSize = 0;
 
@@ -27,6 +27,8 @@ TEST(Methods, std_function)
     Variant var { res.outputArguments, true };
     ASSERT_TRUE(var.is_a<std::string>());
     ASSERT_EQ(var.get<std::string>(), "hello"s);
+
+    UA_Server_run_shutdown(server);
 }
 
 TEST(Methods, memberFunction)
@@ -39,10 +41,10 @@ TEST(Methods, memberFunction)
     Callable c;
     opc::Server s;
     std::function fn = [&](int32_t a) { return c.run(a); };
-    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, "doIt"), "open", fn);
+    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, 2222), "open", fn);
 
     std::function<int32_t(Callable*, int)> memberFn = &Callable::run;
-    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, "doIt2"), "run",
+    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, 2223), "run",
                 &Callable::run);
 
     auto server = s.getUAServer();
@@ -58,7 +60,7 @@ TEST(Methods, memberFunction)
     UA_CallMethodRequest req;
     UA_CallMethodRequest_init(&req);
     req.objectId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
-    req.methodId = UA_NODEID_STRING(1, (char *)"doIt");
+    req.methodId = UA_NODEID_NUMERIC(1, 2222);
     req.inputArguments = &var;
     req.inputArgumentsSize = 1;
 
@@ -68,6 +70,8 @@ TEST(Methods, memberFunction)
     Variant v { res.outputArguments, true };
     ASSERT_TRUE(v.is_a<int32_t>());
     ASSERT_EQ(v.get<int32_t>(), 1242);
+
+    UA_Server_run_shutdown(server);
 }
 
 void freeVoidVoid()
@@ -78,7 +82,7 @@ void freeVoidVoid()
 TEST(Methods, freeVoidVoid)
 {
     opc::Server s;
-    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, "doIt"), "open",
+    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, 2222), "open",
                 &freeVoidVoid);
 
     auto server = s.getUAServer();
@@ -87,13 +91,15 @@ TEST(Methods, freeVoidVoid)
     UA_CallMethodRequest req;
     UA_CallMethodRequest_init(&req);
     req.objectId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
-    req.methodId = UA_NODEID_STRING(1, (char *)"doIt");
+    req.methodId = UA_NODEID_NUMERIC(1, 2222);
     req.inputArguments = nullptr;
     req.inputArgumentsSize = 0;
 
     UA_CallMethodResult res = UA_Server_call(server, &req);
     ASSERT_EQ(res.statusCode, UA_STATUSCODE_GOOD);
     ASSERT_EQ(res.outputArgumentsSize, 0);
+
+    UA_Server_run_shutdown(server);
 }
 
 void freeVoidConstStdString(const std::string& test)
@@ -104,7 +110,7 @@ void freeVoidConstStdString(const std::string& test)
 TEST(Methods, freeVoidConstString)
 {
     opc::Server s;
-    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, "doIt"), "open",
+    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, 2222), "open",
                 &freeVoidConstStdString);
 }
 
@@ -116,7 +122,7 @@ std::vector<std::string> freeVectorOfString()
 TEST(Methods, freeVectorString)
 {
     opc::Server s;
-    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, "doIt"), "open",
+    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, 2222), "open",
                 &freeVectorOfString);
 
     auto server = s.getUAServer();
@@ -125,7 +131,7 @@ TEST(Methods, freeVectorString)
     UA_CallMethodRequest req;
     UA_CallMethodRequest_init(&req);
     req.objectId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
-    req.methodId = UA_NODEID_STRING(1, (char *)"doIt");
+    req.methodId = UA_NODEID_NUMERIC(1, 2222);
     req.inputArguments = nullptr;
     req.inputArgumentsSize = 0;
 
@@ -135,6 +141,8 @@ TEST(Methods, freeVectorString)
     Variant v{res.outputArguments, true};
     ASSERT_TRUE(v.is_a<std::vector<std::string>>());
     ASSERT_EQ(v.get<std::vector<std::string>>().size(), 2);
+
+    UA_Server_run_shutdown(server);
 }
 
 int32_t testOrder(
@@ -158,7 +166,7 @@ int32_t testOrder(
 TEST(Methods, testOrder)
 {
     opc::Server s;
-    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, "doIt"), "open",
+    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, 2222), "open",
                 &testOrder);
 
     auto server = s.getUAServer();
@@ -174,7 +182,7 @@ TEST(Methods, testOrder)
     UA_CallMethodRequest req;
     UA_CallMethodRequest_init(&req);
     req.objectId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
-    req.methodId = UA_NODEID_STRING(1, (char *)"doIt");
+    req.methodId = UA_NODEID_NUMERIC(1, 2222);
     req.inputArguments = var;
     req.inputArgumentsSize = cnt;
 
@@ -184,4 +192,12 @@ TEST(Methods, testOrder)
     Variant v{res.outputArguments, true};
     ASSERT_TRUE(v.is_a<int32_t>());
     ASSERT_EQ(v.get<int32_t>(), cnt-1);
+
+    for (auto i = 0; i < cnt; i++)
+    {
+        UA_Variant_clear(&var[i]);
+    }
+
+
+    UA_Server_run_shutdown(server);
 }
