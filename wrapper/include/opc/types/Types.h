@@ -1,7 +1,11 @@
 #pragma once
 #include <string>
 #include <iostream>
+#include <opc/Conversion.h>
+#include <open62541/types.h>
 
+
+struct UA_Variant;
 namespace opc
 {
 namespace types
@@ -49,6 +53,11 @@ class LocalizedText
     std::string txt{};
 };
 
+void convertToUAVariantImpl(const opc::types::LocalizedText &m,
+                                UA_Variant *var);
+opc::types::LocalizedText fromUALocalizedText(const UA_LocalizedText *lt);
+UA_LocalizedText fromLocalizedText(const opc::types::LocalizedText &lt);
+
 class QualifiedName
 {
   public:
@@ -59,11 +68,13 @@ class QualifiedName
 
     uint16_t namespaceIndex() const { return nsIdx; }
     const std::string &name() const { return n; }
-    //const std::string name() const {return n;}
 
   private:
     uint16_t nsIdx;
     std::string n;
 };
+QualifiedName fromUAQualifiedName(const UA_QualifiedName *qn);
+UA_QualifiedName fromQualifiedName(const opc::types::QualifiedName &qn);
+
 } // namespace types
 } // namespace opc

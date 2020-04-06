@@ -3,7 +3,7 @@
 #include <import/value.h>
 #include <nodesetLoader/nodesetLoader.h>
 #include <opc/Conversion.h>
-#include <opc/NodeId.h>
+#include <opc/types/NodeId.h>
 #include <opc/NodeMetaInfo.h>
 #include <opc/Server.h>
 #include <opc/Variant.h>
@@ -119,7 +119,7 @@ UA_StatusCode Server::internalMethodCallback(
             Variant v{const_cast<UA_Variant *>(&input[i])};
             inputArgs.push_back(std::move(v));
         }
-        if (s->call(objectContext, opc::fromUaNodeId(*methodId), inputArgs,
+        if (s->call(objectContext, opc::types::fromUaNodeId(*methodId), inputArgs,
                     outputArgs))
         {
             outputSize = outputArgs.size();
@@ -150,7 +150,7 @@ Server::internalRead(UA_Server *server, const UA_NodeId *sessionId,
         if (info->getDataSourceKey().compare(ds->getKey()) == 0)
         {
             Variant var{&value->value};
-            ds->read(opc::fromUaNodeId(*nodeId), var);
+            ds->read(opc::types::fromUaNodeId(*nodeId), var);
             return UA_STATUSCODE_GOOD;
         }
     }
@@ -170,7 +170,7 @@ UA_StatusCode Server::internalWrite(UA_Server *server,
     // TODO: can we avoid this copy?
     // we can avoid it at the moment, because it's copied in Variant.get<>()
     Variant var{const_cast<UA_Variant *>(&value->value)};
-    ds->write(opc::fromUaNodeId(*nodeId), var);
+    ds->write(opc::types::fromUaNodeId(*nodeId), var);
     return UA_STATUSCODE_GOOD;
 }
 
@@ -190,7 +190,7 @@ types::LocalizedText Server::readDisplayName(const NodeId &id)
 {
     UA_LocalizedText lt;
     UA_Server_readDisplayName(server, fromNodeId(id), &lt);
-    types::LocalizedText localized = fromUALocalizedText(&lt);
+    types::LocalizedText localized = types::fromUALocalizedText(&lt);
     UA_LocalizedText_clear(&lt);
     return localized;
 }

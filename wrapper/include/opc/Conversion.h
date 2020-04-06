@@ -1,11 +1,12 @@
 #pragma once
-#include <opc/NodeId.h>
-#include <opc/Types.h>
 #include <array>
 #include <cassert>
 #include <memory>
+#include <opc/types/NodeId.h>
+#include <opc/types/Types.h>
 #include <open62541/server.h>
 #include <vector>
+#include <string>
 
 namespace opc
 {
@@ -98,38 +99,47 @@ inline const UA_DataType *getDataType<std::vector<std::string>>()
     return &UA_TYPES[UA_TYPES_STRING];
 }
 
-template <>
-inline const UA_DataType *getDataType<opc::types::LocalizedText>()
+//void convertToUAvariantImpl(std::string val, UA_Variant *var);
+//void convertToUAvariantImpl(std::string& val, UA_Variant *var);
+//void convertToUAvariantImpl(const std::string &val, UA_Variant *var);
+//void convertToUAvariantImpl(std::string &&val, UA_Variant *var);
+
+//void convertToUAVariantImpl(std::string v, UA_Variant *var);
+//void convertToUAVariantImpl(std::string &v, UA_Variant *var);
+//void convertToUAVariantImpl(const std::string &v, UA_Variant *var);
+//void convertToUAVariantImpl(std::string &&v, UA_Variant *var);
+
+template <class T>
+struct HasconvertToUAVariantImpl_
 {
-    return &UA_TYPES[UA_TYPES_LOCALIZEDTEXT];
+    template <typename C>
+    static std::true_type
+    test(decltype(convertToUAVariantImpl(std::declval<C>(),
+                                         std::declval<UA_Variant *>())) *);
+    template <typename C>
+    static std::false_type test(...);
+    typedef decltype(test<T>(0)) type;
+};
+
+template <typename T>
+using HasconvertToUAVariantImpl = typename HasconvertToUAVariantImpl_<T>::type;
+
+template <typename T>
+typename std::enable_if<HasconvertToUAVariantImpl<T>::value, void>::type
+convertToUAVariant(T &&t, UA_Variant *var)
+{
+    convertToUAVariantImpl(std::forward<T>(t), var);
 }
 
 template <typename T>
-void toUAVariant(T val, UA_Variant *var)
+typename std::enable_if<!HasconvertToUAVariantImpl<T>::value, void>::type
+convertToUAVariant(T &&val, UA_Variant *var)
 {
-    static_assert(std::is_arithmetic_v<T>, "Type not integral");
+    static_assert(std::is_arithmetic_v<std::remove_reference_t<T>>, "Type not integral");
     UA_Variant_init(var);
-    UA_Variant_setScalarCopy(var, &val, getDataType<T>());
+    UA_Variant_setScalarCopy(var, &val, getDataType<std::remove_reference_t<T>>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
-
-template <typename T>
-void toUAVariant(std::vector<T> v, UA_Variant *var)
-{
-    static_assert(std::is_arithmetic_v<T>, "Type not integral");
-    UA_Variant_init(var);
-    UA_Variant_setArrayCopy(var, v.data(), v.size(), getDataType<T>());
-    var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
-}
-
-template <>
-void toUAVariant(std::string v, UA_Variant *var);
-
-template <>
-void toUAVariant(opc::types::LocalizedText m, UA_Variant *var);
-
-template <>
-void toUAVariant(std::vector<std::string> v, UA_Variant *var);
 
 template <typename T>
 UA_NodeId getUADataTypeId();
@@ -140,7 +150,7 @@ UA_VariableAttributes getVariableAttributes(T val)
     UA_VariableAttributes attr = UA_VariableAttributes_default;
     attr.dataType = getUADataTypeId<T>();
     attr.valueRank = -1;
-    toUAVariant(val, &attr.value);
+    convertToUAVariant(val, &attr.value);
     return attr;
 }
 
@@ -148,7 +158,7 @@ template <typename T>
 UA_VariableAttributes getVariableAttributes(std::vector<T> &v)
 {
     UA_VariableAttributes attr = UA_VariableAttributes_default;
-    toUAVariant(v, &attr.value);
+    convertToUAVariant(v, &attr.value);
     attr.dataType = getUADataTypeId<T>();
     attr.valueRank = 1;
     attr.arrayDimensionsSize = 1;
@@ -159,12 +169,41 @@ UA_VariableAttributes getVariableAttributes(std::vector<T> &v)
 template <typename T>
 T toStdType(UA_Variant *variant);
 
-opc::NodeId fromUaNodeId(const UA_NodeId &id);
-UA_NodeId fromNodeId(const opc::NodeId &nodeId);
-
-types::LocalizedText fromUALocalizedText(const UA_LocalizedText *lt);
-
-UA_QualifiedName fromQualifiedName(const opc::types::QualifiedName& qn);
-UA_LocalizedText fromLocalizedText(const opc::types::LocalizedText &lt);
+std::string fromUAString(const UA_String *s);
 
 } // namespace opc
+
+namespace std
+{
+template <typename T>
+void convertToUAVariantImpl(T&& val, UA_Variant *var);
+
+// void convertToUAVariantImpl(std::string v, UA_Variant *var);
+//template <>
+//void convertToUAVariantImpl(std::string &v, UA_Variant *var);
+// void convertToUAVariantImpl(const std::string &v, UA_Variant *var);
+// void convertToUAVariantImpl(std::string &&v, UA_Variant *var);
+
+//template <>
+
+
+//template <>
+
+
+
+template <typename T>
+void convertToUAVariantImpl(std::vector<T> val, UA_Variant *var)
+{
+    static_assert(std::is_arithmetic_v<T>, "Type not integral");
+    UA_Variant_init((UA_Variant *)var);
+    UA_Variant_setArrayCopy(var, val.data(), val.size(), opc::getDataType<T>());
+    var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
+}
+
+template <>
+void convertToUAVariantImpl(std::vector<std::string> v, UA_Variant *var);
+
+
+
+
+}

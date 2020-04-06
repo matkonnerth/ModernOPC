@@ -3,11 +3,13 @@
 #include <functional>
 #include <iostream>
 #include <opc/DataSource.h>
-#include <opc/NodeId.h>
+#include <opc/types/NodeId.h>
 #include <opc/Server.h>
 #include <opc/Variant.h>
 #include <thread>
 #include <vector>
+
+using opc::types::NodeId;
 
 auto add(int a, int b, double c) { return a + b + c; }
 
@@ -46,7 +48,7 @@ void setVectorValue(const opc::NodeId &id, opc::Variant &var)
 int main()
 {
     opc::Server s;
-    s.addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, 233),
+    s.addVariableNode(NodeId(0, 85), NodeId(1, 233),
                       "demoNode" + std::to_string(233), 42);
 
     std::vector<float> fVector{1.1f, 2.2f, 3.3f};
@@ -55,10 +57,10 @@ int main()
 
     s.registerDataSource("simpleVal", getValue, setValue);
     s.registerDataSource("vectorDataSource", getVectorValue,
-                         [](const opc::NodeId &, opc::Variant &) {});
+                         [](const NodeId &, opc::Variant &) {});
 
     s.registerDataSource(source1.getKey(),
-                         [&](const opc::NodeId &id, opc::Variant &var) {
+                         [&](const NodeId &id, opc::Variant &var) {
                              source1.read(id, var);
                          },
                          [&](const opc::NodeId &id, opc::Variant &var) {
@@ -66,14 +68,14 @@ int main()
                          });
 
     // adding of variable nodes
-    s.addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, "demoVector"),
+    s.addVariableNode(NodeId(0, 85), NodeId(1, "demoVector"),
                       "demoVector", fVector,
                       std::make_unique<opc::NodeMetaInfo>("vectorDataSource"));
-    s.addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, "demoInt"), "demoInt",
+    s.addVariableNode(NodeId(0, 85), NodeId(1, "demoInt"), "demoInt",
                       23, std::make_unique<opc::NodeMetaInfo>("simpleVal"));
-    s.addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, "IntVector"),
+    s.addVariableNode(NodeId(0, 85), NodeId(1, "IntVector"),
                       "IntVector", test);
-    s.addVariableNode(opc::NodeId(0, 85), opc::NodeId(1, "source1Var"),
+    s.addVariableNode(NodeId(0, 85), NodeId(1, "source1Var"),
                       "source1Var", 12,
                       std::make_unique<opc::NodeMetaInfo>("source1"));
 }

@@ -1,5 +1,5 @@
 #include <opc/Server.h>
-#include <opc/Types.h>
+#include <opc/types/Types.h>
 #include <opc/Variant.h>
 #include <gtest/gtest.h>
 

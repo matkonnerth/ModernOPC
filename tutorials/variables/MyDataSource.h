@@ -5,7 +5,11 @@
 #include <opc/Variant.h>
 
 namespace opc {
+namespace types
+{
 class NodeId;
+}
+
 class Variant;
 }  // namespace opc
 
@@ -14,13 +18,13 @@ class MyDataSource {
     MyDataSource(const std::string &key) : key(key) {}
 
     void
-    read(const opc::NodeId &id, opc::Variant &var) {
+    read(const opc::types::NodeId &id, opc::Variant &var) {
         std::cout << "datasource: " << key << " read called" << std::endl;
         var(std::vector{1,2,3,4,54,56});
     }
 
     void
-    write(const opc::NodeId &id, opc::Variant &var) {}
+    write(const opc::types::NodeId &id, opc::Variant &var) {}
 
     const std::string &
     getKey() {

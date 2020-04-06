@@ -1,9 +1,10 @@
 #include <opc/Variant.h>
 #include <gtest/gtest.h>
 #include <open62541/server.h>
-#include <opc/Types.h>
+#include <opc/types/Types.h>
 
 using opc::types::LocalizedText;
+using namespace std::string_literals;
 
 TEST(variant, baseTypes)
 {
@@ -63,7 +64,7 @@ TEST(variant, setPerReference)
     opc::Variant var;
     std::string s{"myString"};
     const std::string& sref=s;
-    var(s);
+    var(sref);
 }
 
 TEST(variant, setAndGet)
@@ -82,5 +83,17 @@ TEST(variant, localizedText)
 TEST(variant, rvalueVector)
 {
     std::vector v{1,2,3};
+    opc::Variant var{std::move(v)};
+}
+
+TEST(variant, stringVector)
+{
+    std::vector v{"1"s, "2"s, "3"s};
+    opc::Variant var{v};
+}
+
+TEST(variant, stringVectorRValue)
+{
+    std::vector v{"1"s, "2"s, "3"s};
     opc::Variant var{std::move(v)};
 }

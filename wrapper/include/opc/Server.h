@@ -2,9 +2,9 @@
 #include <opc/methods/Method.h>
 #include <opc/DataSource.h>
 #include <opc/methods/MethodWrapper.h>
-#include <opc/NodeId.h>
+#include <opc/types/NodeId.h>
 #include <opc/NodeMetaInfo.h>
-#include <opc/Types.h>
+#include <opc/types/Types.h>
 #include <map>
 #include <open62541/server.h>
 #include <open62541/server_config.h>
@@ -12,9 +12,13 @@
 
 struct UA_Server;
 
+
+
 namespace opc
 {
 class BaseEventType;
+
+using types::NodeId;
 
 class Server
 {
@@ -45,7 +49,7 @@ class Server
 
         UA_NodeId newId;
         UA_Server_addMethodNode(
-            server, UA_NODEID_NULL, fromNodeId(parentId),
+            server, UA_NODEID_NULL, types::fromNodeId(parentId),
             UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
             UA_QUALIFIEDNAME(1, const_cast<char *>(name.c_str())), methAttr,
             nullptr, MethodTraits<decltype(fn)>::getNumArgs(), inputArgs.data(),
@@ -55,7 +59,7 @@ class Server
         UA_Server_setNodeContext(server, newId, this);
 
         callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
-            fromUaNodeId(newId), std::make_unique<Call<decltype(fn)>>(fn)));
+            types::fromUaNodeId(newId), std::make_unique<Call<decltype(fn)>>(fn)));
     }
 
     template <typename M>
@@ -84,7 +88,7 @@ class Server
         UA_Server_setNodeContext(server, newId, this);
 
         callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
-            fromUaNodeId(newId), std::make_unique<Call<decltype(fn)>>(fn)));
+            types::fromUaNodeId(newId), std::make_unique<Call<decltype(fn)>>(fn)));
     }
 
     template <typename M>

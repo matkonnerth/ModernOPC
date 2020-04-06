@@ -1,6 +1,5 @@
 #include <opc/Variant.h>
 #include <opc/Conversion.h>
-#include <opc/Types.h>
 
 namespace opc
 {

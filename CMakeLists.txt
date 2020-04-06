@@ -32,7 +32,9 @@ add_library(wrapper SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Variant.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Variant_is_a.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Variant_get.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Conversion.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Conversion.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/types/Types.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/types/NodeId.cpp)
 target_include_directories(wrapper PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
 target_include_directories(wrapper PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src)
 

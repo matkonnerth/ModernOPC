@@ -1,12 +1,10 @@
 #include <opc/Conversion.h>
-#include <opc/Types.h>
 #include <open62541/server.h>
 
-namespace opc
+namespace std
 {
-
 template <>
-void toUAVariant(std::vector<std::string> v, UA_Variant *var)
+void convertToUAVariantImpl(std::vector<std::string> v, UA_Variant *var)
 {
     UA_Variant_init(var);
     auto strings =
@@ -18,29 +16,47 @@ void toUAVariant(std::vector<std::string> v, UA_Variant *var)
         strings[i].data = reinterpret_cast<UA_Byte *>(s.data());
         i++;
     }
-    UA_Variant_setArrayCopy(var, strings, v.size(), getDataType<std::string>());
+    UA_Variant_setArrayCopy(var, strings, v.size(), opc::getDataType<std::string>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
     UA_free(strings);
 }
 
 template <>
-void toUAVariant(std::string v, UA_Variant *var)
+void convertToUAVariantImpl(std::string &v, UA_Variant *var)
 {
     UA_Variant_init(var);
     UA_String s;
     s.length = v.length();
-    s.data = reinterpret_cast<UA_Byte *>(v.data());
-    UA_Variant_setScalarCopy(var, &s, getDataType<std::string>());
+    s.data = (UA_Byte *)(v.data());
+    UA_Variant_setScalarCopy(var, &s, opc::getDataType<std::string>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
 
-template<>
-void toUAVariant(opc::types::LocalizedText m, UA_Variant* var)
+template <>
+void convertToUAVariantImpl(std::string &&v, UA_Variant *var)
 {
-    UA_LocalizedText lt= fromLocalizedText(m);
-    UA_Variant_setScalarCopy(var, &lt, getDataType<opc::types::LocalizedText>());
+    UA_Variant_init(var);
+    UA_String s;
+    s.length = v.length();
+    s.data = (UA_Byte *)(v.data());
+    UA_Variant_setScalarCopy(var, &s, opc::getDataType<std::string>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
+
+template <>
+void convertToUAVariantImpl(const std::string &v, UA_Variant *var)
+{
+    UA_Variant_init(var);
+    UA_String s;
+    s.length = v.length();
+    s.data = (UA_Byte *)(v.data());
+    UA_Variant_setScalarCopy(var, &s, opc::getDataType<std::string>());
+    var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
+}
+}
+
+namespace opc
+{
 
 template <>
 UA_NodeId getUADataTypeId<bool>()
@@ -163,18 +179,16 @@ std::vector<std::string> toStdType(UA_Variant *variant)
     return vec;
 }
 
-types::LocalizedText fromUALocalizedText(const UA_LocalizedText *lt)
-{
-    std::string locale{reinterpret_cast<char *>(lt->locale.data),
-                       lt->locale.length};
-    std::string text{reinterpret_cast<char *>(lt->text.data), lt->text.length};
-    return types::LocalizedText(locale, text);
-}
-
 template <>
 types::LocalizedText toStdType(UA_Variant *variant)
 {
-    return fromUALocalizedText(static_cast<UA_LocalizedText *>(variant->data));
+    return types::fromUALocalizedText(static_cast<UA_LocalizedText *>(variant->data));
+}
+
+template <>
+types::QualifiedName toStdType(UA_Variant *variant)
+{
+    return types::fromUAQualifiedName(static_cast<UA_QualifiedName *>(variant->data));
 }
 
 template <>
@@ -183,76 +197,14 @@ std::vector<types::LocalizedText> toStdType(UA_Variant *var)
     std::vector<types::LocalizedText> vec;
     for (size_t i = 0; i < var->arrayLength; i++)
     {
-        vec.emplace_back(fromUALocalizedText(
+        vec.emplace_back(types::fromUALocalizedText(
             &static_cast<UA_LocalizedText *>(var->data)[i]));
     }
     return vec;
 }
 
-types::QualifiedName fromUAQualifiedName(const UA_QualifiedName *qn)
-{
-    return types::QualifiedName(qn->namespaceIndex, fromUAString(&qn->name));
-}
 
-template <>
-types::QualifiedName toStdType(UA_Variant *variant)
-{
-    return fromUAQualifiedName(static_cast<UA_QualifiedName *>(variant->data));
-}
 
-opc::NodeId fromUaNodeId(const UA_NodeId &id)
-{
 
-    auto nsIdx = id.namespaceIndex;
-    switch (id.identifierType)
-    {
-    case UA_NODEIDTYPE_NUMERIC:
-        return opc::NodeId(nsIdx, static_cast<int>(id.identifier.numeric));
-        break;
-    case UA_NODEIDTYPE_STRING:
-        return opc::NodeId(nsIdx, std::string(reinterpret_cast<char *>(
-                                                  id.identifier.string.data),
-                                              id.identifier.string.length));
-        break;
-    case UA_NODEIDTYPE_BYTESTRING:
-    case UA_NODEIDTYPE_GUID:
-        assert(false);
-        break;
-    }
-    return opc::NodeId(0, 0);
-}
-
-UA_NodeId fromNodeId(const opc::NodeId &nodeId)
-{
-    UA_NodeId id;
-    UA_NodeId_init(&id);
-    id.namespaceIndex = static_cast<UA_UInt16>(nodeId.getNsIdx());
-    switch (nodeId.getIdType())
-    {
-    case opc::NodeId::IdentifierType::NUMERIC:
-        id.identifierType = UA_NodeIdType::UA_NODEIDTYPE_NUMERIC;
-        id.identifier.numeric =
-            static_cast<UA_UInt32>(std::get<int>(nodeId.getIdentifier()));
-        break;
-    case opc::NodeId::IdentifierType::STRING:
-        id.identifierType = UA_NodeIdType::UA_NODEIDTYPE_STRING;
-        id.identifier.string = UA_STRING(
-            (char *)std::get<std::string>(nodeId.getIdentifier()).c_str());
-        break;
-    default:
-        break;
-    }
-    return id;
-}
-
-UA_QualifiedName fromQualifiedName(const opc::types::QualifiedName &qn)
-{
-    return UA_QUALIFIEDNAME_ALLOC(qn.namespaceIndex(), (char *)qn.name().c_str());
-}
-
-UA_LocalizedText fromLocalizedText(const opc::types::LocalizedText &lt)
-{
-    return UA_LOCALIZEDTEXT_ALLOC((char*)lt.locale().c_str(), (char*)lt.text().c_str());
-}
 
 } // namespace opc

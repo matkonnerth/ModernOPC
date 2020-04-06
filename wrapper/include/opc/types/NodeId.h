@@ -1,10 +1,11 @@
 #pragma once
 #include <iostream>
 #include <variant>
-
+#include <open62541/types.h>
 namespace opc
 {
-
+namespace types
+{
 class NodeId
 {
 
@@ -59,5 +60,10 @@ class NodeId
     IdentifierType type{IdentifierType::NUMERIC};
     std::variant<int, std::string> i{0};
 };
+
+NodeId fromUaNodeId(const UA_NodeId &id);
+UA_NodeId fromNodeId(const NodeId &nodeId);
+
+} // namespace types
 
 } // namespace opc

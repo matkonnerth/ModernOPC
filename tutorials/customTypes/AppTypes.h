@@ -12,11 +12,8 @@ namespace app
               double min;
               double max;
         };
+
+
+        void convertToUAVariantImpl(app::types::Range2 m, UA_Variant *var);
     }
-}
-struct UA_Variant;
-namespace opc
-{
-    template <>
-    void toUAVariant(app::types::Range2 m, UA_Variant *var);
 }

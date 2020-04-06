@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <opc/Conversion.h>
-struct UA_Variant;
+
 
 namespace opc {
 
@@ -14,7 +14,7 @@ class Variant {
     {
         variant = UA_Variant_new();
         owned = true;
-        toUAVariant(std::forward<T>(val), variant);
+        convertToUAVariant(std::forward<T>(val), variant);
     }
     ~Variant();
 
@@ -27,7 +27,7 @@ class Variant {
 
     template <typename T>
     void
-    operator()(T&& val){toUAVariant(std::forward<T>(val), variant);};
+    operator()(T&& val){convertToUAVariant(std::forward<T>(val), variant);};
 
     template <typename T>
     T
