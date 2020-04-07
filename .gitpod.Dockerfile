@@ -4,7 +4,7 @@ USER gitpod
 
 RUN pyenv global 3.7.7
 RUN pip install conan
-RUN sudo apt-get update && sudo apt-get install valgrind
+RUN sudo apt-get update && sudo apt-get -y install valgrind
 # RUN conan profile update settings.compiler.libcxx=libstdc++11 default
 
 # Install custom tools, runtime, etc. using apt-get
