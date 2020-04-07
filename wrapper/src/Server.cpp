@@ -189,7 +189,7 @@ UA_StatusCode Server::internalWrite(UA_Server *server,
     return UA_STATUSCODE_GOOD;
 }
 
-bool Server::readValue(const NodeId &id, Variant &var)
+bool Server::readValue(const NodeId &id, Variant &var) const
 {
     UA_Variant *v = UA_Variant_new();
     if (UA_STATUSCODE_GOOD == UA_Server_readValue(server, fromNodeId(id), v))
@@ -198,6 +198,17 @@ bool Server::readValue(const NodeId &id, Variant &var)
         return true;
     }
     UA_Variant_delete(v);
+    return false;
+}
+
+bool Server::writeValue(const NodeId &id, const Variant &var)
+{
+    UA_Variant v;
+    UA_Variant_copy(var.getUAVariant(), &v);
+    if (UA_STATUSCODE_GOOD == UA_Server_writeValue(server, fromNodeId(id), v));
+    {
+        return true;
+    }
     return false;
 }
 

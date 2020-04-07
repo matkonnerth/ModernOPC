@@ -24,4 +24,6 @@ TEST(DataSource, simple)
     ASSERT_TRUE(s.readValue(opc::NodeId(1, "demoInt"), var));
     ASSERT_TRUE(var.is_a<int32_t>());
     ASSERT_EQ(var.get<int32_t>(), 42);
+
+    ASSERT_TRUE(s.writeValue(opc::NodeId(1, "demoInt"), var));
 }

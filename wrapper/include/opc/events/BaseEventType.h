@@ -41,6 +41,13 @@ class BaseEventType
         return eventFields;
     }
 
+    void setEventField(const std::vector<QualifiedName>& path, Variant&& var)
+    {
+      
+      eventFields.emplace_back(std::make_pair(
+            path, std::move(var)));
+    }
+
   private:
     const NodeId eventType{0, 0};
 

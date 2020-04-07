@@ -1,5 +1,4 @@
 #pragma once
-#include <unordered_map>
 #include <memory>
 #include <opc/DataSource.h>
 #include <opc/NodeMetaInfo.h>
@@ -11,14 +10,13 @@
 #include <open62541/server.h>
 #include <open62541/server_config.h>
 #include <open62541/types.h>
+#include <unordered_map>
 
 struct UA_Server;
 
 namespace opc
 {
 class BaseEventType;
-
-
 
 class Server
 {
@@ -60,8 +58,7 @@ class Server
         UA_Server_setNodeContext(server, newId, this);
 
         callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
-            fromUaNodeId(newId),
-            std::make_unique<Call<decltype(fn)>>(fn)));
+            fromUaNodeId(newId), std::make_unique<Call<decltype(fn)>>(fn)));
     }
 
     template <typename M>
@@ -95,8 +92,7 @@ class Server
         UA_Server_setNodeContext(server, newId, this);
 
         callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
-            fromUaNodeId(newId),
-            std::make_unique<Call<decltype(fn)>>(fn)));
+            fromUaNodeId(newId), std::make_unique<Call<decltype(fn)>>(fn)));
     }
 
     template <typename M>
@@ -170,7 +166,8 @@ class Server
 
     auto &getDataSources() { return datasources; }
 
-    bool readValue(const NodeId &id, Variant &var);
+    bool writeValue(const NodeId &id, const Variant &var);
+    bool readValue(const NodeId &id, Variant &var) const;
 
     LocalizedText readDisplayName(const NodeId &id);
 

@@ -14,3 +14,25 @@ TEST(Events, BaseEventType)
     opc::Server s { 4844 };
     s.setEvent(event, opc::NodeId(0, 0));
 }
+
+TEST(Events, wrong_eventField)
+{
+    opc::BaseEventType event;
+    event.setMessage(opc::LocalizedText{"de", "Nachricht"});
+
+    event.setEventField(
+        std::vector<opc::QualifiedName>{opc::QualifiedName(34, "dasdf"s)},
+        opc::Variant());
+
+    opc::Server s{4844};
+    s.setEvent(event, opc::NodeId(0, 0));
+}
+
+TEST(Events, BaseEventType2)
+{
+    opc::BaseEventType event;
+    event.setMessage(opc::LocalizedText{"de", "Nachricht"});
+
+    opc::Server s{4844};
+    s.setEvent(event, opc::NodeId(34, 3434));
+}
