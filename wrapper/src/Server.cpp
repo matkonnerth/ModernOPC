@@ -270,12 +270,25 @@ UA_StatusCode Server::getNodeIdForPath(const UA_NodeId objectId,
     if (bpr.statusCode != UA_STATUSCODE_GOOD || bpr.targetsSize < 1)
     {
         retval = bpr.statusCode;
+        for (auto &path : pathElements)
+        {
+       
+        UA_QualifiedName_clear(&path.targetName);
+        cnt++;
+        }
         UA_BrowsePathResult_clear(&bpr);
         free(elements);
         return retval;
     }
     retval = bpr.statusCode;
     *outId = bpr.targets[0].targetId.nodeId;
+    cnt=0;
+    for (auto &path : pathElements)
+    {
+       
+        UA_QualifiedName_clear(&path.targetName);
+        cnt++;
+    }
     UA_BrowsePathResult_clear(&bpr);
     free(elements);
     return retval;
