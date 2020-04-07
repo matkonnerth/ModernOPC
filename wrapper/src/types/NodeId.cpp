@@ -64,6 +64,7 @@ void convertToUAVariantImpl(const NodeId &id, UA_Variant *var)
 {
     UA_NodeId uaId = fromNodeId(id);
     UA_Variant_setScalarCopy(var, &uaId, opc::getDataType<NodeId>());
+    UA_NodeId_clear(&uaId);
 }
 
 std::ostream &operator<<(std::ostream &os, const NodeId &id)
