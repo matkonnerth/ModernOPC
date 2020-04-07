@@ -1,31 +1,30 @@
 #pragma once
-#include <opc/methods/Method.h>
+#include <map>
+#include <memory>
 #include <opc/DataSource.h>
+#include <opc/NodeMetaInfo.h>
+#include <opc/VariableAttributes.h>
+#include <opc/methods/Method.h>
 #include <opc/methods/MethodWrapper.h>
 #include <opc/types/NodeId.h>
-#include <opc/NodeMetaInfo.h>
 #include <opc/types/Types.h>
-#include <map>
 #include <open62541/server.h>
 #include <open62541/server_config.h>
 #include <open62541/types.h>
-#include <opc/VariableAttributes.h>
-#include <memory>
 
 struct UA_Server;
-
-
 
 namespace opc
 {
 class BaseEventType;
 
-using types::NodeId;
+
 
 class Server
 {
   public:
     Server();
+    explicit Server(uint16_t port);
     ~Server();
     Server(const Server &) = delete;
     Server &operator=(const Server &) = delete;
@@ -37,8 +36,8 @@ class Server
     bool loadNodeset(const std::string &path);
 
     template <typename R, typename... ARGS>
-    void addMethod(const NodeId &parentId, const NodeId& requestedId, const std::string &name,
-                   std::function<R(ARGS...)> fn)
+    void addMethod(const NodeId &parentId, const NodeId &requestedId,
+                   const std::string &name, std::function<R(ARGS...)> fn)
     {
         std::vector<UA_Argument> inputArgs =
             MethodTraits<decltype(fn)>::getInputArguments();
@@ -51,7 +50,7 @@ class Server
 
         UA_NodeId newId;
         UA_Server_addMethodNode(
-            server, types::fromNodeId(requestedId), types::fromNodeId(parentId),
+            server, fromNodeId(requestedId), fromNodeId(parentId),
             UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
             UA_QUALIFIEDNAME(1, const_cast<char *>(name.c_str())), methAttr,
             nullptr, MethodTraits<decltype(fn)>::getNumArgs(), inputArgs.data(),
@@ -61,7 +60,8 @@ class Server
         UA_Server_setNodeContext(server, newId, this);
 
         callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
-            types::fromUaNodeId(newId), std::make_unique<Call<decltype(fn)>>(fn)));
+            fromUaNodeId(newId),
+            std::make_unique<Call<decltype(fn)>>(fn)));
     }
 
     template <typename M>
@@ -79,8 +79,8 @@ class Server
         methAttr.userExecutable = true;
 
         UA_NodeId newId;
-        const UA_Argument* outArgs=nullptr;
-        if(outputArgs.size()>0)
+        const UA_Argument *outArgs = nullptr;
+        if (outputArgs.size() > 0)
         {
             outArgs = outputArgs.data();
         }
@@ -88,14 +88,15 @@ class Server
             server, fromNodeId(requestedId), fromNodeId(parentId),
             UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
             UA_QUALIFIEDNAME(1, const_cast<char *>(name.c_str())), methAttr,
-            nullptr, MethodTraits<M>::getNumArgs(), inputArgs.data(), outputArgs.size(),
-            outArgs, nullptr, &newId);
+            nullptr, MethodTraits<M>::getNumArgs(), inputArgs.data(),
+            outputArgs.size(), outArgs, nullptr, &newId);
 
         UA_Server_setMethodNode_callback(server, newId, internalMethodCallback);
         UA_Server_setNodeContext(server, newId, this);
 
         callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
-            types::fromUaNodeId(newId), std::make_unique<Call<decltype(fn)>>(fn)));
+            fromUaNodeId(newId),
+            std::make_unique<Call<decltype(fn)>>(fn)));
     }
 
     template <typename M>
@@ -171,13 +172,13 @@ class Server
 
     bool readValue(const NodeId &id, Variant &var);
 
-    types::LocalizedText readDisplayName(const NodeId &id);
+    LocalizedText readDisplayName(const NodeId &id);
 
     uint16_t getNamespaceIndex(const std::string &uri);
 
     UA_Server *getUAServer();
 
-    void setEvent(const BaseEventType &event);
+    void setEvent(const BaseEventType &event, const opc::NodeId &sourceNode);
 
   private:
     UA_Server *server{nullptr};
@@ -193,6 +194,8 @@ class Server
 
     inline static void *sServer{nullptr};
 
+    void create(uint16_t port);
+
     static UA_StatusCode
     internalRead(UA_Server *server, const UA_NodeId *sessionId,
                  void *sessionContext, const UA_NodeId *nodeId,
@@ -207,7 +210,7 @@ class Server
     UA_StatusCode setUpEvent(UA_NodeId *outId, const BaseEventType &event);
 
     UA_StatusCode getNodeIdForPath(const UA_NodeId objectId,
-                                   const std::vector<types::QualifiedName> &qn,
+                                   const std::vector<QualifiedName> &qn,
                                    UA_NodeId *outId);
 };
 } // namespace opc

@@ -7,61 +7,60 @@ namespace opc
 {
 
 template <>
-const UA_DataType *getDataType<opc::types::LocalizedText>()
+const UA_DataType *getDataType<LocalizedText>()
 {
     return &UA_TYPES[UA_TYPES_LOCALIZEDTEXT];
 }
 
 template <>
-const UA_DataType *getDataType<opc::types::QualifiedName>()
+const UA_DataType *getDataType<QualifiedName>()
 {
     return &UA_TYPES[UA_TYPES_QUALIFIEDNAME];
 }
 
 template <>
-types::LocalizedText toStdType(UA_Variant *variant)
+LocalizedText toStdType(UA_Variant *variant)
 {
-    return types::fromUALocalizedText(
+    return fromUALocalizedText(
         static_cast<UA_LocalizedText *>(variant->data));
 }
 
 template <>
-types::QualifiedName toStdType(UA_Variant *variant)
+QualifiedName toStdType(UA_Variant *variant)
 {
-    return types::fromUAQualifiedName(
+    return fromUAQualifiedName(
         static_cast<UA_QualifiedName *>(variant->data));
 }
 
 template <>
-std::vector<types::LocalizedText> toStdType(UA_Variant *var)
+std::vector<LocalizedText> toStdType(UA_Variant *var)
 {
-    std::vector<types::LocalizedText> vec;
+    std::vector<LocalizedText> vec;
     for (size_t i = 0; i < var->arrayLength; i++)
     {
-        vec.emplace_back(types::fromUALocalizedText(
+        vec.emplace_back(fromUALocalizedText(
             &static_cast<UA_LocalizedText *>(var->data)[i]));
     }
     return vec;
 }
 
-namespace types
-{
-void convertToUAVariantImpl(const opc::types::LocalizedText& m, UA_Variant *var)
+
+void convertToUAVariantImpl(const LocalizedText& m, UA_Variant *var)
 {
     UA_LocalizedText lt = fromLocalizedText(m);
     UA_Variant_setScalarCopy(var, &lt,
-                             getDataType<opc::types::LocalizedText>());
+                             getDataType<LocalizedText>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
     UA_LocalizedText_clear(&lt);
 }
 
-UA_QualifiedName fromQualifiedName(const opc::types::QualifiedName &qn)
+UA_QualifiedName fromQualifiedName(const QualifiedName &qn)
 {
     return UA_QUALIFIEDNAME_ALLOC(qn.namespaceIndex(),
                                   (char *)qn.name().c_str());
 }
 
-UA_LocalizedText fromLocalizedText(const opc::types::LocalizedText &lt)
+UA_LocalizedText fromLocalizedText(const LocalizedText &lt)
 {
     return UA_LOCALIZEDTEXT_ALLOC((char *)lt.locale().c_str(),
                                   (char *)lt.text().c_str());
@@ -72,21 +71,21 @@ LocalizedText fromUALocalizedText(const UA_LocalizedText *lt)
     std::string locale{reinterpret_cast<char *>(lt->locale.data),
                        lt->locale.length};
     std::string text{reinterpret_cast<char *>(lt->text.data), lt->text.length};
-    return types::LocalizedText(locale, text);
+    return LocalizedText(locale, text);
 }
 
 QualifiedName fromUAQualifiedName(const UA_QualifiedName *qn)
 {
     return QualifiedName(qn->namespaceIndex,
-                         opc::types::fromUAString(&qn->name));
+                         fromUAString(&qn->name));
 }
 
-void convertToUAVariantImpl(const opc::types::QualifiedName &qn,
+void convertToUAVariantImpl(const QualifiedName &qn,
                             UA_Variant *var)
 {
     UA_QualifiedName n = fromQualifiedName(qn);
     UA_Variant_setScalarCopy(var, &n,
-                             opc::getDataType<opc::types::QualifiedName>());
+                             opc::getDataType<QualifiedName>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
     UA_QualifiedName_clear(&n);
 }
@@ -103,6 +102,6 @@ std::ostream &operator<<(std::ostream &os, const LocalizedText &lt)
     return os;
 }
 
-} // namespace types
+
 
 } // namespace opc

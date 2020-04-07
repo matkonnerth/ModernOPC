@@ -1,23 +1,21 @@
+#include <cassert>
+#include <opc/DataType.h>
 #include <opc/types/NodeId.h>
 #include <open62541/types.h>
 #include <open62541/types_generated_handling.h>
-#include <opc/DataType.h>
 #include <ostream>
 #include <variant>
-#include <cassert>
 
 namespace opc
 {
 
 template <>
-const UA_DataType *getDataType<types::NodeId>()
+const UA_DataType *getDataType<NodeId>()
 {
     return &UA_TYPES[UA_TYPES_NODEID];
 }
 
-namespace types
-{
-opc::types::NodeId fromUaNodeId(const UA_NodeId &id)
+NodeId fromUaNodeId(const UA_NodeId &id)
 {
 
     auto nsIdx = id.namespaceIndex;
@@ -53,8 +51,8 @@ UA_NodeId fromNodeId(const NodeId &nodeId)
         break;
     case NodeId::IdentifierType::STRING:
         id.identifierType = UA_NodeIdType::UA_NODEIDTYPE_STRING;
-        id.identifier.string = UA_STRING(
-            (char *)std::get<std::string>(nodeId.getIdentifier()).c_str());
+        id.identifier.string = UA_STRING_ALLOC(
+            std::get<std::string>(nodeId.getIdentifier()).c_str());
         break;
     default:
         break;
@@ -68,31 +66,27 @@ void convertToUAVariantImpl(const NodeId &id, UA_Variant *var)
     UA_Variant_setScalarCopy(var, &uaId, opc::getDataType<NodeId>());
 }
 
-std::ostream& operator<<(std::ostream&os, const NodeId& id)
+std::ostream &operator<<(std::ostream &os, const NodeId &id)
 {
     os << "ns=" << id.getNsIdx();
-    
-    switch(id.getIdType())
+
+    switch (id.getIdType())
     {
-        case NodeId::IdentifierType::NUMERIC:
-            os << ";i=" << std::get<int>(id.getIdentifier());
-            break;
-        case NodeId::IdentifierType::STRING:
-            os << ";s=" << std::get<std::string>(id.getIdentifier());
-            break;
+    case NodeId::IdentifierType::NUMERIC:
+        os << ";i=" << std::get<int>(id.getIdentifier());
+        break;
+    case NodeId::IdentifierType::STRING:
+        os << ";s=" << std::get<std::string>(id.getIdentifier());
+        break;
     }
-    
+
     return os;
 }
 
-
-} // namespace types
-
-
 template <>
-types::NodeId toStdType(UA_Variant *variant)
+NodeId toStdType(UA_Variant *variant)
 {
-    return types::fromUaNodeId(*static_cast<UA_NodeId *>(variant->data));
+    return fromUaNodeId(*static_cast<UA_NodeId *>(variant->data));
 }
 
 } // namespace opc

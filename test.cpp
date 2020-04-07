@@ -70,6 +70,7 @@
 // } // namespace opc
 
 #include <opc/Variant.h>
+#include <iostream>
 
 using opc::Variant;
 
@@ -80,4 +81,9 @@ int main()
     Variant v2 {
         std::vector<int> {}
     };
+
+    for(auto i=0; i< 1000; i++)
+    {
+        std::cout << "int a" << i << ", ";
+    }
 }

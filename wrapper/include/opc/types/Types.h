@@ -7,8 +7,7 @@
 struct UA_Variant;
 namespace opc
 {
-namespace types
-{
+
 struct Range
 {
     double min;
@@ -52,10 +51,10 @@ class LocalizedText
     std::string txt{};
 };
 std::ostream &operator<<(std::ostream &os, const LocalizedText &qn);
-void convertToUAVariantImpl(const opc::types::LocalizedText &m,
+void convertToUAVariantImpl(const LocalizedText &m,
                                 UA_Variant *var);
-opc::types::LocalizedText fromUALocalizedText(const UA_LocalizedText *lt);
-UA_LocalizedText fromLocalizedText(const opc::types::LocalizedText &lt);
+LocalizedText fromUALocalizedText(const UA_LocalizedText *lt);
+UA_LocalizedText fromLocalizedText(const LocalizedText &lt);
 
 class QualifiedName
 {
@@ -75,9 +74,8 @@ class QualifiedName
 
 std::ostream &operator<<(std::ostream &os, const QualifiedName& qn);
  void convertToUAVariantImpl(
-    const opc::types::QualifiedName &qn, UA_Variant *var);
+    const QualifiedName &qn, UA_Variant *var);
 QualifiedName fromUAQualifiedName(const UA_QualifiedName *qn);
-UA_QualifiedName fromQualifiedName(const opc::types::QualifiedName &qn);
+UA_QualifiedName fromQualifiedName(const QualifiedName &qn);
 
-} // namespace types
 } // namespace opc

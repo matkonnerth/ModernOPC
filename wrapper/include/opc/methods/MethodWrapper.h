@@ -56,11 +56,17 @@ class Call<std::function<R(ClassType *, INARGS...)>> : public ICallable
 
         auto t1 = std::make_tuple(static_cast<ClassType *>(obj));
         auto t2 = std::tuple_cat(t1, inputArgs);
-        R result = std::apply(m_f, t2);
-
-        Variant var;
-        var(result);
-        outputArguments.push_back(std::move(var));
+        if constexpr (std::is_void_v<R>)
+        {
+            std::apply(m_f, t2);
+        }
+        else
+        {
+            R result = std::apply(m_f, t2);
+            Variant var;
+            var(result);
+            outputArguments.push_back(std::move(var));
+        }
         return true;
     }
 

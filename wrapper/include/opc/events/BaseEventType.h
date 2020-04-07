@@ -8,9 +8,6 @@
 namespace opc
 {
 
-using opc::types::LocalizedText;
-using opc::types::NodeId;
-using opc::types::QualifiedName;
 class BaseEventType
 {
   public:
@@ -27,6 +24,14 @@ class BaseEventType
         eventFields.emplace_back(std::make_pair(
             std::vector<QualifiedName>{QualifiedName(0, "Message")},
             std::move(var)));
+    }
+
+    void setSourceNode(const NodeId& id)
+    {
+      Variant var{id};
+      eventFields.emplace_back(std::make_pair(
+          std::vector<QualifiedName>{QualifiedName(0, "SourceNode")},
+          std::move(var)));
     }
 
     const NodeId &getEventType() const { return eventType; }
@@ -48,12 +53,16 @@ class TransitionEventType : public BaseEventType
   public:
     TransitionEventType() : BaseEventType(NodeId(0, 2311)) {}
 
-    void setTransition(const LocalizedText &transition)
+    void setTransition(const LocalizedText &transition, const NodeId& transitionId)
     {
         Variant var{transition};
         eventFields.emplace_back(std::make_pair(
             std::vector<QualifiedName>{QualifiedName(0, "Transition")},
             std::move(var)));
+          
+        eventFields.emplace_back(std::make_pair(
+            std::vector<QualifiedName>{QualifiedName(0, "Transition"), QualifiedName(0, "Id")},
+            Variant{transitionId}));
     }
 };
 

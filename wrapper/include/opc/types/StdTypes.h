@@ -7,8 +7,6 @@
 
 namespace opc
 {
-namespace types
-{
 inline std::string fromUAString(const UA_String *s)
 {
     if (s->length > 0)
@@ -17,7 +15,6 @@ inline std::string fromUAString(const UA_String *s)
     }
     return std::string{};
 }
-} // namespace types
 } // namespace opc
 
 

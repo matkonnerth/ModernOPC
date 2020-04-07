@@ -69,7 +69,7 @@ UA_NodeId getUADataTypeId<std::vector<int>>()
 }
 
 template <>
-UA_NodeId getUADataTypeId<opc::types::LocalizedText>()
+UA_NodeId getUADataTypeId<LocalizedText>()
 {
     return UA_NODEID_NUMERIC(0, UA_NS0ID_LOCALIZEDTEXT);
 }

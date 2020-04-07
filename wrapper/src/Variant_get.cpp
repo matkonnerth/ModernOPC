@@ -91,27 +91,27 @@ std::vector<std::string> Variant::get<std::vector<std::string>>() const
 }
 
 template <>
-types::LocalizedText Variant::get<types::LocalizedText>() const
+LocalizedText Variant::get<LocalizedText>() const
 {
-    return toStdType<types::LocalizedText>(variant);
+    return toStdType<LocalizedText>(variant);
 }
 
 template <>
-std::vector<types::LocalizedText>
-Variant::get<std::vector<types::LocalizedText>>() const
+std::vector<LocalizedText>
+Variant::get<std::vector<LocalizedText>>() const
 {
-    return toStdType<std::vector<types::LocalizedText>>(variant);
+    return toStdType<std::vector<LocalizedText>>(variant);
 }
 
 template <>
-types::QualifiedName Variant::get<types::QualifiedName>() const
+QualifiedName Variant::get<QualifiedName>() const
 {
-    return toStdType<types::QualifiedName>(variant);
+    return toStdType<QualifiedName>(variant);
 }
 
 template <>
-types::NodeId Variant::get<types::NodeId>() const
+NodeId Variant::get<NodeId>() const
 {
-    return toStdType<types::NodeId>(variant);
+    return toStdType<NodeId>(variant);
 }
 } // namespace opc

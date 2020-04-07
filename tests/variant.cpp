@@ -4,11 +4,8 @@
 #include <opc/types/Types.h>
 #include <opc/types/NodeId.h>
 
-using opc::types::LocalizedText;
-using opc::types::QualifiedName;
+
 using namespace std::string_literals;
-using opc::Variant;
-using opc::types::NodeId;
 
 TEST(variant, baseTypes)
 {
@@ -79,10 +76,10 @@ TEST(variant, setAndGet)
 
 TEST(variant, localizedText)
 {
-    LocalizedText lt{"de", "Hallo"};
+    opc::LocalizedText lt{"de", "Hallo"};
     opc::Variant var;
     var(std::move(lt));
-    ASSERT_TRUE(var.is_a<LocalizedText>());
+    ASSERT_TRUE(var.is_a<opc::LocalizedText>());
     std::cout << lt << "\n";
 }
 
@@ -106,7 +103,7 @@ TEST(variant, stringVectorRValue)
 
 TEST(variant, primitiveTypes)
 {
-    Variant var;
+    opc::Variant var;
     var = true;
     ASSERT_TRUE(var.is_a<bool>());
     var = static_cast<int8_t>(127);
@@ -134,7 +131,7 @@ TEST(variant, primitiveTypes)
 
 TEST(variant, string)
 {
-    Variant var {"helloWorld"s};
+    opc::Variant var {"helloWorld"s};
     ASSERT_TRUE(var.is_a<std::string>());
     std::string s = var.get<std::string>();
     ASSERT_EQ("helloWorld"s, s);
@@ -142,18 +139,18 @@ TEST(variant, string)
 
 TEST(variant, qualifiedName)
 {
-    QualifiedName qn {9, "name1"};
-    Variant var{qn};
-    ASSERT_TRUE(var.is_a<QualifiedName>());
-    QualifiedName q2 = var.get<QualifiedName>();
+    opc::QualifiedName qn {9, "name1"};
+    opc::Variant var{qn};
+    ASSERT_TRUE(var.is_a<opc::QualifiedName>());
+    opc::QualifiedName q2 = var.get<opc::QualifiedName>();
     std::cout << q2 << "\n";
 }
 
 TEST(variant, NodeId)
 {
-    NodeId id{2, "stringId"};
-    Variant var {id};
-    ASSERT_TRUE(var.is_a<NodeId>());
-    auto id2 = var.get<NodeId>();
+    opc::NodeId id{2, "stringId"};
+    opc::Variant var {id};
+    ASSERT_TRUE(var.is_a<opc::NodeId>());
+    auto id2 = var.get<opc::NodeId>();
     std::cout << id2 << "\n";
 }

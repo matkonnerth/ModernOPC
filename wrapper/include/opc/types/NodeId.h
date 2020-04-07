@@ -5,8 +5,7 @@
 #include <opc/Variant.h>
 namespace opc
 {
-namespace types
-{
+
 class NodeId
 {
 
@@ -56,22 +55,18 @@ class NodeId
         STRING
     };
 
+    friend std::ostream &operator<<(std::ostream &os, const NodeId &id);
+    friend void convertToUAVariantImpl(const NodeId &qn, UA_Variant *var);
+    friend UA_NodeId fromNodeId(const NodeId &nodeId);
+
   private:
     uint16_t nsIdx{0};
     IdentifierType type{IdentifierType::NUMERIC};
     std::variant<int, std::string> i{0};
 };
 
-std::ostream &operator<<(std::ostream &os, const NodeId &id);
-void convertToUAVariantImpl(const opc::types::NodeId &qn,
-                            UA_Variant *var);
 NodeId fromUaNodeId(const UA_NodeId &id);
-UA_NodeId fromNodeId(const NodeId &nodeId);
-
-
-} // namespace types
-
 template <>
-types::NodeId toStdType(UA_Variant *variant);
+NodeId toStdType(UA_Variant *variant);
 
 } // namespace opc

@@ -28,23 +28,22 @@ UA_Server_Read(NodeInfo, NodeId, AttributeId, ) ->
 
 namespace opc {
 class Variant;
-namespace types
-{
+
 class NodeId;
-}
+
 class DataSource {
   public:
-    DataSource(const std::string &key, std::function<void(const types::NodeId&, Variant &var)> read,
-               std::function<void(const types::NodeId&, Variant &var)> write)
+    DataSource(const std::string &key, std::function<void(const NodeId&, Variant &var)> read,
+               std::function<void(const NodeId&, Variant &var)> write)
         : key(key), m_read(read), m_write(write) {}
 
     void
-    read(const types::NodeId& id, Variant &var) {
+    read(const NodeId& id, Variant &var) {
         m_read(id, var);
     }
 
     void
-    write(const types::NodeId& id, Variant &var) {
+    write(const NodeId& id, Variant &var) {
         m_write(id, var);
     }
 
@@ -55,7 +54,7 @@ class DataSource {
 
   private:
     std::string key;
-    std::function<void(const types::NodeId&, Variant &)> m_read;
-    std::function<void(const types::NodeId&, Variant &)> m_write;
+    std::function<void(const NodeId&, Variant &)> m_read;
+    std::function<void(const NodeId&, Variant &)> m_write;
 };
 }  // namespace opc

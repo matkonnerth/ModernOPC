@@ -2,29 +2,45 @@
 #include <import/import.h>
 #include <import/value.h>
 #include <nodesetLoader/nodesetLoader.h>
-#include <opc/types/NodeId.h>
 #include <opc/NodeMetaInfo.h>
 #include <opc/Server.h>
 #include <opc/Variant.h>
 #include <opc/events/BaseEventType.h>
+#include <opc/types/NodeId.h>
 #include <open62541/plugin/log_stdout.h>
 #include <open62541/server.h>
 #include <open62541/server_config_default.h>
 
 namespace opc
 {
-Server::Server() : isRunning{true}
+
+Server::Server() { create(4840); }
+
+Server::Server(uint16_t port) { create(port); }
+
+Server::~Server() { UA_Server_delete(server); }
+
+void Server::create(uint16_t port)
 {
     server = UA_Server_new();
-    UA_ServerConfig_setDefault(UA_Server_getConfig(server));
+    auto config = UA_Server_getConfig(server);
+    auto status = UA_ServerConfig_setMinimal(config, port, nullptr);
+    if (status != UA_STATUSCODE_GOOD)
+    {
+        UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_SERVER,
+                       "Setting serer config failed with StatusCode %s",
+                       UA_StatusCode_name(status));
+    }
     // UA_ServerConfig_addNetworkLayerWS(UA_Server_getConfig(server), 7681, 0,
     // 0);
     sServer = this;
 }
 
-Server::~Server() { UA_Server_delete(server); }
-
-void Server::run() { UA_Server_run(server, &isRunning); }
+void Server::run()
+{
+    isRunning = true;
+    UA_Server_run(server, &isRunning);
+}
 
 void Server::registerDataSource(
     const std::string &key,
@@ -118,8 +134,8 @@ UA_StatusCode Server::internalMethodCallback(
             Variant v{const_cast<UA_Variant *>(&input[i])};
             inputArgs.push_back(std::move(v));
         }
-        if (s->call(objectContext, opc::types::fromUaNodeId(*methodId), inputArgs,
-                    outputArgs))
+        if (s->call(objectContext, fromUaNodeId(*methodId),
+                    inputArgs, outputArgs))
         {
             outputSize = outputArgs.size();
             if (outputSize == 1)
@@ -149,7 +165,7 @@ Server::internalRead(UA_Server *server, const UA_NodeId *sessionId,
         if (info->getDataSourceKey().compare(ds->getKey()) == 0)
         {
             Variant var{&value->value};
-            ds->read(opc::types::fromUaNodeId(*nodeId), var);
+            ds->read(fromUaNodeId(*nodeId), var);
             return UA_STATUSCODE_GOOD;
         }
     }
@@ -169,7 +185,7 @@ UA_StatusCode Server::internalWrite(UA_Server *server,
     // TODO: can we avoid this copy?
     // we can avoid it at the moment, because it's copied in Variant.get<>()
     Variant var{const_cast<UA_Variant *>(&value->value)};
-    ds->write(opc::types::fromUaNodeId(*nodeId), var);
+    ds->write(fromUaNodeId(*nodeId), var);
     return UA_STATUSCODE_GOOD;
 }
 
@@ -185,11 +201,11 @@ bool Server::readValue(const NodeId &id, Variant &var)
     return false;
 }
 
-types::LocalizedText Server::readDisplayName(const NodeId &id)
+LocalizedText Server::readDisplayName(const NodeId &id)
 {
     UA_LocalizedText lt;
     UA_Server_readDisplayName(server, fromNodeId(id), &lt);
-    types::LocalizedText localized = types::fromUALocalizedText(&lt);
+    LocalizedText localized = fromUALocalizedText(&lt);
     UA_LocalizedText_clear(&lt);
     return localized;
 }
@@ -238,7 +254,8 @@ UA_StatusCode Server::getNodeIdForPath(const UA_NodeId objectId,
     bp.relativePath.elements = pathElements.data();
 
     UA_StatusCode retval;
-    UA_BrowsePathResult bpr = UA_Server_translateBrowsePathToNodeIds(server, &bp);
+    UA_BrowsePathResult bpr =
+        UA_Server_translateBrowsePathToNodeIds(server, &bp);
     if (bpr.statusCode != UA_STATUSCODE_GOOD || bpr.targetsSize < 1)
     {
         retval = bpr.statusCode;
@@ -301,7 +318,8 @@ UA_StatusCode Server::setUpEvent(UA_NodeId *outId, const BaseEventType &event)
             continue;
         }
 
-        status = UA_Server_writeValue(server, pathId, *field.second.getUAVariant());
+        status =
+            UA_Server_writeValue(server, pathId, *field.second.getUAVariant());
         if (status != UA_STATUSCODE_GOOD)
         {
             UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
@@ -313,7 +331,7 @@ UA_StatusCode Server::setUpEvent(UA_NodeId *outId, const BaseEventType &event)
     return UA_STATUSCODE_GOOD;
 }
 
-void Server::setEvent(const BaseEventType &event)
+void Server::setEvent(const BaseEventType &event, const opc::NodeId &sourceNode)
 {
     UA_NodeId eventNodeId;
     UA_StatusCode retval = setUpEvent(&eventNodeId, event);
@@ -324,9 +342,8 @@ void Server::setEvent(const BaseEventType &event)
                        UA_StatusCode_name(retval));
     }
 
-    retval = UA_Server_triggerEvent(server, eventNodeId,
-                                    UA_NODEID_NUMERIC(0, UA_NS0ID_SERVER),
-                                    nullptr, UA_TRUE);
+    retval = UA_Server_triggerEvent(
+        server, eventNodeId, fromNodeId(sourceNode), nullptr, UA_TRUE);
     if (retval != UA_STATUSCODE_GOOD)
     {
         UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,

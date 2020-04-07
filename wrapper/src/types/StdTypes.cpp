@@ -52,10 +52,7 @@ void convertToUAVariantImpl(const std::string &v, UA_Variant *var)
     UA_Variant_setScalarCopy(var, &s, opc::getDataType<std::string>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
-} // namespace std
 
-namespace opc
-{
 template <>
 std::vector<int> toStdType(UA_Variant *variant)
 {
@@ -91,7 +88,7 @@ std::vector<uint> toStdType(UA_Variant *variant)
 template <>
 std::string toStdType(UA_Variant *variant)
 {
-    return opc::types::fromUAString(static_cast<UA_String *>(variant->data));
+    return fromUAString(static_cast<UA_String *>(variant->data));
 }
 
 template <>
@@ -101,7 +98,7 @@ std::vector<std::string> toStdType(UA_Variant *variant)
     for (size_t i = 0; i < variant->arrayLength; i++)
     {
         UA_String *s = ((UA_String *)variant->data) + i;
-        vec.emplace_back(opc::types::fromUAString(s));
+        vec.emplace_back(fromUAString(s));
     }
     return vec;
 }
