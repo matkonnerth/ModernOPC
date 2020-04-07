@@ -7,99 +7,6 @@
 
 namespace opc
 {
-// datatype Ids
-template <>
-UA_NodeId getUADataTypeId<bool>()
-{
-    return UA_NODEID_NUMERIC(0, UA_NS0ID_BOOLEAN);
-}
-
-template <>
-UA_NodeId getUADataTypeId<int8_t>()
-{
-    return UA_NODEID_NUMERIC(0, UA_NS0ID_SBYTE);
-}
-
-template <>
-UA_NodeId getUADataTypeId<uint8_t>()
-{
-    return UA_NODEID_NUMERIC(0, UA_NS0ID_BYTE);
-}
-
-template <>
-UA_NodeId getUADataTypeId<int16_t>()
-{
-    return UA_NODEID_NUMERIC(0, UA_NS0ID_INT16);
-}
-
-template <>
-UA_NodeId getUADataTypeId<uint16_t>()
-{
-    return UA_NODEID_NUMERIC(0, UA_NS0ID_UINT16);
-}
-
-template <>
-UA_NodeId getUADataTypeId<int32_t>()
-{
-    return UA_NODEID_NUMERIC(0, UA_NS0ID_INT32);
-}
-
-template <>
-UA_NodeId getUADataTypeId<uint32_t>()
-{
-    return UA_NODEID_NUMERIC(0, UA_NS0ID_UINT32);
-}
-
-template <>
-UA_NodeId getUADataTypeId<float>()
-{
-    return UA_NODEID_NUMERIC(0, UA_NS0ID_FLOAT);
-}
-
-template <>
-UA_NodeId getUADataTypeId<double>()
-{
-    return UA_NODEID_NUMERIC(0, UA_NS0ID_DOUBLE);
-}
-
-template <>
-UA_NodeId getUADataTypeId<std::vector<int>>()
-{
-    return getUADataTypeId<int>();
-}
-
-template <>
-UA_NodeId getUADataTypeId<LocalizedText>()
-{
-    return UA_NODEID_NUMERIC(0, UA_NS0ID_LOCALIZEDTEXT);
-}
-
-template <>
-UA_NodeId getUADataTypeId<void>()
-{
-    return UA_NODEID_NULL;
-}
-
-template <>
-UA_NodeId getUADataTypeId<unsigned long>()
-{
-    return UA_NODEID_NUMERIC(0, UA_NS0ID_UINT64);
-}
-
-template <>
-UA_NodeId getUADataTypeId<std::string>()
-{
-    return UA_NODEID_NUMERIC(0, UA_NS0ID_STRING);
-}
-
-template <>
-UA_NodeId getUADataTypeId<std::vector<std::string>>()
-{
-    return getUADataTypeId<std::string>();
-}
-
-// datatypes
-
 template <>
 const UA_DataType *getDataType<bool>()
 {
@@ -195,7 +102,13 @@ const UA_DataType *getDataType<std::string>()
 template <>
 const UA_DataType *getDataType<std::vector<std::string>>()
 {
-    return &UA_TYPES[UA_TYPES_STRING];
+    return getDataType<std::string>();
+}
+
+template <>
+const UA_DataType *getDataType<std::vector<int>>()
+{
+    return getDataType<int>();
 }
 
 } // namespace opc

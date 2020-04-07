@@ -4,6 +4,9 @@
 #include <tuple>
 #include <vector>
 
+namespace opc
+{
+
 template <typename Tuple, typename F, std::size_t... Indices>
 void for_each_impl(Tuple &&tuple, F &&f, std::index_sequence<Indices...>)
 {
@@ -21,9 +24,6 @@ void for_each(Tuple &&tuple, F &&f)
                   std::make_index_sequence<N>{});
 }
 
-namespace opc
-{
-
 class ICallable
 {
   public:
@@ -40,8 +40,8 @@ class Call<std::function<R(ClassType *, INARGS...)>> : public ICallable
 {
   public:
     Call(std::function<R(ClassType *, INARGS...)> f) : m_f(f) {}
-    virtual bool call(void *obj, const std::vector<Variant> &inputArguments,
-                      std::vector<Variant> &outputArguments) override
+    bool call(void *obj, const std::vector<Variant> &inputArguments,
+              std::vector<Variant> &outputArguments) override
     {
 
         std::tuple<std::remove_const_t<std::remove_reference_t<INARGS>>...>
@@ -79,8 +79,8 @@ class Call<std::function<R(INARGS...)>> : public ICallable
 {
   public:
     Call(std::function<R(INARGS...)> f) : m_f(f) {}
-    virtual bool call(void *obj, const std::vector<Variant> &inputArguments,
-                      std::vector<Variant> &outputArguments) override
+    bool call(void *obj, const std::vector<Variant> &inputArguments,
+              std::vector<Variant> &outputArguments) override
     {
         std::tuple<std::remove_const_t<std::remove_reference_t<INARGS>>...>
             inputArgs;

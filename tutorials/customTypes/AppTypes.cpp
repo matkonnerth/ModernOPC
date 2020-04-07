@@ -6,12 +6,6 @@ namespace opc
 {
 
 template <>
-UA_NodeId getUADataTypeId<app::types::Range2>()
-{
-    return UA_NODEID_NUMERIC(0, UA_NS0ID_RANGE);
-}
-
-template <>
 const UA_DataType *getDataType<app::types::Range2>()
 {
     return &UA_TYPES[UA_TYPES_RANGE];

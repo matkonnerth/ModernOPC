@@ -1,5 +1,5 @@
 #pragma once
-#include <map>
+#include <unordered_map>
 #include <memory>
 #include <opc/DataSource.h>
 #include <opc/NodeMetaInfo.h>
@@ -189,7 +189,7 @@ class Server
         const UA_NodeId *methodId, void *methodContext,
         const UA_NodeId *objectId, void *objectContext, size_t inputSize,
         const UA_Variant *input, size_t outputSize, UA_Variant *output);
-    std::map<const NodeId, std::unique_ptr<ICallable>> callbacks{};
+    std::unordered_map<NodeId, std::unique_ptr<ICallable>> callbacks{};
     std::vector<std::unique_ptr<DataSource>> datasources{};
 
     inline static void *sServer{nullptr};

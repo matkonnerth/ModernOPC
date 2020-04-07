@@ -69,21 +69,17 @@
 
 // } // namespace opc
 
-#include <opc/Variant.h>
+#include <opc/types/NodeId.h>
 #include <iostream>
+#include <unordered_map>
+#include <string>
+//#include <opc/Server.h>
 
-using opc::Variant;
+using opc::NodeId;
 
 int main()
 {
-    Variant v {3};
-
-    Variant v2 {
-        std::vector<int> {}
-    };
-
-    for(auto i=0; i< 1000; i++)
-    {
-        std::cout << "int a" << i << ", ";
-    }
+    NodeId id{1, 234234};
+    //std::unordered_map<NodeId, std::string> myMap {};
+    //myMap.emplace(std::pair(id, "id1"));
 }

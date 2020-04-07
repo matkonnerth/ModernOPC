@@ -11,7 +11,7 @@ option(ENABLE_ASAN off "enable address sanitizer")
 option(CALC_COVERAGE off "calculate code coverage")
 
 if(CALC_COVERAGE)
-    set(COMPILER_OPTIONS -fprofile-arcs -ftest-coverage)
+    set(COMPILER_OPTIONS -g -O0 -fno-inline -fno-inline-small-functions -fno-default-inline -fprofile-arcs -ftest-coverage)
     set(LIB_GCOV gcov)
 endif()
 
@@ -26,7 +26,7 @@ endif()
 #open62541 configuration
 SET(UA_ENABLE_SUBSCRIPTIONS_EVENTS ON CACHE BOOL "Enable event support")
 SET(BUILD_SHARED_LIBS ON CACHE BOOL "build open shared")
-SET(UA_NAMESPACE_ZERO FULL CACHE STRING "generate full namespace zero")
+SET(UA_NAMESPACE_ZERO REDUCED CACHE STRING "generate full namespace zero")
 
 add_subdirectory(open62541)
 add_subdirectory(nodesetLoader)
@@ -53,6 +53,6 @@ add_subdirectory(tutorials)
 add_subdirectory(benchmarks)
 
 add_executable(demo test.cpp) 
-#target_include_directories(demo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
-target_link_libraries(demo PRIVATE wrapper open62541)
+target_include_directories(demo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
+target_link_libraries(demo PRIVATE open62541)
 target_compile_features(demo PRIVATE cxx_std_17)

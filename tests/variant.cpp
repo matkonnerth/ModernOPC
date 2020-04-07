@@ -106,27 +106,37 @@ TEST(variant, primitiveTypes)
     opc::Variant var;
     var = true;
     ASSERT_TRUE(var.is_a<bool>());
+    ASSERT_EQ(var.get<bool>(), true);
     var = static_cast<int8_t>(127);
     ASSERT_TRUE(var.is_a<int8_t>());
+    ASSERT_EQ(var.get<int8_t>(),127);
     var = static_cast<uint8_t>(255);
     ASSERT_TRUE(var.is_a<uint8_t>());
+    ASSERT_EQ(var.get<uint8_t>(), 255);
     var = static_cast<int16_t>(123);
     ASSERT_TRUE(var.is_a<int16_t>());
+    ASSERT_EQ(var.get<int16_t>(), 123);
     var = static_cast<uint16_t>(2134);
     ASSERT_TRUE(var.is_a<uint16_t>());
+    ASSERT_EQ(var.get<uint16_t>(), 2134);
     var = static_cast<int32_t>(2342);
     ASSERT_TRUE(var.is_a<int32_t>());
+    ASSERT_EQ(var.get<int32_t>(), 2342);
     var = static_cast<uint32_t>(234234);
     ASSERT_TRUE(var.is_a<uint32_t>());
+    ASSERT_EQ(var.get<uint32_t>(), 234234);
     var = static_cast<int64_t>(23423);
     ASSERT_TRUE(var.is_a<int64_t>());
+    ASSERT_EQ(var.get<int64_t>(), 23423);
     var = static_cast<uint64_t>(234234);
     ASSERT_EQ(var.get<uint64_t>(), 234234);
     ASSERT_TRUE(var.is_a<uint64_t>());
     var = 1.34f;
     ASSERT_TRUE(var.is_a<float>());
+    ASSERT_EQ(var.get<float>(), 1.34f);
     var = 3.1415;
     ASSERT_TRUE(var.is_a<double>());
+    ASSERT_EQ(var.get<double>(), 3.1415);
 }
 
 TEST(variant, string)

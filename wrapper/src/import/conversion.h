@@ -3,7 +3,7 @@
 #include <nodesetLoader/nodesetLoader.h>
 #include <open62541/types.h>
 
-static inline UA_Boolean isNodeId(const char *s)
+inline UA_Boolean isNodeId(const char *s)
 {
     if (!s)
     {
@@ -17,7 +17,7 @@ static inline UA_Boolean isNodeId(const char *s)
     return UA_FALSE;
 }
 
-static inline UA_Boolean isTrue(const char *s)
+inline UA_Boolean isTrue(const char *s)
 {
     if (!s)
     {
@@ -30,7 +30,7 @@ static inline UA_Boolean isTrue(const char *s)
     return UA_TRUE;
 }
 
-static inline UA_NodeId getNodeIdFromChars(TNodeId id)
+inline UA_NodeId getNodeIdFromChars(TNodeId id)
 {
     if (!id.id)
     {
@@ -57,7 +57,7 @@ static inline UA_NodeId getNodeIdFromChars(TNodeId id)
 }
 
 // todo: handle guid, bytestring
-static inline UA_NodeId extractNodeId(char *s)
+inline UA_NodeId extractNodeId(char *s)
 {
     if (!s)
     {
@@ -105,6 +105,8 @@ static inline UA_NodeId extractNodeId(char *s)
             id.identifier.string = sid;
             break;
         }
+        default:
+            return UA_NODEID_NULL;
         }
         return id;
     }

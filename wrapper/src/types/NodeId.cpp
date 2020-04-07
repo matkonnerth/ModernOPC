@@ -54,8 +54,6 @@ UA_NodeId fromNodeId(const NodeId &nodeId)
         id.identifier.string = UA_STRING_ALLOC(
             std::get<std::string>(nodeId.getIdentifier()).c_str());
         break;
-    default:
-        break;
     }
     return id;
 }
@@ -90,4 +88,36 @@ NodeId toStdType(UA_Variant *variant)
     return fromUaNodeId(*static_cast<UA_NodeId *>(variant->data));
 }
 
+bool NodeId::operator==(const NodeId&other) const
+{
+    if (nsIdx != other.nsIdx)
+        return false;
+    if(type != other.type)
+    {
+        return false;
+    }
+    else
+    {
+        switch (type)
+        {
+        case NodeId::IdentifierType::NUMERIC:
+            return std::get<int>(i) == std::get<int>(other.i); 
+            break;
+        case NodeId::IdentifierType::STRING:
+            return std::get<std::string>(i) == std::get<std::string>(other.i);
+            break;
+        }
+    }
+    return false;
+}
+
+std::size_t getHash(const NodeId &id)
+{
+    size_t h1 = std::hash<uint16_t>()(id.nsIdx);
+    size_t h2 = std::hash<std::variant<int, std::string>>()(id.i);
+    return h1 ^ (h2 << 1);
+}
+
 } // namespace opc
+
+

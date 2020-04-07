@@ -30,12 +30,12 @@ struct MethodTraitsBase
     template <typename T>
     inline static UA_Argument getInputArgument(const int &iArg = 0)
     {
-
-        UA_NodeId id = getUADataTypeId<std::remove_const_t<std::remove_reference_t<T>>>();
         UA_Argument inputArgument;
         UA_Argument_init(&inputArgument);
         inputArgument.name = UA_STRING_NULL;
-        inputArgument.dataType = id;
+        inputArgument.dataType =
+            getDataType<std::remove_const_t<std::remove_reference_t<T>>>()
+                ->typeId;
         inputArgument.valueRank = UA_VALUERANK_SCALAR;
         return inputArgument;
     }
@@ -52,12 +52,12 @@ struct MethodTraitsBase
     template <typename T>
     inline static UA_Argument getOutputArgument()
     {
-
-        UA_NodeId id = getUADataTypeId<T>();
         UA_Argument inputArgument;
         UA_Argument_init(&inputArgument);
         inputArgument.name = UA_STRING_NULL;
-        inputArgument.dataType = id;
+        inputArgument.dataType =
+            getDataType<std::remove_const_t<std::remove_reference_t<T>>>()
+                ->typeId;
         if constexpr (is_vector<T>::value)
         {
             inputArgument.valueRank = UA_VALUERANK_ONE_DIMENSION;

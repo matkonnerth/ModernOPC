@@ -61,6 +61,12 @@ uint64_t Variant::get<uint64_t>() const
 }
 
 template <>
+float Variant::get<float>() const
+{
+    return toStdType<float>(variant);
+}
+
+template <>
 double Variant::get<double>() const
 {
     return toStdType<double>(variant);
