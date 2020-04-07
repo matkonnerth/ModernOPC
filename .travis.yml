@@ -20,7 +20,7 @@ matrix:
             - valgrind
       env:
         - GCC_MEMCHECK=true
-  - os: linux
+    - os: linux
       dist: bionic
       compiler: gcc
       env:
