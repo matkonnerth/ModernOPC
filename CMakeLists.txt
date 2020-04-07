@@ -8,10 +8,16 @@ include(CTest)
 enable_testing()
 
 option(ENABLE_ASAN off "enable address sanitizer")
+option(CALC_COVERAGE off "calculate code coverage")
+
+if(CALC_COVERAGE)
+    set(COMPILER_OPTIONS -fprofile-arcs -ftest-coverage)
+    set(LIB_GCOV gcov)
+endif()
 
 set(DO_CLANG_TIDY clang-tidy -checks=-*,modernize-*,performance-*,boost-*)
 set(CMAKE_CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
-set(COMPILER_OPTIONS -Wall -Wextra -pedantic-errors -Wconversion -Wsign-conversion -Wpedantic -Weffc++ -Wno-unused-parameter)
+set(${COMPILER_OPTIONS} -Wall -Wextra -pedantic-errors -Wconversion -Wsign-conversion -Wpedantic -Weffc++ -Wno-unused-parameter)
 if(ENABLE_ASAN)
     set(COMPILER_OPTIONS -fsanitize=address -fsanitize-address-use-after-scope)
     set(LIB_ASAN asan)
@@ -38,7 +44,7 @@ add_library(wrapper SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/DataType.cpp)
 target_include_directories(wrapper PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
 target_include_directories(wrapper PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src)
-target_link_libraries(wrapper PRIVATE open62541 xmlImport)
+target_link_libraries(wrapper PRIVATE ${LIB_GCOV} open62541 xmlImport)
 target_compile_features(wrapper PRIVATE cxx_std_17)
 target_compile_options(wrapper PRIVATE ${COMPILER_OPTIONS})
 

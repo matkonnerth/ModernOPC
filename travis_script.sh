@@ -22,3 +22,14 @@ if ! [ -z ${USE_CLANG+x} ]; then
     make test
 fi
 
+# coverage
+if ! [ -z ${COVERAGE+x} ]; then
+    mkdir -p build
+    cd build
+    conan install -s compiler.libcxx=libstdc++11 ..
+    cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_SHARED_LIBS=ON -DCALC_COVERAGE=ON .. 
+    make 
+    make test
+fi
+
+

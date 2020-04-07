@@ -20,14 +20,11 @@ matrix:
             - valgrind
       env:
         - GCC_MEMCHECK=true
-#    - os: linux
-#      dist: bionic
-#      compiler: clang-7.0
-#      env:
-#        - USE_CLANG=true
-
-
-
+  - os: linux
+      dist: bionic
+      compiler: gcc
+      env:
+       - COVERAGE=true
 
 before_install:
 - pyenv versions
@@ -43,6 +40,7 @@ script:
 
 after_success:
 - echo == Build success ==
+- bash <(curl -s https://codecov.io/bash)
 
 after_failure:
 - echo == Build failed ==
