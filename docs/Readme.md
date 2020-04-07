@@ -1,4 +1,6 @@
-# open62541 Wrapper [![Build Status](https://travis-ci.org/matkonnerth/openWrapper.svg?branch=master)](https://travis-ci.org/matkonnerth/openWrapper)
+# open62541 Wrapper 
+[![Build Status](https://travis-ci.org/matkonnerth/openWrapper.svg?branch=master)](https://travis-ci.org/matkonnerth/openWrapper)
+[![codecov](https://codecov.io/gh/matkonnerth/openWrapper/branch/master/graph/badge.svg)](https://codecov.io/gh/matkonnerth/openWrapper)
 
 # todos
 * support for statemachines
