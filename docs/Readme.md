@@ -2,7 +2,7 @@
 
 # todos
 * support for statemachines
-* support binding to specific interface / port
+
 * support user defined datatypes:
   * structures
   * enumerations
@@ -17,6 +17,7 @@
 * client
 * run tests with valgrind/asan
 * closer look on method template implementation, lots of tuples in binary
+* support binding to specific interface / port: more general, config object
 
 # tutorials
 * suppport creating Objects from Object types

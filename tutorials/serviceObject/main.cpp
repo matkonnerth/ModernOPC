@@ -2,7 +2,7 @@
 #include <opc/Server.h>
 #include <functional>
 
-std::vector<std::string> freeBrowse(std::string path)
+std::vector<std::string> freeBrowse(const std::string& path)
 {
     std::vector<std::string> paths {"2", "1", "3"};
     return paths;

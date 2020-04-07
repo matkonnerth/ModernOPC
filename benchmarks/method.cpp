@@ -13,7 +13,7 @@ static UA_StatusCode helloWorldMethodCallback(
     void *objectContext, size_t inputSize, const UA_Variant *input,
     size_t outputSize, UA_Variant *output)
 {
-    UA_Int32 *in = (UA_Int32 *)input->data;
+    auto *in = static_cast<UA_Int32*>(input->data);
     *in=*in+1;
     UA_Variant_setScalarCopy(output, in, &UA_TYPES[UA_TYPES_INT32]);
     //UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_SERVER, "Method called");
@@ -40,7 +40,7 @@ static void addHellWorldMethod(UA_Server *server)
                             UA_NODEID_NUMERIC(0, UA_NS0ID_HASORDEREDCOMPONENT),
                             UA_QUALIFIEDNAME(1, (char *)"hello world"),
                             helloAttr, &helloWorldMethodCallback, 1,
-                            &inputArgument, 1, &outputArgument, NULL, NULL);
+                            &inputArgument, 1, &outputArgument, nullptr, nullptr);
 }
 
 static void serverRaw(benchmark::State &state)

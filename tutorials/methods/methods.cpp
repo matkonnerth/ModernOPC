@@ -3,7 +3,7 @@
 
 struct Callable
 {
-    Callable(const std::string s) : state{s} {}
+    Callable(const std::string& s) : state{s} {}
     int run(int test)
     {
         std::cout << state << std::endl;

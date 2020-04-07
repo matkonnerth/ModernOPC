@@ -10,6 +10,7 @@ enable_testing()
 option(ENABLE_ASAN off "enable address sanitizer")
 
 set(DO_CLANG_TIDY clang-tidy -checks=-*,modernize-*,performance-*,boost-*)
+set(CMAKE_CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
 set(COMPILER_OPTIONS -Wall -Wextra -pedantic-errors -Wconversion -Wsign-conversion -Wpedantic -Weffc++ -Wno-unused-parameter)
 if(ENABLE_ASAN)
     set(COMPILER_OPTIONS -fsanitize=address -fsanitize-address-use-after-scope)
@@ -37,11 +38,9 @@ add_library(wrapper SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/DataType.cpp)
 target_include_directories(wrapper PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
 target_include_directories(wrapper PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src)
-
 target_link_libraries(wrapper PRIVATE open62541 xmlImport)
 target_compile_features(wrapper PRIVATE cxx_std_17)
 target_compile_options(wrapper PRIVATE ${COMPILER_OPTIONS})
-set_target_properties(wrapper PROPERTIES CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
 
 add_subdirectory(tests)
 add_subdirectory(tutorials)

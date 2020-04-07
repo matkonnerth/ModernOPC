@@ -6,7 +6,7 @@ using namespace std::string_literals;
 
 struct Callable
 {
-    Callable(const std::string s, opc::Server& server) : state{s}, server{server} {}
+    Callable(const std::string& s, opc::Server& server) : state{s}, server{server} {}
     void switchToAutomatic()
     {
         std::cout << "automatic requested" << std::endl;
@@ -21,7 +21,6 @@ struct Callable
     void switchToManual()
     {
         std::cout << "manual requested"<< std::endl;
-
         opc::TransitionEventType tEvent2;
         tEvent2.setMessage(opc::LocalizedText("de"s, "transitionEvent"));
         tEvent2.setTransition(
