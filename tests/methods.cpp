@@ -166,7 +166,7 @@ int32_t testOrder(
 TEST(Methods, testOrder)
 {
     opc::Server s;
-    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, "doIt"), "open",
+    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, 2222), "open",
                 &testOrder);
 
     auto server = s.getUAServer();
@@ -182,7 +182,7 @@ TEST(Methods, testOrder)
     UA_CallMethodRequest req;
     UA_CallMethodRequest_init(&req);
     req.objectId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
-    req.methodId = UA_NODEID_STRING_ALLOC(1, "doIt");
+    req.methodId = UA_NODEID_NUMERIC(1, 2222);
     req.inputArguments = var;
     req.inputArgumentsSize = cnt;
 
