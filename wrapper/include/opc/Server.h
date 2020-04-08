@@ -33,61 +33,13 @@ class Server
     Server &operator=(Server &&) = delete;
 
     void run();
-
     bool loadNodeset(const std::string &path);
-
-    /*
-    template <typename R, typename... ARGS>
-    void addMethod(const NodeId &parentId, const NodeId &requestedId,
-                   const std::string &name, std::function<R(ARGS...)> fn)
-    {
-        std::vector<UA_Argument> inputArgs =
-            MethodTraits<decltype(fn)>::getInputArguments();
-        std::vector<UA_Argument> outputArgs =
-            MethodTraits<decltype(fn)>::getOutputArguments();
-
-        UA_MethodAttributes methAttr = UA_MethodAttributes_default;
-        methAttr.executable = true;
-        methAttr.userExecutable = true;
-
-        UA_NodeId newId;
-        UA_Server_addMethodNode(
-            server, fromNodeId(requestedId), fromNodeId(parentId),
-            UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-            UA_QUALIFIEDNAME(1, const_cast<char *>(name.c_str())), methAttr,
-            nullptr, MethodTraits<decltype(fn)>::getNumArgs(), inputArgs.data(),
-            1, outputArgs.data(), nullptr, &newId);
-
-        UA_Server_setMethodNode_callback(server, newId, internalMethodCallback);
-        UA_Server_setNodeContext(server, newId, this);
-
-        callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
-            fromUaNodeId(newId), std::make_unique<Call<decltype(fn)>>(fn)));
-    }
-    */
 
     std::shared_ptr<MethodNode>
     createMethod(const NodeId &objId, const NodeId &methodId,
                  const QualifiedName &browseName,
                  const std::vector<UA_Argument> &in,
                  const std::vector<UA_Argument> &outArgs);
-
-    template <typename R, typename... ARGS>
-    void bindMethodNode(const NodeId &id, std::function<R(ARGS...)> fn)
-    {
-        UA_Server_setMethodNode_callback(server, fromNodeId(id),
-                                         internalMethodCallback);
-        callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
-            id, std::make_unique<Call<decltype(fn)>>(fn)));
-
-        UA_Server_setNodeContext(server, fromNodeId(id), this);
-    }
-
-    void registerMethodCallback(const NodeId &id)
-    {
-        UA_Server_setMethodNode_callback(server, fromNodeId(id),
-                                         internalMethodCallback);
-    }
 
     bool call(void *objectContext, const NodeId &id,
               const std::vector<Variant> &inputArgs,
@@ -148,15 +100,17 @@ class Server
     void setEvent(const BaseEventType &event, const opc::NodeId &sourceNode);
 
     std::shared_ptr<ObjectNode> getObject(const NodeId &);
-    std::shared_ptr<ObjectNode>
-    createObject(const NodeId &parentId, const NodeId &requestedId,
-                         const NodeId &typeId, const QualifiedName &browseName,
-                         void *context);
+    std::shared_ptr<ObjectNode> createObject(const NodeId &parentId,
+                                             const NodeId &requestedId,
+                                             const NodeId &typeId,
+                                             const QualifiedName &browseName,
+                                             void *context);
     std::shared_ptr<ObjectNode> getObjectsFolder();
     std::shared_ptr<MethodNode> getMethod(const NodeId &id);
     std::shared_ptr<MethodNode> createMethod(const NodeId &objectId,
                                              const NodeId &methodId,
                                              QualifiedName browseName);
+    void connectMethodCallback(const NodeId&id);
 
   private:
     UA_Server *server{nullptr};
@@ -167,7 +121,6 @@ class Server
         const UA_NodeId *methodId, void *methodContext,
         const UA_NodeId *objectId, void *objectContext, size_t inputSize,
         const UA_Variant *input, size_t outputSize, UA_Variant *output);
-    std::unordered_map<NodeId, std::unique_ptr<ICallable>> callbacks{};
     std::vector<std::unique_ptr<DataSource>> datasources{};
     std::vector<std::unique_ptr<NodeMetaInfo>> nodeMetaInfos{};
 

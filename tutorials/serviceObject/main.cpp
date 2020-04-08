@@ -1,10 +1,12 @@
 #include "FileService.h"
-#include <opc/Server.h>
 #include <functional>
+#include <opc/Server.h>
+#include <opc/nodes/MethodNode.h>
+#include <opc/nodes/ObjectNode.h>
 
-std::vector<std::string> freeBrowse(const std::string& path)
+std::vector<std::string> freeBrowse(const std::string &path)
 {
-    std::vector<std::string> paths {"2", "1", "3"};
+    std::vector<std::string> paths{"2", "1", "3"};
     return paths;
 }
 
@@ -16,14 +18,19 @@ int main()
 
     s.loadNodeset("../models/serviceobject.xml");
 
-    //bind member functions
-    s.bindMethodNode(opc::NodeId(2,7001), &FileService::browse);
-    s.bindMethodNode(opc::NodeId(2, 7002), &FileService::getBrowsedPaths);
-    //bind free function
-    s.bindMethodNode(opc::NodeId(2, 7005), &freeBrowse);
+    // bind member functions
 
-    s.addObject(opc::NodeId(0,85), opc::NodeId(2, "stringId"), opc::NodeId(2,1002), "MyServiceObject", &fs1);
-    s.addObject(opc::NodeId(0, 85), opc::NodeId(2, "stringId2"),
-                opc::NodeId(2, 1002), "Fileservice2", &fs2);
+    s.getMethod(opc::NodeId(2, 7001))->bindCallable(&FileService::browse);
+    s.getMethod(opc::NodeId(2, 7002))
+        ->bindCallable(&FileService::getBrowsedPaths);
+    // bind free function
+    s.getMethod(opc::NodeId(2, 7005))->bindCallable(&freeBrowse);
+
+    s.getObjectsFolder()->addObject(opc::NodeId(2, "stringId"),
+                                    opc::QualifiedName(1, "MyServiceObject"),
+                                    &fs1, opc::NodeId(2, 1002));
+    s.getObjectsFolder()->addObject(opc::NodeId(2, "stringId2"),
+                                    opc::QualifiedName(1, "Fileservice2"), &fs2,
+                                    opc::NodeId(2, 1002));
     s.run();
 }

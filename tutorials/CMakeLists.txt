@@ -1,6 +1,6 @@
 add_subdirectory(customTypes)
-#add_subdirectory(serviceObject)
+add_subdirectory(serviceObject)
 add_subdirectory(methods)
-#add_subdirectory(events)
+add_subdirectory(events)
 add_subdirectory(nodesets)
 add_subdirectory(variables)

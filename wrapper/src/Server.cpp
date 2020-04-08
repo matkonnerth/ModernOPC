@@ -489,4 +489,10 @@ std::shared_ptr<ObjectNode> Server::getObjectsFolder()
     return getObject(NodeId(0, 85));
 }
 
+void Server::connectMethodCallback(const NodeId &id)
+{
+    UA_Server_setNodeContext(server, fromNodeId(id), this);
+    UA_Server_setMethodNode_callback(server, fromNodeId(id), &internalMethodCallback);
+}
+
 } // namespace opc

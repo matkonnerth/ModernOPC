@@ -6,6 +6,8 @@
 #include <open62541/server_config_default.h>
 #include <opc/Server.h>
 #include <opc/types/NodeId.h>
+#include <opc/nodes/MethodNode.h>
+#include <opc/nodes/ObjectNode.h>
 
 static UA_StatusCode helloWorldMethodCallback(
     UA_Server *server, const UA_NodeId *sessionId, void *sessionHandle,
@@ -83,7 +85,8 @@ static void serverWrapped(benchmark::State &state)
     using opc::NodeId;
 
     opc::Server s;
-    s.addMethod(NodeId(0, 85), NodeId(1, 62541), "test", &callback);
+    s.getObjectsFolder()->addMethod(NodeId(1, 62541), opc::QualifiedName(1,"test"),
+                                    &callback);
 
     auto server = s.getUAServer();
     UA_StatusCode retval = UA_Server_run_startup(server);
@@ -133,7 +136,7 @@ static void serverManyArgs(benchmark::State &state)
     using opc::NodeId;
 
     opc::Server s;
-    s.addMethod(NodeId(0, 85), NodeId(1, 62541), "test", &manyArgs);
+    s.getObjectsFolder()->addMethod(NodeId(1, 62541), opc::QualifiedName(1, "test"), &manyArgs);
 
     auto server = s.getUAServer();
     UA_StatusCode retval = UA_Server_run_startup(server);

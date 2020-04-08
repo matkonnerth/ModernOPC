@@ -52,7 +52,7 @@ target_compile_options(wrapper PRIVATE ${COMPILER_OPTIONS})
 
 add_subdirectory(tests)
 add_subdirectory(tutorials)
-#add_subdirectory(benchmarks)
+add_subdirectory(benchmarks)
 
 add_executable(demo test.cpp) 
 target_include_directories(demo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
