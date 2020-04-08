@@ -67,6 +67,12 @@ class Variant
         owned = true;
         convertToUAVariant(std::forward<T>(val), variant);
     }
+    template<typename T>
+    Variant(T &&val, bool owned)
+    {
+        variant = UA_Variant_new();
+        convertToUAVariant(std::forward<T>(val), variant);
+    }
     ~Variant();
 
     Variant(const Variant &other) = delete;
