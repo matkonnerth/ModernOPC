@@ -306,3 +306,18 @@ TEST(Methods, lambda)
     std::vector<Variant> out{};
     method->invoke(nullptr, std::vector<Variant>{}, out);
 }
+
+TEST(Methods, getExistingNode)
+{
+    opc::Server s;
+    auto method = s.getMethod(opc::NodeId(0, 11492));
+    ASSERT_TRUE(method);
+    ASSERT_EQ(method->getId(), NodeId(0, 11492));
+}
+
+TEST(Methods, getExistingNode_butNoMethod)
+{
+    opc::Server s;
+    auto method = s.getMethod(opc::NodeId(0, 85));
+    ASSERT_FALSE(method);
+}
