@@ -9,7 +9,8 @@ void getValue(const opc::NodeId &id, opc::Variant &var)
 
 void setValue(const opc::NodeId &id, opc::Variant &var)
 {
-    auto test = var.get<double>();
+    ASSERT_TRUE(var.is_a<int32_t>());
+    auto test = var.get<int32_t>();
     (void)test;
 }
 

@@ -59,7 +59,7 @@ inline UA_NodeId getNodeIdFromChars(TNodeId id)
 // todo: handle guid, bytestring
 inline UA_NodeId extractNodeId(char *s)
 {
-    if (!s)
+    if (!s || strlen(s)<3)
     {
         return UA_NODEID_NULL;
     }
