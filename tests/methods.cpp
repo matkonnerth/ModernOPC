@@ -2,9 +2,12 @@
 #include <memory>
 #include <opc/Server.h>
 #include <opc/Variant.h>
-#include <opc/methods/MethodWrapper.h>
+#include <opc/nodes/MethodNode.h>
+#include <opc/nodes/ObjectNode.h>
 #include <vector>
 
+using opc::NodeId;
+using opc::QualifiedName;
 using opc::Variant;
 using namespace std::string_literals;
 
@@ -12,7 +15,10 @@ TEST(Methods, std_function)
 {
     std::function test = []() { return "hello"s; };
     opc::Server s;
-    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, 2222), "open", test);
+
+    auto objectsFolder = s.getObject(NodeId(0, 85));
+    objectsFolder->addMethod(opc::NodeId(1, "test"s), QualifiedName(1, "open"),
+                             test);
 
     auto server = s.getUAServer();
     UA_StatusCode retval = UA_Server_run_startup(server);
@@ -20,7 +26,7 @@ TEST(Methods, std_function)
     UA_CallMethodRequest req;
     UA_CallMethodRequest_init(&req);
     req.objectId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
-    req.methodId = UA_NODEID_NUMERIC(1, 2222);
+    req.methodId = UA_NODEID_STRING(1, (char *)"test");
     req.inputArguments = nullptr;
     req.inputArgumentsSize = 0;
 
@@ -45,11 +51,13 @@ TEST(Methods, memberFunction)
     Callable c;
     opc::Server s;
     std::function fn = [&](int32_t a) { return c.run(a); };
-    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, 2222), "open", fn);
+    auto objectsFolder = s.getObject(NodeId(0, 85));
 
-    std::function<int32_t(Callable *, int)> memberFn = &Callable::run;
-    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, 2223), "run",
-                &Callable::run);
+    objectsFolder->addMethod(opc::NodeId(1, 2222), QualifiedName(1, "open"),
+                             fn);
+
+    objectsFolder->addMethod(opc::NodeId(1, 2223), QualifiedName(1, "run"),
+                             &Callable::run);
 
     auto server = s.getUAServer();
     UA_StatusCode retval = UA_Server_run_startup(server);
@@ -81,8 +89,9 @@ void freeVoidVoid() {}
 TEST(Methods, freeVoidVoid)
 {
     opc::Server s;
-    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, 2222), "open",
-                &freeVoidVoid);
+    auto objectsFolder = s.getObject(NodeId(0, 85));
+    objectsFolder->addMethod(opc::NodeId(1, 2222), QualifiedName(1, "open"),
+                             &freeVoidVoid);
 
     auto server = s.getUAServer();
     UA_StatusCode retval = UA_Server_run_startup(server);
@@ -106,8 +115,9 @@ void freeVoidConstStdString(const std::string &test) { (void)test; }
 TEST(Methods, freeVoidConstString)
 {
     opc::Server s;
-    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, 2222), "open",
-                &freeVoidConstStdString);
+    auto objectsFolder = s.getObject(NodeId(0, 85));
+    objectsFolder->addMethod(opc::NodeId(1, 2222), QualifiedName(1, "open"),
+                             &freeVoidConstStdString);
 }
 
 std::vector<std::string> freeVectorOfString()
@@ -118,8 +128,8 @@ std::vector<std::string> freeVectorOfString()
 TEST(Methods, freeVectorString)
 {
     opc::Server s;
-    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, 2222), "open",
-                &freeVectorOfString);
+    s.getObjectsFolder()->addMethod(
+        opc::NodeId(1, 2222), QualifiedName(1, "open"), &freeVectorOfString);
 
     auto server = s.getUAServer();
     UA_StatusCode retval = UA_Server_run_startup(server);
@@ -163,7 +173,8 @@ int32_t testOrder(int a0, int a1, int a2, int a3, int a4, int a5, int a6,
 TEST(Methods, testOrder)
 {
     opc::Server s;
-    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, 2222), "open", &testOrder);
+    s.getObjectsFolder()->addMethod(opc::NodeId(1, 2222),
+                                    QualifiedName(1, "open"), &testOrder);
 
     auto server = s.getUAServer();
     UA_StatusCode retval = UA_Server_run_startup(server);
@@ -234,8 +245,6 @@ TEST(Methods, opc_Call_void_int)
     ASSERT_EQ(out.size(), 0);
 }
 
-
-
 TEST(Methods, opc_Call_int_ptr_int)
 {
     struct Callable23
@@ -245,7 +254,7 @@ TEST(Methods, opc_Call_int_ptr_int)
 
     Callable23 callable1;
 
-    std::function<int32_t(Callable23*, int, int, int)> fn = &Callable23::calc;
+    std::function<int32_t(Callable23 *, int, int, int)> fn = &Callable23::calc;
 
     std::unique_ptr<opc::ICallable> c =
         std::make_unique<opc::Call<decltype(fn)>>(opc::Call<decltype(fn)>{fn});
@@ -264,7 +273,7 @@ TEST(Methods, opc_Call_void_ptr_int)
 {
     struct Callable23
     {
-        void calc(int a, int b, int c) { }
+        void calc(int a, int b, int c) {}
     };
 
     Callable23 callable1;

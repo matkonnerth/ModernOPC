@@ -7,6 +7,7 @@
 #include <opc/methods/MethodWrapper.h>
 #include <opc/types/NodeId.h>
 #include <opc/types/Types.h>
+#include <open62541/plugin/log_stdout.h>
 #include <open62541/server.h>
 #include <open62541/server_config.h>
 #include <open62541/types.h>
@@ -17,6 +18,8 @@ struct UA_Server;
 namespace opc
 {
 class BaseEventType;
+class MethodNode;
+class ObjectNode;
 
 class Server
 {
@@ -33,6 +36,7 @@ class Server
 
     bool loadNodeset(const std::string &path);
 
+    /*
     template <typename R, typename... ARGS>
     void addMethod(const NodeId &parentId, const NodeId &requestedId,
                    const std::string &name, std::function<R(ARGS...)> fn)
@@ -60,52 +64,13 @@ class Server
         callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
             fromUaNodeId(newId), std::make_unique<Call<decltype(fn)>>(fn)));
     }
+    */
 
-    template <typename M>
-    void addMethod(const NodeId &parentId, const NodeId &requestedId,
-                   const std::string &name, const M &memberFn)
-    {
-        typename MethodTraits<M>::type fn{memberFn};
-        std::vector<UA_Argument> inputArgs =
-            MethodTraits<M>::getInputArguments();
-        std::vector<UA_Argument> outputArgs =
-            MethodTraits<M>::getOutputArguments();
-
-        UA_MethodAttributes methAttr = UA_MethodAttributes_default;
-        methAttr.executable = true;
-        methAttr.userExecutable = true;
-
-        UA_NodeId newId;
-        const UA_Argument *outArgs = nullptr;
-        if (outputArgs.size() > 0)
-        {
-            outArgs = outputArgs.data();
-        }
-        UA_Server_addMethodNode(
-            server, fromNodeId(requestedId), fromNodeId(parentId),
-            UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-            UA_QUALIFIEDNAME(1, const_cast<char *>(name.c_str())), methAttr,
-            nullptr, MethodTraits<M>::getNumArgs(), inputArgs.data(),
-            outputArgs.size(), outArgs, nullptr, &newId);
-
-        UA_Server_setMethodNode_callback(server, newId, internalMethodCallback);
-        UA_Server_setNodeContext(server, newId, this);
-
-        callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
-            fromUaNodeId(newId), std::make_unique<Call<decltype(fn)>>(fn)));
-    }
-
-    template <typename M>
-    void bindMethodNode(const NodeId &id, const M &memberFn)
-    {
-        typename MethodTraits<M>::type fn{memberFn};
-        UA_Server_setMethodNode_callback(server, fromNodeId(id),
-                                         internalMethodCallback);
-        callbacks.insert(std::pair<const NodeId, std::unique_ptr<ICallable>>(
-            id, std::make_unique<Call<decltype(fn)>>(fn)));
-
-        UA_Server_setNodeContext(server, fromNodeId(id), this);
-    }
+    std::shared_ptr<MethodNode>
+    createMethod(const NodeId &objId, const NodeId &methodId,
+                 const QualifiedName &browseName,
+                 const std::vector<UA_Argument> &in,
+                 const std::vector<UA_Argument> &outArgs);
 
     template <typename R, typename... ARGS>
     void bindMethodNode(const NodeId &id, std::function<R(ARGS...)> fn)
@@ -118,6 +83,12 @@ class Server
         UA_Server_setNodeContext(server, fromNodeId(id), this);
     }
 
+    void registerMethodCallback(const NodeId &id)
+    {
+        UA_Server_setMethodNode_callback(server, fromNodeId(id),
+                                         internalMethodCallback);
+    }
+
     bool call(void *objectContext, const NodeId &id,
               const std::vector<Variant> &inputArgs,
               std::vector<Variant> &outputArgs);
@@ -127,7 +98,7 @@ class Server
                          const std::string &browseName, T initialValue,
                          std::unique_ptr<NodeMetaInfo> info)
     {
-        
+
         UA_VariableAttributes attr = getVariableAttributes(initialValue);
         attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
         UA_Server_addVariableNode(
@@ -157,10 +128,6 @@ class Server
             nullptr);
     }
 
-    bool addObject(const NodeId &parentId, const NodeId &requestedId,
-                   const NodeId &typeId, const std::string &browseName,
-                   void *context);
-
     void registerDataSource(
         const std::string &key,
         std::function<void(const NodeId &id, Variant &var)> read,
@@ -176,8 +143,20 @@ class Server
     uint16_t getNamespaceIndex(const std::string &uri);
 
     UA_Server *getUAServer();
+    const UA_Server *getUAServer() const;
 
     void setEvent(const BaseEventType &event, const opc::NodeId &sourceNode);
+
+    std::shared_ptr<ObjectNode> getObject(const NodeId &);
+    std::shared_ptr<ObjectNode>
+    createObject(const NodeId &parentId, const NodeId &requestedId,
+                         const NodeId &typeId, const QualifiedName &browseName,
+                         void *context);
+    std::shared_ptr<ObjectNode> getObjectsFolder();
+    std::shared_ptr<MethodNode> getMethod(const NodeId &id);
+    std::shared_ptr<MethodNode> createMethod(const NodeId &objectId,
+                                             const NodeId &methodId,
+                                             QualifiedName browseName);
 
   private:
     UA_Server *server{nullptr};
@@ -190,7 +169,7 @@ class Server
         const UA_Variant *input, size_t outputSize, UA_Variant *output);
     std::unordered_map<NodeId, std::unique_ptr<ICallable>> callbacks{};
     std::vector<std::unique_ptr<DataSource>> datasources{};
-    std::vector<std::unique_ptr<NodeMetaInfo>> nodeMetaInfos {};
+    std::vector<std::unique_ptr<NodeMetaInfo>> nodeMetaInfos{};
 
     inline static void *sServer{nullptr};
 
@@ -212,5 +191,8 @@ class Server
     UA_StatusCode getNodeIdForPath(const UA_NodeId objectId,
                                    const std::vector<QualifiedName> &qn,
                                    UA_NodeId *outId);
+
+    std::unordered_map<NodeId, std::shared_ptr<ObjectNode>> objects{};
+    std::unordered_map<NodeId, std::shared_ptr<MethodNode>> methods{};
 };
 } // namespace opc

@@ -41,7 +41,9 @@ add_library(wrapper SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/types/Types.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/types/StdTypes.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/types/NodeId.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/DataType.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/DataType.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/nodes/ObjectNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/nodes/Node.cpp)
 target_include_directories(wrapper PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
 target_include_directories(wrapper PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src)
 target_link_libraries(wrapper PRIVATE ${LIB_GCOV} open62541 xmlImport)
@@ -50,7 +52,7 @@ target_compile_options(wrapper PRIVATE ${COMPILER_OPTIONS})
 
 add_subdirectory(tests)
 add_subdirectory(tutorials)
-add_subdirectory(benchmarks)
+#add_subdirectory(benchmarks)
 
 add_executable(demo test.cpp) 
 target_include_directories(demo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)

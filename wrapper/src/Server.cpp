@@ -6,6 +6,8 @@
 #include <opc/Server.h>
 #include <opc/Variant.h>
 #include <opc/events/BaseEventType.h>
+#include <opc/nodes/MethodNode.h>
+#include <opc/nodes/ObjectNode.h>
 #include <opc/types/NodeId.h>
 #include <open62541/plugin/log_stdout.h>
 #include <open62541/server.h>
@@ -108,10 +110,11 @@ bool Server::call(void *objectContext, const NodeId &id,
                   const std::vector<Variant> &inputArgs,
                   std::vector<Variant> &outputArgs)
 {
-    ICallable *c = callbacks.at(id).get();
-    if (c)
+
+    auto it = methods.find(id);
+    if (it != methods.end())
     {
-        return c->call(objectContext, inputArgs, outputArgs);
+        return it->second->invoke(objectContext, inputArgs, outputArgs);
     }
     return false;
 }
@@ -134,8 +137,8 @@ UA_StatusCode Server::internalMethodCallback(
             Variant v{const_cast<UA_Variant *>(&input[i])};
             inputArgs.push_back(std::move(v));
         }
-        if (s->call(objectContext, fromUaNodeId(*methodId),
-                    inputArgs, outputArgs))
+        if (s->call(objectContext, fromUaNodeId(*methodId), inputArgs,
+                    outputArgs))
         {
             outputSize = outputArgs.size();
             if (outputSize == 1)
@@ -203,7 +206,9 @@ bool Server::readValue(const NodeId &id, Variant &var) const
 
 bool Server::writeValue(const NodeId &id, const Variant &var)
 {
-    if (UA_STATUSCODE_GOOD == UA_Server_writeValue(server, fromNodeId(id), *var.getUAVariant()));
+    if (UA_STATUSCODE_GOOD ==
+        UA_Server_writeValue(server, fromNodeId(id), *var.getUAVariant()))
+        ;
     {
         return true;
     }
@@ -221,18 +226,30 @@ LocalizedText Server::readDisplayName(const NodeId &id)
 
 UA_Server *Server::getUAServer() { return server; }
 
-bool Server::addObject(const NodeId &parentId, const NodeId &requestedId,
-                       const NodeId &typeId, const std::string &browseName,
-                       void *context)
+std::shared_ptr<ObjectNode> Server::createObject(const NodeId &parentId,
+                                              const NodeId &requestedId,
+                                              const NodeId &typeId,
+                                              const QualifiedName &browseName,
+                                              void *context)
 {
     UA_ObjectAttributes attr = UA_ObjectAttributes_default;
-    UA_StatusCode status = UA_Server_addObjectNode(
+    auto status = UA_Server_addObjectNode(
         server, fromNodeId(requestedId), fromNodeId(parentId),
         UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-        UA_QUALIFIEDNAME(requestedId.getNsIdx(), (char *)browseName.c_str()),
-        fromNodeId(typeId), attr, nullptr, nullptr);
+        fromQualifiedName(browseName), fromNodeId(typeId), attr, nullptr,
+        nullptr);
+
+    if (status != UA_STATUSCODE_GOOD)
+    {
+        UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+                       "addObject failed. StatusCode %s",
+                       UA_StatusCode_name(status));
+        return nullptr;
+    }
     UA_Server_setNodeContext(server, fromNodeId(requestedId), context);
-    return UA_STATUSCODE_GOOD == status;
+    auto ptr = std::make_shared<ObjectNode>(this, requestedId);
+    objects.emplace(requestedId, ptr);
+    return ptr;
 }
 
 UA_StatusCode Server::getNodeIdForPath(const UA_NodeId objectId,
@@ -270,9 +287,9 @@ UA_StatusCode Server::getNodeIdForPath(const UA_NodeId objectId,
         retval = bpr.statusCode;
         for (auto &path : pathElements)
         {
-       
-        UA_QualifiedName_clear(&path.targetName);
-        cnt++;
+
+            UA_QualifiedName_clear(&path.targetName);
+            cnt++;
         }
         UA_BrowsePathResult_clear(&bpr);
         free(elements);
@@ -280,10 +297,10 @@ UA_StatusCode Server::getNodeIdForPath(const UA_NodeId objectId,
     }
     retval = bpr.statusCode;
     *outId = bpr.targets[0].targetId.nodeId;
-    cnt=0;
+    cnt = 0;
     for (auto &path : pathElements)
     {
-       
+
         UA_QualifiedName_clear(&path.targetName);
         cnt++;
     }
@@ -364,14 +381,112 @@ void Server::setEvent(const BaseEventType &event, const opc::NodeId &sourceNode)
                        UA_StatusCode_name(retval));
     }
 
-    retval = UA_Server_triggerEvent(
-        server, eventNodeId, fromNodeId(sourceNode), nullptr, UA_TRUE);
+    retval = UA_Server_triggerEvent(server, eventNodeId, fromNodeId(sourceNode),
+                                    nullptr, UA_TRUE);
     if (retval != UA_STATUSCODE_GOOD)
     {
         UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
                        "Trigger event failed. StatusCode %s",
                        UA_StatusCode_name(retval));
     }
+}
+
+std::shared_ptr<ObjectNode> Server::getObject(const NodeId &id)
+{
+    auto it = objects.find(id);
+    if (it != objects.end())
+    {
+        return it->second;
+    }
+    UA_NodeClass nodeClass;
+    auto status = UA_Server_readNodeClass(server, fromNodeId(id), &nodeClass);
+    if (status != UA_STATUSCODE_GOOD)
+    {
+        UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+                       "getObject failed. StatusCode %s",
+                       UA_StatusCode_name(status));
+        return nullptr;
+    }
+    if (nodeClass != UA_NODECLASS_OBJECT)
+    {
+        UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+                       "Nodeclass mismatch.");
+        return nullptr;
+    }
+    auto ptr = std::make_shared<ObjectNode>(this, id);
+    // UA_Server_setNodeContext(server, fromNodeId(id), ptr.get());
+    objects.emplace(id, ptr);
+    return ptr;
+}
+
+std::shared_ptr<MethodNode> Server::getMethod(const NodeId &id)
+{
+    auto it = methods.find(id);
+    if (it != methods.end())
+    {
+        return it->second;
+    }
+    UA_NodeClass nodeClass;
+    auto status = UA_Server_readNodeClass(server, fromNodeId(id), &nodeClass);
+    if (status != UA_STATUSCODE_GOOD)
+    {
+        UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+                       "getObject failed. StatusCode %s",
+                       UA_StatusCode_name(status));
+        return nullptr;
+    }
+    if (nodeClass != UA_NODECLASS_METHOD)
+    {
+        UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+                       "Nodeclass mismatch.");
+        return nullptr;
+    }
+    auto ptr = std::make_shared<MethodNode>(this, id);
+    // UA_Server_setNodeContext(server, fromNodeId(id), ptr.get());
+    methods.emplace(id, ptr);
+    return ptr;
+}
+
+// template<typename M>
+std::shared_ptr<MethodNode>
+Server::createMethod(const NodeId &objId, const NodeId &methodId,
+                     const QualifiedName &browseName,
+                     const std::vector<UA_Argument> &inArgs,
+                     const std::vector<UA_Argument> &outArgs)
+{
+    UA_MethodAttributes methAttr = UA_MethodAttributes_default;
+    methAttr.executable = true;
+    methAttr.userExecutable = true;
+
+    const UA_Argument *out = nullptr;
+    if (outArgs.size() > 0)
+    {
+        out = outArgs.data();
+    }
+    auto status = UA_Server_addMethodNode(
+        server, fromNodeId(methodId), fromNodeId(objId),
+        UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+        fromQualifiedName(browseName), methAttr, &internalMethodCallback,
+        inArgs.size(), inArgs.data(), outArgs.size(), out, nullptr, nullptr);
+
+    if (status != UA_STATUSCODE_GOOD)
+    {
+        UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+                       "Creating method node failed %s",
+                       UA_StatusCode_name(status));
+        return nullptr;
+    }
+    // todo: why do we set here the server
+    UA_Server_setNodeContext(server, fromNodeId(methodId), this);
+
+    auto ptr = std::make_shared<MethodNode>(this, methodId);
+    methods.emplace(methodId, ptr);
+    return ptr;
+}
+
+std::shared_ptr<ObjectNode> Server::getObjectsFolder()
+{
+    return getObject(NodeId(0, 85));
 }
 
 } // namespace opc

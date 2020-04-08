@@ -1,6 +1,9 @@
 #include <opc/Server.h>
 #include <functional>
+#include <opc/nodes/ObjectNode.h>
 
+
+using opc::QualifiedName;
 struct Callable
 {
     Callable(const std::string& s) : state{s} {}
@@ -17,21 +20,19 @@ struct Callable
 int main()
 {
     opc::Server s;
+    auto root = s.getObjectsFolder();
 
     Callable c1{"Hello"};
     Callable c2{"world"};
 
-    s.addObject(opc::NodeId(0,85), opc::NodeId(1,"hello"), opc::NodeId(0,0), "Hello", &c1);
-    s.addObject(opc::NodeId(0, 85), opc::NodeId(1, "world"), opc::NodeId(0, 0),
-                "World", &c2);
-
-    s.addMethod(opc::NodeId(1, "hello"), opc::NodeId(1, "doIt"), "run",
-                &Callable::run);
-    s.addMethod(opc::NodeId(1, "world"), opc::NodeId(1, "doIt2"), "run",
-                &Callable::run);
+    root->addObject(opc::NodeId(1, "hello"), QualifiedName(1,"Hello"), &c1)
+        ->addMethod(opc::NodeId(1, "doIt"), QualifiedName(1, "run"), &Callable::run);
+    root->addObject(opc::NodeId(1, "world"), QualifiedName(1, "World"), &c2)
+        ->addMethod(opc::NodeId(1, "doIt2"), QualifiedName(1,"run"),
+                    &Callable::run);
 
     std::function f = [](int a, int b) { return std::vector<int>{a, b}; };
-    s.addMethod(opc::NodeId(0, 85), opc::NodeId(1, "doIt3"), "addMethod2", f);
+    root->addMethod(opc::NodeId(1, "doIt3"), QualifiedName(1, "getVector"), f);
 
     s.run();
 }

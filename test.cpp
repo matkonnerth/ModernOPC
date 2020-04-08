@@ -69,17 +69,13 @@
 
 // } // namespace opc
 
-#include <opc/types/NodeId.h>
-#include <iostream>
-#include <unordered_map>
-#include <string>
-//#include <opc/Server.h>
+#include <opc/Server.h>
 
 using opc::NodeId;
 
 int main()
 {
-    NodeId id{1, 234234};
+    opc::Server s;
     //std::unordered_map<NodeId, std::string> myMap {};
     //myMap.emplace(std::pair(id, "id1"));
 }
