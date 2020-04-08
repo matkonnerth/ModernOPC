@@ -291,3 +291,13 @@ TEST(Methods, opc_Call_void_ptr_int)
     c->call(&callable1, in, out);
     ASSERT_EQ(out.size(), 0);
 }
+
+TEST(Methods, lambda)
+{
+
+    std::function fn = []() { std::cout << "test" << std::endl; };
+
+    opc::Server s;
+    s.getObjectsFolder()->addMethod(opc::NodeId(1, 2222),
+                                    QualifiedName(1, "open"), fn);
+}
