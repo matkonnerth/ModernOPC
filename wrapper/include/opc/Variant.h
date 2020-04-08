@@ -7,6 +7,11 @@
 
 namespace opc
 {
+template<typename T>
+struct removeConstRef
+{
+    using type = std::remove_const_t<std::remove_reference_t<T>>;
+};
 
 template <typename T>
 T toStdType(UA_Variant *variant);
@@ -17,9 +22,11 @@ void convertToUAVariantImpl(T val, UA_Variant *var);
 template <typename T>
 void convertToUAVariantImpl(std::vector<T> val, UA_Variant *var)
 {
-    static_assert(std::is_arithmetic_v<T>, "Type not integral");
+    static_assert(std::is_arithmetic_v<typename removeConstRef<T>::type>,
+                  "Type not integral");
     UA_Variant_init(var);
-    UA_Variant_setArrayCopy(var, val.data(), val.size(), opc::getDataType<T>());
+    UA_Variant_setArrayCopy(var, val.data(), val.size(),
+                            opc::getDataType<typename removeConstRef<T>::type>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
 
@@ -29,7 +36,7 @@ void convertToUAVariantImpl(std::string &&v, UA_Variant *var);
 void convertToUAVariantImpl(const std::string &v, UA_Variant *var);
 
 template <typename T>
-typename std::enable_if<!std::is_arithmetic_v<std::remove_reference_t<T>>,
+typename std::enable_if<!std::is_arithmetic_v<typename removeConstRef<T>::type>,
                         void>::type
 convertToUAVariant(T &&t, UA_Variant *var)
 {
@@ -37,15 +44,14 @@ convertToUAVariant(T &&t, UA_Variant *var)
 }
 
 template <typename T>
-typename std::enable_if<std::is_arithmetic_v<std::remove_reference_t<T>>,
+typename std::enable_if<std::is_arithmetic_v<typename removeConstRef<T>::type>,
                         void>::type
 convertToUAVariant(T &&val, UA_Variant *var)
 {
-    static_assert(std::is_arithmetic_v<std::remove_reference_t<T>>,
+    static_assert(std::is_arithmetic_v<typename removeConstRef<T>::type>,
                   "Type not integral");
     UA_Variant_init(var);
-    UA_Variant_setScalarCopy(var, &val,
-                             getDataType<std::remove_reference_t<T>>());
+    UA_Variant_setScalarCopy(var, &val, getDataType<typename removeConstRef<T>::type>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
 
@@ -89,9 +95,9 @@ class Variant
     {
         if constexpr (opc::is_vector<T>::value)
         {
-            return variant->type == getDataType<typename T::value_type>();
+            return variant->type == getDataType<typename removeConstRef<T>::type>();
         }
-        return variant->type == getDataType<T>();
+        return variant->type == getDataType<typename removeConstRef<T>::type>();
     }
 
   private:

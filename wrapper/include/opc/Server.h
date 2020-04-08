@@ -127,7 +127,7 @@ class Server
                          const std::string &browseName, T initialValue,
                          std::unique_ptr<NodeMetaInfo> info)
     {
-        // memleak with info.release()!!
+        
         UA_VariableAttributes attr = getVariableAttributes(initialValue);
         attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
         UA_Server_addVariableNode(
@@ -135,7 +135,9 @@ class Server
             UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
             UA_QUALIFIEDNAME(1, (char *)browseName.c_str()),
             UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), attr,
-            info.release(), nullptr);
+            info.get(), nullptr);
+
+        nodeMetaInfos.emplace_back(std::move(info));
 
         UA_Server_setVariableNode_dataSource(server, fromNodeId(requestedId),
                                              internalSrc);
@@ -188,6 +190,7 @@ class Server
         const UA_Variant *input, size_t outputSize, UA_Variant *output);
     std::unordered_map<NodeId, std::unique_ptr<ICallable>> callbacks{};
     std::vector<std::unique_ptr<DataSource>> datasources{};
+    std::vector<std::unique_ptr<NodeMetaInfo>> nodeMetaInfos {};
 
     inline static void *sServer{nullptr};
 

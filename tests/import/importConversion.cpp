@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <src/import/conversion.h>
+#include <open62541/types_generated.h>
 
 TEST(conversion, isTrue)
 {
@@ -25,6 +26,7 @@ TEST(conversion, extractNodeId_string)
     char test[] = "test";
     UA_NodeId exp = UA_NODEID_STRING(0, &test[0]);
     ASSERT_TRUE(UA_NodeId_equal(&id, &exp));
+    UA_clear(&id, &UA_TYPES[UA_TYPES_NODEID]);
 }
 
 TEST(conversion, extractNodeId_notNs0_string)
@@ -34,6 +36,7 @@ TEST(conversion, extractNodeId_notNs0_string)
     char test[] = "test";
     UA_NodeId exp = UA_NODEID_STRING(234, &test[0]);
     ASSERT_TRUE(UA_NodeId_equal(&id, &exp));
+    UA_clear(&id, &UA_TYPES[UA_TYPES_NODEID]);
 }
 
 TEST(conversion, extractNodeId_ns333_numeric)

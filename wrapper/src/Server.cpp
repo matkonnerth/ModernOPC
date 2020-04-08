@@ -203,9 +203,7 @@ bool Server::readValue(const NodeId &id, Variant &var) const
 
 bool Server::writeValue(const NodeId &id, const Variant &var)
 {
-    UA_Variant v;
-    UA_Variant_copy(var.getUAVariant(), &v);
-    if (UA_STATUSCODE_GOOD == UA_Server_writeValue(server, fromNodeId(id), v));
+    if (UA_STATUSCODE_GOOD == UA_Server_writeValue(server, fromNodeId(id), *var.getUAVariant()));
     {
         return true;
     }

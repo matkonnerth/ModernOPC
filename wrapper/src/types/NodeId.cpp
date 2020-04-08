@@ -15,7 +15,7 @@ const UA_DataType *getDataType<NodeId>()
     return &UA_TYPES[UA_TYPES_NODEID];
 }
 
-NodeId fromUaNodeId(const UA_NodeId &id)
+const NodeId fromUaNodeId(const UA_NodeId &id)
 {
 
     auto nsIdx = id.namespaceIndex;
@@ -37,7 +37,7 @@ NodeId fromUaNodeId(const UA_NodeId &id)
     return NodeId(0, 0);
 }
 
-UA_NodeId fromNodeId(const NodeId &nodeId)
+UA_NodeId fromNodeId(NodeId &nodeId)
 {
     UA_NodeId id;
     UA_NodeId_init(&id);
@@ -58,11 +58,31 @@ UA_NodeId fromNodeId(const NodeId &nodeId)
     return id;
 }
 
+const UA_NodeId fromNodeId(const NodeId &nodeId)
+{
+    UA_NodeId id;
+    UA_NodeId_init(&id);
+    id.namespaceIndex = static_cast<UA_UInt16>(nodeId.getNsIdx());
+    switch (nodeId.getIdType())
+    {
+    case NodeId::IdentifierType::NUMERIC:
+        id.identifierType = UA_NodeIdType::UA_NODEIDTYPE_NUMERIC;
+        id.identifier.numeric =
+            static_cast<UA_UInt32>(std::get<int>(nodeId.getIdentifier()));
+        break;
+    case NodeId::IdentifierType::STRING:
+        id.identifierType = UA_NodeIdType::UA_NODEIDTYPE_STRING;
+        id.identifier.string = UA_STRING(const_cast<char *>(
+            std::get<std::string>(nodeId.getIdentifier()).c_str()));
+        break;
+    }
+    return id;
+}
+
 void convertToUAVariantImpl(const NodeId &id, UA_Variant *var)
 {
-    UA_NodeId uaId = fromNodeId(id);
+    const UA_NodeId uaId = fromNodeId(id);
     UA_Variant_setScalarCopy(var, &uaId, opc::getDataType<NodeId>());
-    UA_NodeId_clear(&uaId);
 }
 
 std::ostream &operator<<(std::ostream &os, const NodeId &id)
@@ -88,11 +108,11 @@ NodeId toStdType(UA_Variant *variant)
     return fromUaNodeId(*static_cast<UA_NodeId *>(variant->data));
 }
 
-bool NodeId::operator==(const NodeId&other) const
+bool NodeId::operator==(const NodeId &other) const
 {
     if (nsIdx != other.nsIdx)
         return false;
-    if(type != other.type)
+    if (type != other.type)
     {
         return false;
     }
@@ -101,7 +121,7 @@ bool NodeId::operator==(const NodeId&other) const
         switch (type)
         {
         case NodeId::IdentifierType::NUMERIC:
-            return std::get<int>(i) == std::get<int>(other.i); 
+            return std::get<int>(i) == std::get<int>(other.i);
             break;
         case NodeId::IdentifierType::STRING:
             return std::get<std::string>(i) == std::get<std::string>(other.i);
@@ -119,5 +139,3 @@ std::size_t getHash(const NodeId &id)
 }
 
 } // namespace opc
-
-

@@ -5,21 +5,23 @@ namespace opc
 {
 
 template <typename T>
-UA_VariableAttributes getVariableAttributes(T val)
+const UA_VariableAttributes getVariableAttributes(const T val)
 {
     UA_VariableAttributes attr = UA_VariableAttributes_default;
     attr.dataType =
         getDataType<std::remove_const_t<std::remove_reference_t<T>>>()->typeId;
     attr.valueRank = -1;
-    convertToUAVariant(val, &attr.value);
+    Variant var{val};
+    attr.value = *var.getUAVariant();
     return attr;
 }
 
 template <typename T>
-UA_VariableAttributes getVariableAttributes(std::vector<T> &v)
+const UA_VariableAttributes getVariableAttributes(const std::vector<T> &v)
 {
     UA_VariableAttributes attr = UA_VariableAttributes_default;
-    convertToUAVariant(v, &attr.value);
+    Variant var{v};
+    attr.value = *var.getUAVariant();
     attr.dataType =
         getDataType<std::remove_const_t<std::remove_reference_t<T>>>()->typeId;
     attr.valueRank = 1;
