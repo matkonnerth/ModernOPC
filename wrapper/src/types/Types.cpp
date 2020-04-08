@@ -54,10 +54,10 @@ void convertToUAVariantImpl(const LocalizedText& m, UA_Variant *var)
     UA_LocalizedText_clear(&lt);
 }
 
-UA_QualifiedName fromQualifiedName(const QualifiedName &qn)
+const UA_QualifiedName fromQualifiedName(const QualifiedName &qn)
 {
-    return UA_QUALIFIEDNAME_ALLOC(qn.namespaceIndex(),
-                                  qn.name().c_str());
+    return UA_QUALIFIEDNAME(qn.namespaceIndex(),
+                                  const_cast<char*>(qn.name().c_str()));
 }
 
 UA_LocalizedText fromLocalizedText(const LocalizedText &lt)
@@ -87,7 +87,6 @@ void convertToUAVariantImpl(const QualifiedName &qn,
     UA_Variant_setScalarCopy(var, &n,
                              opc::getDataType<QualifiedName>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
-    UA_QualifiedName_clear(&n);
 }
 
 std::ostream &operator<<(std::ostream &os, const QualifiedName &qn)

@@ -287,8 +287,6 @@ UA_StatusCode Server::getNodeIdForPath(const UA_NodeId objectId,
         retval = bpr.statusCode;
         for (auto &path : pathElements)
         {
-
-            UA_QualifiedName_clear(&path.targetName);
             cnt++;
         }
         UA_BrowsePathResult_clear(&bpr);
@@ -301,7 +299,6 @@ UA_StatusCode Server::getNodeIdForPath(const UA_NodeId objectId,
     for (auto &path : pathElements)
     {
 
-        UA_QualifiedName_clear(&path.targetName);
         cnt++;
     }
     UA_BrowsePathResult_clear(&bpr);
