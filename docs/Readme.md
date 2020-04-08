@@ -1,4 +1,18 @@
-# open62541 Wrapper [![Build Status](https://travis-ci.org/matkonnerth/openWrapper.svg?branch=master)](https://travis-ci.org/matkonnerth/openWrapper)
+# opc++
+[![Build Status](https://travis-ci.org/matkonnerth/openWrapper.svg?branch=master)](https://travis-ci.org/matkonnerth/openWrapper)
+[![codecov](https://codecov.io/gh/matkonnerth/openWrapper/branch/master/graph/badge.svg)](https://codecov.io/gh/matkonnerth/openWrapper)
+
+# a lightweight c++ opc ua library which uses open62541 for the heavy lifting
+
+# goals
+* make use of opc ua in c++ projects as easy as possible
+* Support for for import of xml nodesets
+* Extended support for methods and events
+* Extended support for statemachines
+
+# not a goal
+* completely wrapping away the open62541 library
+* duplicate functionality, push as much as possible towards the open62541 implementation
 
 # todos
 * support for statemachines

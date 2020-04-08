@@ -57,13 +57,13 @@ void convertToUAVariantImpl(const LocalizedText& m, UA_Variant *var)
 UA_QualifiedName fromQualifiedName(const QualifiedName &qn)
 {
     return UA_QUALIFIEDNAME_ALLOC(qn.namespaceIndex(),
-                                  (char *)qn.name().c_str());
+                                  qn.name().c_str());
 }
 
 UA_LocalizedText fromLocalizedText(const LocalizedText &lt)
 {
-    return UA_LOCALIZEDTEXT_ALLOC((char *)lt.locale().c_str(),
-                                  (char *)lt.text().c_str());
+    return UA_LOCALIZEDTEXT_ALLOC(lt.locale().c_str(),
+                                  lt.text().c_str());
 }
 
 LocalizedText fromUALocalizedText(const UA_LocalizedText *lt)
