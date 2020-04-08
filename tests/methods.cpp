@@ -300,4 +300,9 @@ TEST(Methods, lambda)
     opc::Server s;
     s.getObjectsFolder()->addMethod(opc::NodeId(1, 2222),
                                     QualifiedName(1, "open"), fn);
+
+    auto method = s.getMethod(opc::NodeId(1, 2222));
+    ASSERT_TRUE(method);
+    std::vector<Variant> out{};
+    method->invoke(nullptr, std::vector<Variant>{}, out);
 }

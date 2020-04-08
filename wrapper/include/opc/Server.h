@@ -123,11 +123,7 @@ class Server
         const UA_Variant *input, size_t outputSize, UA_Variant *output);
     std::vector<std::unique_ptr<DataSource>> datasources{};
     std::vector<std::unique_ptr<NodeMetaInfo>> nodeMetaInfos{};
-
-    inline static void *sServer{nullptr};
-
     void create(uint16_t port);
-
     static UA_StatusCode
     internalRead(UA_Server *server, const UA_NodeId *sessionId,
                  void *sessionContext, const UA_NodeId *nodeId,

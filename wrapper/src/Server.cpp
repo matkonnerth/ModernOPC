@@ -22,6 +22,19 @@ Server::Server(uint16_t port) { create(port); }
 
 Server::~Server() { UA_Server_delete(server); }
 
+Server *getServerFromContext(UA_Server *server)
+{
+    Server *s = nullptr;
+    UA_Server_getNodeContext(server, UA_NODEID_NUMERIC(0, UA_NS0ID_SERVER),
+                             (void **)&s);
+    return s;
+}
+
+void setServerContext(UA_Server *server, Server *s)
+{
+    UA_Server_setNodeContext(server, UA_NODEID_NUMERIC(0, UA_NS0ID_SERVER), s);
+}
+
 void Server::create(uint16_t port)
 {
     server = UA_Server_new();
@@ -35,7 +48,8 @@ void Server::create(uint16_t port)
     }
     // UA_ServerConfig_addNetworkLayerWS(UA_Server_getConfig(server), 7681, 0,
     // 0);
-    sServer = this;
+
+    setServerContext(server, this);
 }
 
 void Server::run()
@@ -125,8 +139,7 @@ UA_StatusCode Server::internalMethodCallback(
     void *objectContext, size_t inputSize, const UA_Variant *input,
     size_t outputSize, UA_Variant *output)
 {
-    opc::Server *s{nullptr};
-    UA_Server_getNodeContext(server, *methodId, (void **)&s);
+    auto s = getServerFromContext(server);
 
     if (s)
     {
@@ -163,7 +176,9 @@ Server::internalRead(UA_Server *server, const UA_NodeId *sessionId,
         return UA_STATUSCODE_BADNODATA;
 
     auto info = static_cast<NodeMetaInfo *>(nodeContext);
-    for (auto &ds : static_cast<Server *>(sServer)->getDataSources())
+
+    Server *s = getServerFromContext(server);
+    for (auto &ds : s->getDataSources())
     {
         if (info->getDataSourceKey().compare(ds->getKey()) == 0)
         {
@@ -182,9 +197,8 @@ UA_StatusCode Server::internalWrite(UA_Server *server,
                                     const UA_NumericRange *range,
                                     const UA_DataValue *value)
 {
-    // if(!nodeContext)
-    //    return UA_STATUSCODE_BADNODATA;
-    auto &ds = static_cast<Server *>(sServer)->getDataSources().at(0);
+    // TODO: !!!
+    auto &ds = getServerFromContext(server)->getDataSources().at(0);
     // TODO: can we avoid this copy?
     // we can avoid it at the moment, because it's copied in Variant.get<>()
     Variant var{const_cast<UA_Variant *>(&value->value)};
@@ -226,11 +240,10 @@ LocalizedText Server::readDisplayName(const NodeId &id)
 
 UA_Server *Server::getUAServer() { return server; }
 
-std::shared_ptr<ObjectNode> Server::createObject(const NodeId &parentId,
-                                              const NodeId &requestedId,
-                                              const NodeId &typeId,
-                                              const QualifiedName &browseName,
-                                              void *context)
+std::shared_ptr<ObjectNode>
+Server::createObject(const NodeId &parentId, const NodeId &requestedId,
+                     const NodeId &typeId, const QualifiedName &browseName,
+                     void *context)
 {
     UA_ObjectAttributes attr = UA_ObjectAttributes_default;
     auto status = UA_Server_addObjectNode(
@@ -411,7 +424,6 @@ std::shared_ptr<ObjectNode> Server::getObject(const NodeId &id)
         return nullptr;
     }
     auto ptr = std::make_shared<ObjectNode>(this, id);
-    // UA_Server_setNodeContext(server, fromNodeId(id), ptr.get());
     objects.emplace(id, ptr);
     return ptr;
 }
@@ -439,7 +451,6 @@ std::shared_ptr<MethodNode> Server::getMethod(const NodeId &id)
         return nullptr;
     }
     auto ptr = std::make_shared<MethodNode>(this, id);
-    // UA_Server_setNodeContext(server, fromNodeId(id), ptr.get());
     methods.emplace(id, ptr);
     return ptr;
 }
@@ -473,9 +484,6 @@ Server::createMethod(const NodeId &objId, const NodeId &methodId,
                        UA_StatusCode_name(status));
         return nullptr;
     }
-    // todo: why do we set here the server
-    UA_Server_setNodeContext(server, fromNodeId(methodId), this);
-
     auto ptr = std::make_shared<MethodNode>(this, methodId);
     methods.emplace(methodId, ptr);
     return ptr;
@@ -488,8 +496,8 @@ std::shared_ptr<ObjectNode> Server::getObjectsFolder()
 
 void Server::connectMethodCallback(const NodeId &id)
 {
-    UA_Server_setNodeContext(server, fromNodeId(id), this);
-    UA_Server_setMethodNode_callback(server, fromNodeId(id), &internalMethodCallback);
+    UA_Server_setMethodNode_callback(server, fromNodeId(id),
+                                     &internalMethodCallback);
 }
 
 } // namespace opc
