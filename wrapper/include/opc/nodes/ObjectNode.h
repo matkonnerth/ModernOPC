@@ -41,12 +41,20 @@ class ObjectNode : public Node
     std::shared_ptr<VariableNode>
                   addVariable(const NodeId &requestedId, const NodeId& typeId,
                               const QualifiedName &browseName,
-                              T initialValue)
+                              T&& initialValue)
     {
         UA_VariableAttributes attr = getVariableAttributes(initialValue);
         auto var=server->createVariable(id, requestedId, typeId, browseName, attr);
         UA_VariableAttributes_clear(&attr);
         return var;
+    }
+
+    template<typename T>
+    std::shared_ptr<VariableNode> addBaseDataTypeVariable(const NodeId &requestedId,
+                                              const QualifiedName &browseName,
+                                              T&& initialValue)
+    {
+        return addVariable(requestedId, NodeId(0,UA_NS0ID_BASEDATAVARIABLETYPE), browseName, std::forward<T>(initialValue));
     }
 };
 

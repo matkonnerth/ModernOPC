@@ -11,9 +11,12 @@ namespace app
               Range2(double min, double max) : min{min}, max{max} {}
               double min;
               double max;
+
+              friend void convertToUAVariantImpl(const app::types::Range2& m,
+                                          UA_Variant *var);
         };
 
 
-        void convertToUAVariantImpl(app::types::Range2 m, UA_Variant *var);
+        
     }
 }

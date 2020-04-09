@@ -28,6 +28,11 @@ matrix:
       compiler: gcc
       env:
        - GCC_ASAN=true
+    - os: linux
+      dist: bionic
+      compiler: gcc
+      env:
+       - GCC_RELEASE=true
 
 before_install:
 - pyenv versions
