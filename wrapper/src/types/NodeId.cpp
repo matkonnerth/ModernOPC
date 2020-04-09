@@ -9,11 +9,7 @@
 namespace opc
 {
 
-template <>
-NodeId toStdType(UA_Variant *variant)
-{
-    return fromUaNodeId(*static_cast<UA_NodeId *>(variant->data));
-}
+
 
 const NodeId fromUaNodeId(const UA_NodeId &id)
 {
@@ -83,6 +79,12 @@ void convertToUAVariantImpl(const NodeId &id, UA_Variant *var)
 {
     const UA_NodeId uaId = fromNodeId(id);
     UA_Variant_setScalarCopy(var, &uaId, opc::getDataType<NodeId>());
+}
+
+template <>
+NodeId Variant::get<NodeId>() const
+{
+    return fromUaNodeId(*static_cast<UA_NodeId *>(variant->data));
 }
 
 std::ostream &operator<<(std::ostream &os, const NodeId &id)

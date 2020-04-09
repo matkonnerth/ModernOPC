@@ -1,5 +1,4 @@
 #pragma once
-#include <opc/DataType.h>
 #include <opc/Variant.h>
 
 namespace app

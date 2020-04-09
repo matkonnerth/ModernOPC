@@ -7,19 +7,19 @@ namespace opc
 {
 
 template <>
-LocalizedText toStdType(UA_Variant *variant)
+LocalizedText Variant::get<LocalizedText>() const
 {
     return fromUALocalizedText(static_cast<UA_LocalizedText *>(variant->data));
 }
 
 template <>
-std::vector<LocalizedText> toStdType(UA_Variant *var)
+std::vector<LocalizedText> Variant::get<std::vector<LocalizedText>>() const
 {
     std::vector<LocalizedText> vec;
-    for (size_t i = 0; i < var->arrayLength; i++)
+    for (size_t i = 0; i < variant->arrayLength; i++)
     {
         vec.emplace_back(fromUALocalizedText(
-            &static_cast<UA_LocalizedText *>(var->data)[i]));
+            &static_cast<UA_LocalizedText *>(variant->data)[i]));
     }
     return vec;
 }

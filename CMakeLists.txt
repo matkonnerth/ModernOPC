@@ -42,7 +42,6 @@ add_library(wrapper SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/types/QualifiedName.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/types/StdTypes.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/types/NodeId.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/DataType.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/nodes/ObjectNode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/nodes/Node.cpp)
 target_include_directories(wrapper PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)

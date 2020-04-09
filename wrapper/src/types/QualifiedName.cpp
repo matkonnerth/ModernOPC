@@ -5,11 +5,13 @@
 
 namespace opc
 {
+
 template <>
-QualifiedName toStdType(UA_Variant *variant)
+QualifiedName Variant::get<QualifiedName>() const
 {
     return fromUAQualifiedName(static_cast<UA_QualifiedName *>(variant->data));
 }
+
 
 const UA_QualifiedName fromQualifiedName(const QualifiedName &qn)
 {
