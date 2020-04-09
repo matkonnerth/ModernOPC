@@ -38,8 +38,19 @@ if ! [ -z ${CLANG_RELEASE+x} ]; then
     cd build
     conan install -s compiler.libcxx=libstdc++11 .. --build libxml2 --build gtest --build benchmark
     cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
-    make VERBOSE=ON open62541
-    make VERBOSE=ON
+    make open62541
+    make
+    make test
+fi
+
+# clang, asan, test
+if ! [ -z ${CLANG_RELEASE+x} ]; then
+    mkdir -p build
+    cd build
+    conan install -s compiler.libcxx=libstdc++11 .. --build libxml2 --build gtest --build benchmark
+    cmake -DENABLE_ASAN=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+    make open62541
+    make
     make test
 fi
 
