@@ -3,16 +3,8 @@
 #include <iostream>
 #include <open62541/types.h>
 
-
-struct UA_Variant;
 namespace opc
 {
-
-struct Range
-{
-    double min;
-    double max;
-};
 
 class LocalizedText
 {
@@ -20,24 +12,6 @@ class LocalizedText
     LocalizedText(const std::string &locale, const std::string &text)
         : loc{locale}, txt{text}
     {
-    }
-
-    LocalizedText(const LocalizedText& other) {
-        loc = other.loc;
-        txt = other.txt;
-        std::cout << "copy ctor called\n";
-    }
-
-    LocalizedText& operator=(const LocalizedText& other)
-    {
-      if(&other==this)
-      {
-        return *this;
-      }
-      loc = other.loc;
-      txt = other.txt;
-      std::cout << "copy assign called\n";
-      return *this;
     }
 
     LocalizedText(LocalizedText&& other) = default;

@@ -22,14 +22,22 @@
 * conan for pulling dependencies (conan.io)
 * C++ Standard 17
 
+# CI
+[![Build Status](https://travis-ci.org/matkonnerth/openWrapper.svg?branch=master)](https://travis-ci.org/matkonnerth/openWrapper)
+[![codecov](https://codecov.io/gh/matkonnerth/openWrapper/branch/master/graph/badge.svg)](https://codecov.io/gh/matkonnerth/openWrapper)
+
 # license
 ??
 
 # Quick start
 
 # Build
-git clone 
-
+https://github.com/matkonnerth/ModernOPC.git
+git submodule init && git submodule update
+mkdir build && cd build
+conan install ..
+make -j
+make test
 
 # todos
 * support for statemachines
@@ -44,7 +52,7 @@ git clone
 * client
 * closer look on method template implementation, lots of tuples in binary
 * support binding to specific interface / port: more general, config object
-* 
+* add clang build
 
 # tutorials
 * suppport creating Objects from Object types
