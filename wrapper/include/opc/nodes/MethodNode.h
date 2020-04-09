@@ -19,7 +19,7 @@ class MethodNode : public Node
     {
         typename MethodTraits<M>::type fn{memberFn};
         callable = std::make_unique<Call<decltype(fn)>>(fn);
-        server->connectMethodCallback(id);
+        server->connectMethodCallback(id, callable.get());
     }
 
     inline bool invoke(void *objectContext,

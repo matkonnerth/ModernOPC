@@ -140,7 +140,9 @@ UA_StatusCode Server::internalMethodCallback(
     void *objectContext, size_t inputSize, const UA_Variant *input,
     size_t outputSize, UA_Variant *output)
 {
-    auto s = getServerFromContext(server);
+    
+    //auto s = getServerFromContext(server);
+    ICallable* s = static_cast<ICallable*>(methodContext);
 
     if (s)
     {
@@ -151,7 +153,7 @@ UA_StatusCode Server::internalMethodCallback(
             Variant v{const_cast<UA_Variant *>(&input[i])};
             inputArgs.push_back(std::move(v));
         }
-        if (s->call(objectContext, fromUaNodeId(*methodId), inputArgs,
+        if (s->call(objectContext /*, fromUaNodeId(*methodId)*/, inputArgs,
                     outputArgs))
         {
             outputSize = outputArgs.size();
@@ -436,10 +438,11 @@ void Server::connectVariableDataSource(const NodeId& id, std::unique_ptr<NodeMet
     nodeMetaInfos.emplace_back(std::move(info));
 }
 
-void Server::connectMethodCallback(const NodeId &id)
+void Server::connectMethodCallback(const NodeId &id, ICallable* callable)
 {
     UA_Server_setMethodNode_callback(server, fromNodeId(id),
                                      &internalMethodCallback);
+    UA_Server_setNodeContext(server, fromNodeId(id), callable);
 }
 
 } // namespace opc

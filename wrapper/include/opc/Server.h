@@ -19,6 +19,7 @@ class BaseEventType;
 class MethodNode;
 class ObjectNode;
 class VariableNode;
+class ICallable;
 
 class Server
 {
@@ -82,7 +83,7 @@ class Server
   private:
     void connectVariableDataSource(const NodeId &id,
                                    std::unique_ptr<NodeMetaInfo> info);
-    void connectMethodCallback(const NodeId &id);
+    void connectMethodCallback(const NodeId &id, ICallable* c);
     UA_Server *server{nullptr};
     UA_DataSource internalSrc{internalRead, internalWrite};
     bool isRunning{false};
