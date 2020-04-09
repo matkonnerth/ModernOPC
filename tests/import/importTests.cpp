@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <opc/Server.h>
+#include <opc/nodes/Node.h>
+#include <opc/nodes/ObjectNode.h>
 
 std::string path = "";
 
@@ -26,7 +28,7 @@ TEST(import, displayname)
 {
     opc::Server server;
     ASSERT_TRUE(server.loadNodeset(path + "/" + "Displayname.xml"));
-    ASSERT_TRUE(server.readDisplayName(opc::NodeId(2, 6567)).text() ==
+    ASSERT_TRUE(server.getObject(opc::NodeId(2, 6567))->displayName().text() ==
                 "<GroupIdentifier>");
 }
 

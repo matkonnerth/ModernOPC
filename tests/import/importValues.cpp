@@ -1,7 +1,7 @@
-#include <opc/Server.h>
-#include <opc/types/Types.h>
-#include <opc/Variant.h>
 #include <gtest/gtest.h>
+#include <opc/Server.h>
+#include <opc/Variant.h>
+#include <opc/types/Types.h>
 
 std::string path = "";
 
@@ -13,7 +13,7 @@ TEST(import, namespaceZeroValues)
 
     auto nsIdx = server.getNamespaceIndex(
         "http://open62541.com/nodesetimport/tests/namespaceZeroValues");
-    ASSERT_TRUE(nsIdx==2);
+    ASSERT_TRUE(nsIdx == 2);
     opc::Variant var;
     ASSERT_TRUE(server.readValue(opc::NodeId(2, 1003), var));
     ASSERT_TRUE(var.get<double>() - 3.14 < 0.01);
@@ -34,11 +34,39 @@ TEST(import, namespaceZeroValues)
     ASSERT_TRUE(server.readValue(opc::NodeId(2, 1008), var));
     ASSERT_TRUE(var.get<std::vector<opc::LocalizedText>>()[0].text() ==
                 "griasEich!");
-    ASSERT_TRUE(var.get<std::vector<opc::LocalizedText>>()[1].text() ==
-                "Hi!");
+    ASSERT_TRUE(var.get<std::vector<opc::LocalizedText>>()[1].text() == "Hi!");
     ASSERT_TRUE(server.readValue(opc::NodeId(2, 1009), var));
     ASSERT_TRUE(var.get<opc::QualifiedName>().namespaceIndex() == 2);
     ASSERT_TRUE(var.get<opc::QualifiedName>().name() == "qualifiedName");
+}
+
+TEST(import, primitiveValues)
+{
+
+    opc::Server server;
+    ASSERT_TRUE(server.loadNodeset(path + "/" + "primitivevalues.xml"));
+
+    auto nsIdx = server.getNamespaceIndex(
+        "http://yourorganisation.org/primitiveValues/");
+    ASSERT_TRUE(nsIdx == 2);
+    opc::Variant var;
+    ASSERT_TRUE(server.readValue(opc::NodeId(2, 6005), var));
+    ASSERT_EQ(var.get<int32_t>(), -3434);
+}
+
+TEST(import, unknownDataType)
+{
+
+    opc::Server server;
+    ASSERT_TRUE(
+        server.loadNodeset(path + "/" + "valuesWithUnknownDataType.xml"));
+
+    auto nsIdx = server.getNamespaceIndex(
+        "http://yourorganisation.org/primitiveValues/");
+    ASSERT_TRUE(nsIdx == 2);
+    opc::Variant var;
+    ASSERT_TRUE(server.readValue(opc::NodeId(2, 6005), var));
+    ASSERT_EQ(var.get<int32_t>(), -3434);
 }
 
 int main(int argc, char **argv)

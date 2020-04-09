@@ -1,10 +1,11 @@
 #pragma once
 #include <memory>
 #include <opc/Server.h>
+#include <opc/methods/Method.h>
 #include <opc/nodes/MethodNode.h>
 #include <opc/nodes/Node.h>
 #include <opc/types/Types.h>
-#include <opc/methods/Method.h>
+#include <opc/VariableAttributes.h>
 
 namespace opc
 {
@@ -33,7 +34,20 @@ class ObjectNode : public Node
 
     std::shared_ptr<ObjectNode> addObject(const NodeId &objId,
                                           const QualifiedName &browseName,
-                                          void *context, const NodeId &typeId=NodeId(0,0));
+                                          void *context,
+                                          const NodeId &typeId = NodeId(0, 0));
+
+    template <typename T>
+    std::shared_ptr<VariableNode>
+                  addVariable(const NodeId &requestedId, const NodeId& typeId,
+                              const QualifiedName &browseName,
+                              T initialValue)
+    {
+        UA_VariableAttributes attr = getVariableAttributes(initialValue);
+        auto var=server->createVariable(id, requestedId, typeId, browseName, attr);
+        UA_VariableAttributes_clear(&attr);
+        return var;
+    }
 };
 
 } // namespace opc

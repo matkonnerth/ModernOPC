@@ -12,6 +12,7 @@
 #include <open62541/plugin/log_stdout.h>
 #include <open62541/server.h>
 #include <open62541/server_config_default.h>
+#include <opc/nodes/VariableNode.h>
 
 namespace opc
 {
@@ -227,15 +228,6 @@ bool Server::writeValue(const NodeId &id, const Variant &var)
         return true;
     }
     return false;
-}
-
-LocalizedText Server::readDisplayName(const NodeId &id)
-{
-    UA_LocalizedText lt;
-    UA_Server_readDisplayName(server, fromNodeId(id), &lt);
-    LocalizedText localized = fromUALocalizedText(&lt);
-    UA_LocalizedText_clear(&lt);
-    return localized;
 }
 
 UA_Server *Server::getUAServer() { return server; }
@@ -492,6 +484,38 @@ Server::createMethod(const NodeId &objId, const NodeId &methodId,
 std::shared_ptr<ObjectNode> Server::getObjectsFolder()
 {
     return getObject(NodeId(0, 85));
+}
+
+std::shared_ptr<VariableNode>
+              Server::createVariable(const NodeId &parentId, const NodeId &requestedId, const NodeId &typeId,
+                             const QualifiedName &browseName,
+                             const UA_VariableAttributes &attr)
+{
+    auto status = UA_Server_addVariableNode(
+        server, fromNodeId(requestedId), fromNodeId(parentId),
+        UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+        fromQualifiedName(browseName),
+        fromNodeId(typeId), attr, nullptr,
+        nullptr);
+    if (status != UA_STATUSCODE_GOOD)
+    {
+        UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+                       "Creating variable node failed %s",
+                       UA_StatusCode_name(status));
+        return nullptr;
+    }
+    auto ptr = std::make_shared<VariableNode>(this, requestedId);
+    variables.emplace(requestedId, ptr);
+    return ptr;
+}
+
+
+void Server::connectVariableDataSource(const NodeId& id, std::unique_ptr<NodeMetaInfo> info)
+{
+    UA_Server_setVariableNode_dataSource(server, fromNodeId(id),
+                                         internalSrc);
+    UA_Server_setNodeContext(server, fromNodeId(id), info.get());
+    nodeMetaInfos.emplace_back(std::move(info));
 }
 
 void Server::connectMethodCallback(const NodeId &id)

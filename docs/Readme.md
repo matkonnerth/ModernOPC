@@ -23,14 +23,13 @@
   Solution 2) generate the conversion functions
 * refactor Variant handling
   * hack in open library is necessary to forward declare UA_Variant in Variant.h
-* calculate test coverage
 * provide callback for reading Localized Text from database
 * security
-* Support for base node Ids, node Types (Objectsfolder)
 * client
 * run tests with valgrind/asan
 * closer look on method template implementation, lots of tuples in binary
 * support binding to specific interface / port: more general, config object
+* 
 
 # tutorials
 * suppport creating Objects from Object types

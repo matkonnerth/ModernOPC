@@ -20,9 +20,14 @@ namespace opc
 class BaseEventType;
 class MethodNode;
 class ObjectNode;
+class VariableNode;
 
 class Server
 {
+
+    friend VariableNode;
+    friend MethodNode;
+
   public:
     Server();
     explicit Server(uint16_t port);
@@ -45,40 +50,10 @@ class Server
               const std::vector<Variant> &inputArgs,
               std::vector<Variant> &outputArgs);
 
-    template <typename T>
-    void addVariableNode(const NodeId &parentId, const NodeId &requestedId,
-                         const std::string &browseName, T initialValue,
-                         std::unique_ptr<NodeMetaInfo> info)
-    {
-
-        UA_VariableAttributes attr = getVariableAttributes(initialValue);
-        attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
-        UA_Server_addVariableNode(
-            server, fromNodeId(requestedId), fromNodeId(parentId),
-            UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-            UA_QUALIFIEDNAME(1, (char *)browseName.c_str()),
-            UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), attr,
-            info.get(), nullptr);
-
-        nodeMetaInfos.emplace_back(std::move(info));
-
-        UA_Server_setVariableNode_dataSource(server, fromNodeId(requestedId),
-                                             internalSrc);
-    }
-
-    template <typename T>
-    void addVariableNode(const NodeId &parentId, const NodeId &requestedId,
-                         const std::string &browseName, T initialValue)
-    {
-        UA_VariableAttributes attr = getVariableAttributes(initialValue);
-        attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
-        UA_Server_addVariableNode(
-            server, fromNodeId(requestedId), fromNodeId(parentId),
-            UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-            UA_QUALIFIEDNAME(1, (char *)browseName.c_str()),
-            UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), attr, nullptr,
-            nullptr);
-    }
+    std::shared_ptr<VariableNode>
+    createVariable(const NodeId &parentId, const NodeId &requestedId,
+                   const NodeId &typeId, const QualifiedName &browseName,
+                   const UA_VariableAttributes &attr);
 
     void registerDataSource(
         const std::string &key,
@@ -86,17 +61,11 @@ class Server
         std::function<void(const NodeId &id, Variant &var)> write);
 
     auto &getDataSources() { return datasources; }
-
     bool writeValue(const NodeId &id, const Variant &var);
     bool readValue(const NodeId &id, Variant &var) const;
-
-    LocalizedText readDisplayName(const NodeId &id);
-
     uint16_t getNamespaceIndex(const std::string &uri);
-
     UA_Server *getUAServer();
     const UA_Server *getUAServer() const;
-
     void setEvent(const BaseEventType &event, const opc::NodeId &sourceNode);
 
     std::shared_ptr<ObjectNode> getObject(const NodeId &);
@@ -110,9 +79,13 @@ class Server
     std::shared_ptr<MethodNode> createMethod(const NodeId &objectId,
                                              const NodeId &methodId,
                                              QualifiedName browseName);
-    void connectMethodCallback(const NodeId&id);
+    
+    
 
   private:
+    void connectVariableDataSource(const NodeId &id,
+                                   std::unique_ptr<NodeMetaInfo> info);
+    void connectMethodCallback(const NodeId &id);
     UA_Server *server{nullptr};
     UA_DataSource internalSrc{internalRead, internalWrite};
     bool isRunning{false};
@@ -143,5 +116,6 @@ class Server
 
     std::unordered_map<NodeId, std::shared_ptr<ObjectNode>> objects{};
     std::unordered_map<NodeId, std::shared_ptr<MethodNode>> methods{};
+    std::unordered_map<NodeId, std::shared_ptr<VariableNode>> variables{};
 };
 } // namespace opc

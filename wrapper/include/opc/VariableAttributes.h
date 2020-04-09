@@ -22,7 +22,9 @@ const UA_VariableAttributes getVariableAttributes(const std::vector<T> &v)
         getDataType<std::remove_const_t<std::remove_reference_t<T>>>()->typeId;
     attr.valueRank = 1;
     attr.arrayDimensionsSize = 1;
-    attr.arrayDimensions = new UA_UInt32{static_cast<UA_UInt32>(v.size())};
+    //
+    attr.arrayDimensions = static_cast<UA_UInt32*>(UA_Array_new(1, &UA_TYPES[UA_TYPES_UINT32]));  
+    attr.arrayDimensions[0] = static_cast<UA_UInt32>(v.size());
     return attr;
 }
 

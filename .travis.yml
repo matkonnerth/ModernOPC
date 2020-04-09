@@ -4,8 +4,6 @@ sudo: required
 env:
   global:
 
-
-
 matrix:
   fast_finish: true
   include:
