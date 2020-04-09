@@ -1,15 +1,8 @@
 #include <AppTypes.h>
 #include <opc/Variant.h>
 
-// more or less an extension to the wrapper
 namespace opc
 {
-
-template <>
-const UA_DataType *getDataType<app::types::Range2>()
-{
-    return &UA_TYPES[UA_TYPES_RANGE];
-}
 
 template <>
 app::types::Range2 toStdType(UA_Variant *variant)
@@ -29,16 +22,7 @@ namespace app
 namespace types
 {
 
-void convertToUAVariantImpl(const Range2 &m, UA_Variant *var)
-{
-    UA_Range range;
-    range.high = m.max;
-    range.low = m.min;
-    UA_Variant_setScalarCopy(
-        var, &range,
-        opc::getDataType<
-            std::remove_const_t<std::remove_reference_t<decltype(m)>>>());
-}
+void convertToUAVariantImpl(const Range2 &m, UA_Variant *var) {}
 
 } // namespace types
 } // namespace app

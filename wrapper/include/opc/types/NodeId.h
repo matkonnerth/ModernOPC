@@ -1,8 +1,7 @@
 #pragma once
-#include <iostream>
-#include <opc/DataType.h>
 #include <open62541/types.h>
 #include <variant>
+#include <opc/DataType.h>
 namespace opc
 {
 
@@ -49,6 +48,7 @@ inline const UA_DataType *getDataType<NodeId>()
 {
     return &UA_TYPES[UA_TYPES_NODEID];
 }
+
 
 } // namespace opc
 

@@ -4,7 +4,7 @@
 #include <opc/NodeMetaInfo.h>
 #include <opc/types/NodeId.h>
 #include <opc/types/QualifiedName.h>
-#include <opc/types/LocalizedText.h>
+//#include <opc/types/LocalizedText.h>
 #include <open62541/plugin/log_stdout.h>
 #include <open62541/server.h>
 #include <open62541/server_config.h>
