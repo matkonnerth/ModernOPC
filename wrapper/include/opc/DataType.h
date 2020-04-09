@@ -3,11 +3,11 @@
 #include <open62541/types_generated.h>
 #include <vector>
 #include <string>
+#include <cassert>
 namespace opc
 {
 template <typename T>
 inline const UA_DataType *getDataType();
-
 
 template <>
 inline const UA_DataType *getDataType<void>()
@@ -21,8 +21,6 @@ inline const UA_DataType *getDataType<bool>()
 {
     return &UA_TYPES[UA_TYPES_BOOLEAN];
 }
-
-
 
 template <>
 inline const UA_DataType *getDataType<int8_t>()
