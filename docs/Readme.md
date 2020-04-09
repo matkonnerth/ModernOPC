@@ -1,4 +1,4 @@
-# opc++
+# ModernOPC
 [![Build Status](https://travis-ci.org/matkonnerth/openWrapper.svg?branch=master)](https://travis-ci.org/matkonnerth/openWrapper)
 [![codecov](https://codecov.io/gh/matkonnerth/openWrapper/branch/master/graph/badge.svg)](https://codecov.io/gh/matkonnerth/openWrapper)
 
@@ -6,13 +6,30 @@
 
 # goals
 * make use of opc ua in c++ projects as easy as possible
-* Support for for import of xml nodesets
+* Support for import of xml nodesets
 * Extended support for methods and events
 * Extended support for statemachines
 
 # not a goal
 * completely wrapping away the open62541 library
 * duplicate functionality, push as much as possible towards the open62541 implementation
+
+# dependencies
+* open62541 (https://github.com/open62541/open62541)
+* libXml2 for parsinger nodesets (http://xmlsoft.org/)
+* cmake for makefile generation (https://cmake.org/)
+* gtest for testing (https://github.com/google/googletest)
+* conan for pulling dependencies (conan.io)
+* C++ Standard 17
+
+# license
+??
+
+# Quick start
+
+# Build
+git clone 
+
 
 # todos
 * support for statemachines
@@ -23,10 +40,8 @@
   Solution 2) generate the conversion functions
 * refactor Variant handling
   * hack in open library is necessary to forward declare UA_Variant in Variant.h
-* provide callback for reading Localized Text from database
 * security
 * client
-* run tests with valgrind/asan
 * closer look on method template implementation, lots of tuples in binary
 * support binding to specific interface / port: more general, config object
 * 
