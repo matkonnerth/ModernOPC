@@ -46,13 +46,14 @@ make test
   * enumerations
   Solution 1) let open62541 generate the datatype, manually implement the conversion functions
   Solution 2) generate the conversion functions
-* refactor Variant handling
-  * hack in open library is necessary to forward declare UA_Variant in Variant.h
 * security
 * client
 * closer look on method template implementation, lots of tuples in binary
 * support binding to specific interface / port: more general, config object
 * add clang build
+* add support for guid and bytestring nodeids
+* add Logger
+* return StatusCodes (use the native open62541)
 
 # tutorials
 * suppport creating Objects from Object types

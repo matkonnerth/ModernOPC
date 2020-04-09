@@ -3,8 +3,10 @@
 #include <opc/events/BaseEventType.h>
 #include <opc/types/NodeId.h>
 #include <opc/types/QualifiedName.h>
+#include <opc/nodes/ObjectNode.h>
 
 using opc::Variant;
+using opc::ObjectNode;
 using namespace std::string_literals;
 TEST(Events, BaseEventType)
 {
@@ -12,7 +14,7 @@ TEST(Events, BaseEventType)
     event.setMessage(opc::LocalizedText{"de", "Nachricht"});
 
     opc::Server s { 4844 };
-    s.setEvent(event, opc::NodeId(0, 0));
+    s.getObjectsFolder()->setEvent(event);
 }
 
 TEST(Events, wrong_eventField)
@@ -25,7 +27,7 @@ TEST(Events, wrong_eventField)
         opc::Variant());
 
     opc::Server s{4844};
-    s.setEvent(event, opc::NodeId(0, 0));
+    s.getObjectsFolder()->setEvent(event);
 }
 
 TEST(Events, BaseEventType2)
@@ -34,5 +36,5 @@ TEST(Events, BaseEventType2)
     event.setMessage(opc::LocalizedText{"de", "Nachricht"});
 
     opc::Server s{4844};
-    s.setEvent(event, opc::NodeId(34, 3434));
+    s.getObjectsFolder()->setEvent(event);
 }

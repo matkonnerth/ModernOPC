@@ -4,12 +4,6 @@
 #include <opc/nodes/MethodNode.h>
 #include <opc/nodes/ObjectNode.h>
 
-std::vector<std::string> freeBrowse(const std::string &path)
-{
-    std::vector<std::string> paths{"2", "1", "3"};
-    return paths;
-}
-
 int main()
 {
     opc::Server s;
@@ -18,14 +12,12 @@ int main()
 
     s.loadNodeset("../models/serviceobject.xml");
 
-    // bind member functions
-
+    //bind the Methods to the member functions of the FileService Type
     s.getMethod(opc::NodeId(2, 7001))->bindCallable(&FileService::browse);
     s.getMethod(opc::NodeId(2, 7002))
         ->bindCallable(&FileService::getBrowsedPaths);
-    // bind free function
-    s.getMethod(opc::NodeId(2, 7005))->bindCallable(&freeBrowse);
 
+    //instantiate 2 FileService objects and set the context to the c++ objects
     s.getObjectsFolder()->addObject(opc::NodeId(2, "stringId"),
                                     opc::QualifiedName(1, "MyServiceObject"),
                                     &fs1, opc::NodeId(2, 1002));

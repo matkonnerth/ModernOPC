@@ -1,5 +1,4 @@
 #include "MyDataSource.h"
-#include <chrono>
 #include <functional>
 #include <iostream>
 #include <opc/DataSource.h>
@@ -9,7 +8,6 @@
 #include <opc/nodes/VariableNode.h>
 #include <opc/types/NodeId.h>
 #include <opc/types/QualifiedName.h>
-#include <thread>
 #include <vector>
 
 using opc::NodeId;

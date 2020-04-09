@@ -25,6 +25,7 @@ class Server
 
     friend VariableNode;
     friend MethodNode;
+    friend ObjectNode;
 
   public:
     Server();
@@ -64,7 +65,6 @@ class Server
     uint16_t getNamespaceIndex(const std::string &uri);
     UA_Server *getUAServer();
     const UA_Server *getUAServer() const;
-    void setEvent(const BaseEventType &event, const opc::NodeId &sourceNode);
 
     std::shared_ptr<ObjectNode> getObject(const NodeId &);
     std::shared_ptr<ObjectNode> createObject(const NodeId &parentId,
@@ -77,6 +77,7 @@ class Server
     std::shared_ptr<MethodNode> createMethod(const NodeId &objectId,
                                              const NodeId &methodId,
                                              QualifiedName browseName);
+    
 
   private:
     void connectVariableDataSource(const NodeId &id,
@@ -104,14 +105,13 @@ class Server
                   void *sessionContext, const UA_NodeId *nodeId,
                   void *nodeContext, const UA_NumericRange *range,
                   const UA_DataValue *value);
-    UA_StatusCode setUpEvent(UA_NodeId *outId, const BaseEventType &event);
 
-    UA_StatusCode getNodeIdForPath(const UA_NodeId objectId,
-                                   const std::vector<QualifiedName> &qn,
-                                   UA_NodeId *outId);
 
     std::unordered_map<NodeId, std::shared_ptr<ObjectNode>> objects{};
     std::unordered_map<NodeId, std::shared_ptr<MethodNode>> methods{};
     std::unordered_map<NodeId, std::shared_ptr<VariableNode>> variables{};
+
+    UA_StatusCode getNodeIdForPath(const UA_NodeId& id, const std::vector<QualifiedName> &qn,
+                                   UA_NodeId *outId);
 };
 } // namespace opc

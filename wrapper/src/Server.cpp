@@ -232,34 +232,9 @@ bool Server::writeValue(const NodeId &id, const Variant &var)
 
 UA_Server *Server::getUAServer() { return server; }
 
-std::shared_ptr<ObjectNode>
-Server::createObject(const NodeId &parentId, const NodeId &requestedId,
-                     const NodeId &typeId, const QualifiedName &browseName,
-                     void *context)
-{
-    UA_ObjectAttributes attr = UA_ObjectAttributes_default;
-    auto status = UA_Server_addObjectNode(
-        server, fromNodeId(requestedId), fromNodeId(parentId),
-        UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-        fromQualifiedName(browseName), fromNodeId(typeId), attr, nullptr,
-        nullptr);
-
-    if (status != UA_STATUSCODE_GOOD)
-    {
-        UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
-                       "addObject failed. StatusCode %s",
-                       UA_StatusCode_name(status));
-        return nullptr;
-    }
-    UA_Server_setNodeContext(server, fromNodeId(requestedId), context);
-    auto ptr = std::make_shared<ObjectNode>(this, requestedId);
-    objects.emplace(requestedId, ptr);
-    return ptr;
-}
-
-UA_StatusCode Server::getNodeIdForPath(const UA_NodeId objectId,
-                                       const std::vector<QualifiedName> &qn,
-                                       UA_NodeId *outId)
+UA_StatusCode Server::getNodeIdForPath(const UA_NodeId &startId,
+                                           const std::vector<QualifiedName> &qn,
+                                           UA_NodeId *outId)
 {
     auto *elements = static_cast<UA_RelativePathElement *>(
         calloc(qn.size(), sizeof(UA_RelativePathElement)));
@@ -280,7 +255,7 @@ UA_StatusCode Server::getNodeIdForPath(const UA_NodeId objectId,
 
     UA_BrowsePath bp;
     UA_BrowsePath_init(&bp);
-    bp.startingNode = objectId;
+    bp.startingNode = startId;
     bp.relativePath.elementsSize = qn.size();
     bp.relativePath.elements = pathElements.data();
 
@@ -311,86 +286,29 @@ UA_StatusCode Server::getNodeIdForPath(const UA_NodeId objectId,
     return retval;
 }
 
-UA_StatusCode Server::setUpEvent(UA_NodeId *outId, const BaseEventType &event)
+std::shared_ptr<ObjectNode>
+Server::createObject(const NodeId &parentId, const NodeId &requestedId,
+                     const NodeId &typeId, const QualifiedName &browseName,
+                     void *context)
 {
-    UA_StatusCode retval =
-        UA_Server_createEvent(server, fromNodeId(event.getEventType()), outId);
-    if (retval != UA_STATUSCODE_GOOD)
-    {
-        UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_SERVER,
-                       "createEvent failed. StatusCode %s",
-                       UA_StatusCode_name(retval));
-        return retval;
-    }
+    UA_ObjectAttributes attr = UA_ObjectAttributes_default;
+    auto status = UA_Server_addObjectNode(
+        server, fromNodeId(requestedId), fromNodeId(parentId),
+        UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+        fromQualifiedName(browseName), fromNodeId(typeId), attr, nullptr,
+        nullptr);
 
-    /* Set the Event Attributes */
-    /* Setting the Time is required or else the event will not show up in
-     * UAExpert! */
-    UA_DateTime eventTime = UA_DateTime_now();
-    UA_Server_writeObjectProperty_scalar(
-        server, *outId, UA_QUALIFIEDNAME(0, (char *)"Time"), &eventTime,
-        &UA_TYPES[UA_TYPES_DATETIME]);
-
-    UA_UInt16 eventSeverity = 100;
-    UA_Server_writeObjectProperty_scalar(
-        server, *outId, UA_QUALIFIEDNAME(0, (char *)"Severity"), &eventSeverity,
-        &UA_TYPES[UA_TYPES_UINT16]);
-
-    UA_LocalizedText eventMessage =
-        UA_LOCALIZEDTEXT(nullptr, (char *)"An event has been generated.");
-    UA_Server_writeObjectProperty_scalar(
-        server, *outId, UA_QUALIFIEDNAME(0, (char *)"Message"), &eventMessage,
-        &UA_TYPES[UA_TYPES_LOCALIZEDTEXT]);
-
-    UA_String eventSourceName = UA_STRING((char *)"Server");
-    UA_Server_writeObjectProperty_scalar(
-        server, *outId, UA_QUALIFIEDNAME(0, (char *)"SourceName"),
-        &eventSourceName, &UA_TYPES[UA_TYPES_STRING]);
-
-    for (const auto &field : event.getEventFields())
-    {
-        UA_NodeId pathId;
-        auto status = getNodeIdForPath(*outId, field.first, &pathId);
-        if (status != UA_STATUSCODE_GOOD)
-        {
-            UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
-                           "Cannot resolve browsepath. StatusCode %s",
-                           UA_StatusCode_name(retval));
-            continue;
-        }
-
-        status =
-            UA_Server_writeValue(server, pathId, *field.second.getUAVariant());
-        if (status != UA_STATUSCODE_GOOD)
-        {
-            UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
-                           "Writing Event property failed. StatusCode %s",
-                           UA_StatusCode_name(retval));
-        }
-    }
-
-    return UA_STATUSCODE_GOOD;
-}
-
-void Server::setEvent(const BaseEventType &event, const opc::NodeId &sourceNode)
-{
-    UA_NodeId eventNodeId;
-    UA_StatusCode retval = setUpEvent(&eventNodeId, event);
-    if (retval != UA_STATUSCODE_GOOD)
+    if (status != UA_STATUSCODE_GOOD)
     {
         UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
-                       "Creating event failed. StatusCode %s",
-                       UA_StatusCode_name(retval));
+                       "addObject failed. StatusCode %s",
+                       UA_StatusCode_name(status));
+        return nullptr;
     }
-
-    retval = UA_Server_triggerEvent(server, eventNodeId, fromNodeId(sourceNode),
-                                    nullptr, UA_TRUE);
-    if (retval != UA_STATUSCODE_GOOD)
-    {
-        UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
-                       "Trigger event failed. StatusCode %s",
-                       UA_StatusCode_name(retval));
-    }
+    UA_Server_setNodeContext(server, fromNodeId(requestedId), context);
+    auto ptr = std::make_shared<ObjectNode>(this, requestedId);
+    objects.emplace(requestedId, ptr);
+    return ptr;
 }
 
 std::shared_ptr<ObjectNode> Server::getObject(const NodeId &id)
