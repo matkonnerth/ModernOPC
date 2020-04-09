@@ -36,7 +36,7 @@ fi
 if ! [ -z ${CLANG_RELEASE+x} ]; then
     mkdir -p build
     cd build
-    conan install -s compiler.libcxx=libstdc++11 .. --build gtest
+    conan install -s compiler.libcxx=libstdc++11 .. --build missing
     cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release .. 
     make -j
     make test
