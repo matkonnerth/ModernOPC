@@ -17,7 +17,7 @@ if ! [ -z ${GCC_RELEASE+x} ]; then
     mkdir -p build
     cd build
     conan install -s compiler.libcxx=libstdc++11 ..
-    cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_SHARED_LIBS=ON .. 
+    cmake -DCMAKE_BUILD_TYPE=RelWithDebInfomake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_SHARED_LIBS=ON .. 
     make -j
     make test
 fi
@@ -33,7 +33,7 @@ if ! [ -z ${GCC_ASAN+x} ]; then
 fi
 
 # clang, test
-if ! [ -z ${USE_CLANG+x} ]; then
+if ! [ -z ${CLANG_RELEASE+x} ]; then
     mkdir -p build
     cd build
     conan install -s compiler.libcxx=libstdc++11 .. --build gtest

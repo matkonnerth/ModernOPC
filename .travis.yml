@@ -33,6 +33,11 @@ matrix:
       compiler: gcc
       env:
        - GCC_RELEASE=true
+    - os: linux
+      dist: bionic
+      compiler: clang
+      env:
+       - CLANG_RELEASE=true
 
 before_install:
 - pyenv versions
