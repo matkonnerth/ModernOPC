@@ -140,10 +140,7 @@ UA_StatusCode Server::internalMethodCallback(
     void *objectContext, size_t inputSize, const UA_Variant *input,
     size_t outputSize, UA_Variant *output)
 {
-
-    // auto s = getServerFromContext(server);
     ICallable *s = static_cast<ICallable *>(methodContext);
-
     if (s)
     {
 
