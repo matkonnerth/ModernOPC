@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <opc/events/BaseEventType.h>
 #include <opc/types/NodeId.h>
-#include <opc/types/Types.h>
+#include <opc/types/QualifiedName.h>
 
 using opc::Variant;
 using namespace std::string_literals;

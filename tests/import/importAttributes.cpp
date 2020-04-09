@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <open62541/server.h>
+#include <opc/Variant.h>
 
 std::string path = "";
 

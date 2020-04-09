@@ -1,7 +1,8 @@
 #include <gtest/gtest.h>
 #include <opc/Server.h>
 #include <opc/Variant.h>
-#include <opc/types/Types.h>
+#include <opc/types/LocalizedText.h>
+#include <opc/types/QualifiedName.h>
 
 std::string path = "";
 

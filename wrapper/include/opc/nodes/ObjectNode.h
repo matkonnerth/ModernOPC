@@ -4,7 +4,7 @@
 #include <opc/methods/Method.h>
 #include <opc/nodes/MethodNode.h>
 #include <opc/nodes/Node.h>
-#include <opc/types/Types.h>
+#include <opc/types/QualifiedName.h>
 #include <opc/VariableAttributes.h>
 
 namespace opc

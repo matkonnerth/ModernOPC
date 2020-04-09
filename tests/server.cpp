@@ -3,6 +3,7 @@
 #include <opc/types/NodeId.h>
 #include <string>
 #include <vector>
+#include <opc/Variant.h>
 
 using opc::NodeId;
 using namespace std::string_literals;

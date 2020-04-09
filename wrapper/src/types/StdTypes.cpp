@@ -1,5 +1,4 @@
 #include <opc/types/StdTypes.h>
-#include <opc/DataType.h>
 #include <vector>
 #include <opc/Variant.h>
 

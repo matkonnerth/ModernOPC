@@ -5,7 +5,6 @@
 #include <opc/methods/MethodWrapper.h>
 #include <opc/nodes/Node.h>
 #include <opc/types/NodeId.h>
-#include <opc/types/Types.h>
 #include <vector>
 
 namespace opc
@@ -21,7 +20,6 @@ class MethodNode : public Node
         typename MethodTraits<M>::type fn{memberFn};
         callable = std::make_unique<Call<decltype(fn)>>(fn);
         server->connectMethodCallback(id);
-        // UA_Server_setNodeContext(server, fromNodeId(id), this);
     }
 
     inline bool invoke(void *objectContext,

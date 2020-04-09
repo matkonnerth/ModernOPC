@@ -38,7 +38,8 @@ add_library(wrapper SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/import/Extension.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Variant.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Variant_get.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/types/Types.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/types/LocalizedText.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/types/QualifiedName.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/types/StdTypes.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/types/NodeId.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/DataType.cpp

@@ -8,7 +8,7 @@
 #include <opc/nodes/ObjectNode.h>
 #include <opc/nodes/VariableNode.h>
 #include <opc/types/NodeId.h>
-#include <opc/types/Types.h>
+#include <opc/types/QualifiedName.h>
 #include <thread>
 #include <vector>
 

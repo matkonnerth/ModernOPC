@@ -1,8 +1,9 @@
 #include <opc/Variant.h>
-#include <opc/types/Types.h>
+#include <opc/types/NodeId.h>
+#include <opc/types/QualifiedName.h>
+#include <opc/types/LocalizedText.h>
 #include <string>
 #include <vector>
-#include <opc/types/NodeId.h>
 
 namespace opc
 {

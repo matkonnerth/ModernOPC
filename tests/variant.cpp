@@ -1,9 +1,9 @@
-#include <opc/Variant.h>
 #include <gtest/gtest.h>
-#include <open62541/server.h>
-#include <opc/types/Types.h>
+#include <opc/Variant.h>
 #include <opc/types/NodeId.h>
-
+#include <opc/types/QualifiedName.h>
+#include <opc/types/LocalizedText.h>
+#include <open62541/server.h>
 
 using namespace std::string_literals;
 

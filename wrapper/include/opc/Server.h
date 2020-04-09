@@ -2,11 +2,9 @@
 #include <memory>
 #include <opc/DataSource.h>
 #include <opc/NodeMetaInfo.h>
-#include <opc/VariableAttributes.h>
-#include <opc/methods/Method.h>
-#include <opc/methods/MethodWrapper.h>
 #include <opc/types/NodeId.h>
-#include <opc/types/Types.h>
+#include <opc/types/QualifiedName.h>
+#include <opc/types/LocalizedText.h>
 #include <open62541/plugin/log_stdout.h>
 #include <open62541/server.h>
 #include <open62541/server_config.h>
@@ -79,8 +77,6 @@ class Server
     std::shared_ptr<MethodNode> createMethod(const NodeId &objectId,
                                              const NodeId &methodId,
                                              QualifiedName browseName);
-    
-    
 
   private:
     void connectVariableDataSource(const NodeId &id,

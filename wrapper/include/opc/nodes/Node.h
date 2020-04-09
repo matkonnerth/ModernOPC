@@ -1,6 +1,6 @@
 #pragma once
 #include <opc/types/NodeId.h>
-#include <opc/types/Types.h>
+#include <opc/types/LocalizedText.h>
 #include <opc/Server.h>
 #include <vector>
 

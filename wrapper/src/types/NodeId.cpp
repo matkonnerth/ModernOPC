@@ -1,5 +1,5 @@
 #include <cassert>
-#include <opc/DataType.h>
+#include <opc/Variant.h>
 #include <opc/types/NodeId.h>
 #include <open62541/types.h>
 #include <open62541/types_generated_handling.h>
@@ -10,9 +10,9 @@ namespace opc
 {
 
 template <>
-const UA_DataType *getDataType<NodeId>()
+NodeId toStdType(UA_Variant *variant)
 {
-    return &UA_TYPES[UA_TYPES_NODEID];
+    return fromUaNodeId(*static_cast<UA_NodeId *>(variant->data));
 }
 
 const NodeId fromUaNodeId(const UA_NodeId &id)
@@ -100,12 +100,6 @@ std::ostream &operator<<(std::ostream &os, const NodeId &id)
     }
 
     return os;
-}
-
-template <>
-NodeId toStdType(UA_Variant *variant)
-{
-    return fromUaNodeId(*static_cast<UA_NodeId *>(variant->data));
 }
 
 bool NodeId::operator==(const NodeId &other) const
