@@ -74,7 +74,6 @@ class Variant
         convertToUAVariant(std::forward<T>(val), variant);
     }
     ~Variant();
-
     Variant(const Variant &other) = delete;
     Variant &operator=(const Variant &other) = delete;
     Variant(Variant &&other) noexcept;
@@ -96,6 +95,7 @@ class Variant
     const UA_Variant *getUAVariant() const;
 
     bool isScalar();
+    bool isEmpty() const;
     template <typename T>
     bool is_a()
     {

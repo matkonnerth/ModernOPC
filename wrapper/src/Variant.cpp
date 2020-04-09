@@ -66,4 +66,6 @@ bool Variant::isScalar()
     return UA_Variant_isScalar(variant);
 }
 
+bool Variant::isEmpty() const { return UA_Variant_isEmpty(variant); }
+
 } // namespace opc

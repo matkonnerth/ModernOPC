@@ -38,5 +38,9 @@ int main()
     std::function f = [](int a, int b) { return std::vector<int>{a, b}; };
     root->addMethod(opc::NodeId(1, "doIt3"), QualifiedName(1, "getVector"), f);
 
+    // add a MethodNode and bind it to a lambda function
+    std::function fVoidIntInt = [](int a, int b) { std::cout << a+b << std::endl;};
+    root->addMethod(opc::NodeId(1, "doIt4"), QualifiedName(1, "getVector"), fVoidIntInt);
+
     s.run();
 }

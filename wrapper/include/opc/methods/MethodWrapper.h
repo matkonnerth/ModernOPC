@@ -41,7 +41,7 @@ class Call<std::function<R(ClassType *, INARGS...)>> : public ICallable
   public:
     Call(std::function<R(ClassType *, INARGS...)> f) : m_f(f) {}
     bool call(void *obj, const std::vector<Variant> &inputArguments,
-              std::vector<Variant> &outputArguments) override
+              std::vector<Variant> &outputArguments) final
     {
 
         std::tuple<std::remove_const_t<std::remove_reference_t<INARGS>>...>
@@ -63,9 +63,8 @@ class Call<std::function<R(ClassType *, INARGS...)>> : public ICallable
         else
         {
             R result = std::apply(m_f, t2);
-            Variant var;
+            Variant &var = outputArguments[0];
             var(result);
-            outputArguments.push_back(std::move(var));
         }
         return true;
     }
@@ -80,7 +79,7 @@ class Call<std::function<R(INARGS...)>> : public ICallable
   public:
     Call(std::function<R(INARGS...)> f) : m_f(f) {}
     bool call(void *obj, const std::vector<Variant> &inputArguments,
-              std::vector<Variant> &outputArguments) override
+              std::vector<Variant> &outputArguments) final
     {
         std::tuple<std::remove_const_t<std::remove_reference_t<INARGS>>...>
             inputArgs;
@@ -98,9 +97,11 @@ class Call<std::function<R(INARGS...)>> : public ICallable
         else
         {
             R result = std::apply(m_f, inputArgs);
-            Variant var;
+            //Variant var;
+            //var(result);
+            Variant& var = outputArguments[0];
             var(result);
-            outputArguments.push_back(std::move(var));
+            //outputArguments.
         }
         return true;
     }

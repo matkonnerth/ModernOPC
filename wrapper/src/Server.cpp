@@ -8,11 +8,11 @@
 #include <opc/events/BaseEventType.h>
 #include <opc/nodes/MethodNode.h>
 #include <opc/nodes/ObjectNode.h>
+#include <opc/nodes/VariableNode.h>
 #include <opc/types/NodeId.h>
 #include <open62541/plugin/log_stdout.h>
 #include <open62541/server.h>
 #include <open62541/server_config_default.h>
-#include <opc/nodes/VariableNode.h>
 
 namespace opc
 {
@@ -140,27 +140,23 @@ UA_StatusCode Server::internalMethodCallback(
     void *objectContext, size_t inputSize, const UA_Variant *input,
     size_t outputSize, UA_Variant *output)
 {
-    
-    //auto s = getServerFromContext(server);
-    ICallable* s = static_cast<ICallable*>(methodContext);
+
+    // auto s = getServerFromContext(server);
+    ICallable *s = static_cast<ICallable *>(methodContext);
 
     if (s)
     {
+
         std::vector<Variant> inputArgs;
         std::vector<Variant> outputArgs;
+        outputArgs.emplace_back(Variant(const_cast<UA_Variant *>(output)));
         for (size_t i = 0; i < inputSize; i++)
         {
-            Variant v{const_cast<UA_Variant *>(&input[i])};
-            inputArgs.push_back(std::move(v));
+            inputArgs.emplace_back(
+                Variant(const_cast<UA_Variant *>(&input[i])));
         }
-        if (s->call(objectContext /*, fromUaNodeId(*methodId)*/, inputArgs,
-                    outputArgs))
+        if (s->call(objectContext, inputArgs, outputArgs))
         {
-            outputSize = outputArgs.size();
-            if (outputSize == 1)
-            {
-                outputArgs[0].copyToUaVariant(output);
-            }
             return UA_STATUSCODE_GOOD;
         }
         return UA_STATUSCODE_BADMETHODINVALID;
@@ -235,8 +231,8 @@ bool Server::writeValue(const NodeId &id, const Variant &var)
 UA_Server *Server::getUAServer() { return server; }
 
 UA_StatusCode Server::getNodeIdForPath(const UA_NodeId &startId,
-                                           const std::vector<QualifiedName> &qn,
-                                           UA_NodeId *outId)
+                                       const std::vector<QualifiedName> &qn,
+                                       UA_NodeId *outId)
 {
     auto *elements = static_cast<UA_RelativePathElement *>(
         calloc(qn.size(), sizeof(UA_RelativePathElement)));
@@ -407,15 +403,14 @@ std::shared_ptr<ObjectNode> Server::getObjectsFolder()
 }
 
 std::shared_ptr<VariableNode>
-              Server::createVariable(const NodeId &parentId, const NodeId &requestedId, const NodeId &typeId,
-                             const QualifiedName &browseName,
-                             const UA_VariableAttributes &attr)
+Server::createVariable(const NodeId &parentId, const NodeId &requestedId,
+                       const NodeId &typeId, const QualifiedName &browseName,
+                       const UA_VariableAttributes &attr)
 {
     auto status = UA_Server_addVariableNode(
         server, fromNodeId(requestedId), fromNodeId(parentId),
         UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-        fromQualifiedName(browseName),
-        fromNodeId(typeId), attr, nullptr,
+        fromQualifiedName(browseName), fromNodeId(typeId), attr, nullptr,
         nullptr);
     if (status != UA_STATUSCODE_GOOD)
     {
@@ -429,16 +424,15 @@ std::shared_ptr<VariableNode>
     return ptr;
 }
 
-
-void Server::connectVariableDataSource(const NodeId& id, std::unique_ptr<NodeMetaInfo> info)
+void Server::connectVariableDataSource(const NodeId &id,
+                                       std::unique_ptr<NodeMetaInfo> info)
 {
-    UA_Server_setVariableNode_dataSource(server, fromNodeId(id),
-                                         internalSrc);
+    UA_Server_setVariableNode_dataSource(server, fromNodeId(id), internalSrc);
     UA_Server_setNodeContext(server, fromNodeId(id), info.get());
     nodeMetaInfos.emplace_back(std::move(info));
 }
 
-void Server::connectMethodCallback(const NodeId &id, ICallable* callable)
+void Server::connectMethodCallback(const NodeId &id, ICallable *callable)
 {
     UA_Server_setMethodNode_callback(server, fromNodeId(id),
                                      &internalMethodCallback);

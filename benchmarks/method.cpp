@@ -17,8 +17,7 @@ static UA_StatusCode helloWorldMethodCallback(
 {
     auto *in = static_cast<UA_Int32*>(input->data);
     *in=*in+1;
-    UA_Variant_setScalarCopy(output, in, &UA_TYPES[UA_TYPES_INT32]);
-    //UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_SERVER, "Method called");
+    UA_Variant_setScalar(output, in, &UA_TYPES[UA_TYPES_INT32]);
     return UA_STATUSCODE_GOOD;
 }
 
@@ -110,7 +109,7 @@ static void serverWrapped(benchmark::State &state)
         benchmark::DoNotOptimize(UA_Server_call(server, &req));
     }
 }
-
+/*
 int32_t manyArgs(int a0, int a1, int a2, int a3, int a4, int a5, int a6,
                   int a7, int a8, int a9, int a10, int a11, int a12, int a13,
                   int a14, int a15, int a16, int a17, int a18, int a19, int a20,
@@ -162,9 +161,9 @@ static void serverManyArgs(benchmark::State &state)
         benchmark::DoNotOptimize(UA_Server_call(server, &req));
     }
 }
-
+*/
 BENCHMARK(serverRaw);
 BENCHMARK(serverWrapped);
-BENCHMARK(serverManyArgs);
+//BENCHMARK(serverManyArgs);
 
 BENCHMARK_MAIN();
