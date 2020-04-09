@@ -3,6 +3,10 @@
 #include <nodesetLoader/nodesetLoader.h>
 #include <open62541/types.h>
 
+namespace opc
+{
+
+
 inline UA_Boolean isNodeId(const char *s)
 {
     if (!s)
@@ -112,5 +116,7 @@ inline UA_NodeId extractNodeId(char *s)
     }
     return UA_NODEID_NULL;
 }
+
+} // namespace opc
 
 #endif

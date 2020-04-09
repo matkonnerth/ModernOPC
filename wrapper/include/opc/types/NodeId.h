@@ -1,7 +1,7 @@
 #pragma once
+#include <opc/DataType.h>
 #include <open62541/types.h>
 #include <variant>
-#include <opc/DataType.h>
 namespace opc
 {
 
@@ -42,13 +42,11 @@ class NodeId
 
 const NodeId fromUaNodeId(const UA_NodeId &id);
 
-
 template <>
 inline const UA_DataType *getDataType<NodeId>()
 {
     return &UA_TYPES[UA_TYPES_NODEID];
 }
-
 
 } // namespace opc
 

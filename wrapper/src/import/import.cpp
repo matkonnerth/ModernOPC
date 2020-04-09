@@ -6,6 +6,9 @@
 #include <string>
 #include <vector>
 
+namespace opc
+{
+
 static UA_NodeId getTypeDefinitionIdFromChars2(const TNode *node)
 {
     Reference *ref = node->nonHierachicalRefs;
@@ -50,7 +53,7 @@ static UA_NodeId getReferenceTypeId(const Reference *ref)
     {
         return UA_NODEID_NUMERIC(0, UA_NS0ID_HASENCODING);
     }
-    else if(!strcmp(ref->refType.idString, "HasModellingRule"))
+    else if (!strcmp(ref->refType.idString, "HasModellingRule"))
     {
         return UA_NODEID_NUMERIC(0, UA_NS0ID_HASMODELLINGRULE);
     }
@@ -92,13 +95,13 @@ static UA_NodeId getParentId(const TNode *node, UA_NodeId &parentRefId)
     UA_NodeId parentId = UA_NODEID_NULL;
     if (node->nodeClass == NODECLASS_OBJECT)
     {
-        parentId =
-            getNodeIdFromChars(reinterpret_cast<const TObjectNode *>(node)->parentNodeId);
+        parentId = getNodeIdFromChars(
+            reinterpret_cast<const TObjectNode *>(node)->parentNodeId);
     }
     else if (node->nodeClass == NODECLASS_VARIABLE)
     {
-        parentId =
-            getNodeIdFromChars(reinterpret_cast<const TVariableNode *>(node)->parentNodeId);
+        parentId = getNodeIdFromChars(
+            reinterpret_cast<const TVariableNode *>(node)->parentNodeId);
     }
     Reference *ref = getHierachicalInverseReference(node);
     parentRefId = getReferenceTypeId(ref);
@@ -110,17 +113,19 @@ static UA_NodeId getParentId(const TNode *node, UA_NodeId &parentRefId)
 }
 
 static void handleObjectNode(const TObjectNode *node, UA_NodeId &id,
-                      const UA_NodeId &parentId,
-                      const UA_NodeId &parentReferenceId, const UA_LocalizedText& lt, const UA_QualifiedName& qn, UA_Server *server)
+                             const UA_NodeId &parentId,
+                             const UA_NodeId &parentReferenceId,
+                             const UA_LocalizedText &lt,
+                             const UA_QualifiedName &qn, UA_Server *server)
 {
     UA_ObjectAttributes oAttr = UA_ObjectAttributes_default;
     oAttr.displayName = lt;
 
-    UA_NodeId typeDefId = getTypeDefinitionIdFromChars2(reinterpret_cast<const TNode *>(node));
+    UA_NodeId typeDefId =
+        getTypeDefinitionIdFromChars2(reinterpret_cast<const TNode *>(node));
 
-    UA_Server_addObjectNode(server, id, parentId, parentReferenceId,
-                            qn, typeDefId,
-                            oAttr, nullptr, nullptr);
+    UA_Server_addObjectNode(server, id, parentId, parentReferenceId, qn,
+                            typeDefId, oAttr, nullptr, nullptr);
 }
 
 static void handleMethodNode(const TMethodNode *node, UA_NodeId &id,
@@ -134,12 +139,11 @@ static void handleMethodNode(const TMethodNode *node, UA_NodeId &id,
     attr.userExecutable = isTrue(node->userExecutable);
     attr.displayName = lt;
 
-    UA_Server_addMethodNode(server, id, parentId, parentReferenceId,
-                            qn, attr,
+    UA_Server_addMethodNode(server, id, parentId, parentReferenceId, qn, attr,
                             nullptr, 0, nullptr, 0, nullptr, nullptr, nullptr);
 
     auto ref = node->nonHierachicalRefs;
-    while(ref)
+    while (ref)
     {
         UA_NodeId refId = getReferenceTypeId(ref);
         UA_ExpandedNodeId eid;
@@ -151,26 +155,26 @@ static void handleMethodNode(const TMethodNode *node, UA_NodeId &id,
     }
 }
 
-static std::vector<uint32_t> getArrayDimensions(const char* s)
+static std::vector<uint32_t> getArrayDimensions(const char *s)
 {
     std::string dim{s};
     std::vector<uint32_t> arrDims;
-    if(dim.length()==0)
+    if (dim.length() == 0)
     {
         return arrDims;
-    }    
+    }
     size_t idx = 0;
-    //add the first one
+    // add the first one
     int val = atoi(s);
     arrDims.push_back(static_cast<uint32_t>(val));
-    while(idx < dim.length())
+    while (idx < dim.length())
     {
         size_t cur = dim.find(';', idx);
-        if(cur!= std::string::npos)
+        if (cur != std::string::npos)
         {
-            int val = atoi(s+cur+1);
+            int val = atoi(s + cur + 1);
             arrDims.push_back(static_cast<uint32_t>(val));
-            idx=cur+1;
+            idx = cur + 1;
         }
         else
         {
@@ -197,13 +201,13 @@ static void handleVariableNode(const TVariableNode *node, const UA_NodeId &id,
     attr.userAccessLevel = static_cast<UA_Byte>(atoi(node->userAccessLevel));
     // todo: is this really necessary??
     UA_UInt32 dims = 0;
-    if(!attr.arrayDimensions && node->value && node->value->isArray)
+    if (!attr.arrayDimensions && node->value && node->value->isArray)
     {
         dims = static_cast<UA_UInt32>(node->value->arrayCnt);
         attr.arrayDimensions = &dims;
         attr.arrayDimensionsSize = 1;
     }
-    
+
     if (node->value)
     {
         if (node->value->isArray)
@@ -219,16 +223,15 @@ static void handleVariableNode(const TVariableNode *node, const UA_NodeId &id,
     }
     UA_NodeId typeDefId =
         getTypeDefinitionIdFromChars2(reinterpret_cast<const TNode *>(node));
-    UA_Server_addVariableNode(server, id, parentId, parentReferenceId,
-                                  qn,
-                                  typeDefId, attr, nullptr, nullptr);
+    UA_Server_addVariableNode(server, id, parentId, parentReferenceId, qn,
+                              typeDefId, attr, nullptr, nullptr);
 
     // value is copied in addVariableNode
-    Value_delete(&const_cast<TVariableNode*>(node)->value);
+    Value_delete(&const_cast<TVariableNode *>(node)->value);
 }
 
-static void handleObjectTypeNode(const TObjectTypeNode *node, const UA_NodeId &id,
-                                 const UA_NodeId &parentId,
+static void handleObjectTypeNode(const TObjectTypeNode *node,
+                                 const UA_NodeId &id, const UA_NodeId &parentId,
                                  const UA_NodeId &parentReferenceId,
                                  const UA_LocalizedText &lt,
                                  const UA_QualifiedName &qn, UA_Server *server)
@@ -237,33 +240,27 @@ static void handleObjectTypeNode(const TObjectTypeNode *node, const UA_NodeId &i
     oAttr.displayName = lt;
     oAttr.isAbstract = isTrue(node->isAbstract);
 
-    UA_Server_addObjectTypeNode(server, id, parentId, parentReferenceId,
-                                qn, oAttr,
-                                nullptr, nullptr);
+    UA_Server_addObjectTypeNode(server, id, parentId, parentReferenceId, qn,
+                                oAttr, nullptr, nullptr);
 }
 
-static void handleReferenceTypeNode(const TReferenceTypeNode *node,
-                                    const UA_NodeId &id, const UA_NodeId &parentId,
-                                    const UA_NodeId &parentReferenceId,
-                                    const UA_LocalizedText &lt,
-                                    const UA_QualifiedName &qn,
-                                    UA_Server *server)
+static void handleReferenceTypeNode(
+    const TReferenceTypeNode *node, const UA_NodeId &id,
+    const UA_NodeId &parentId, const UA_NodeId &parentReferenceId,
+    const UA_LocalizedText &lt, const UA_QualifiedName &qn, UA_Server *server)
 {
     UA_ReferenceTypeAttributes attr = UA_ReferenceTypeAttributes_default;
     attr.symmetric = isTrue(node->symmetric);
     attr.displayName = lt;
 
-    UA_Server_addReferenceTypeNode(server, id, parentId, parentReferenceId,
-                                   qn, attr,
-                                   nullptr, nullptr);
+    UA_Server_addReferenceTypeNode(server, id, parentId, parentReferenceId, qn,
+                                   attr, nullptr, nullptr);
 }
 
-static void handleVariableTypeNode(const TVariableTypeNode *node, const UA_NodeId &id,
-                                   const UA_NodeId &parentId,
-                                   const UA_NodeId &parentReferenceId,
-                                   const UA_LocalizedText &lt,
-                                   const UA_QualifiedName &qn,
-                                   UA_Server *server)
+static void handleVariableTypeNode(
+    const TVariableTypeNode *node, const UA_NodeId &id,
+    const UA_NodeId &parentId, const UA_NodeId &parentReferenceId,
+    const UA_LocalizedText &lt, const UA_QualifiedName &qn, UA_Server *server)
 {
     UA_VariableTypeAttributes attr = UA_VariableTypeAttributes_default;
     attr.displayName = lt;
@@ -280,10 +277,10 @@ static void handleVariableTypeNode(const TVariableTypeNode *node, const UA_NodeI
         }
     }
 
-    UA_NodeId typeDefId = getTypeDefinitionIdFromChars2(reinterpret_cast<const TNode*>(node));
+    UA_NodeId typeDefId =
+        getTypeDefinitionIdFromChars2(reinterpret_cast<const TNode *>(node));
 
-    UA_Server_addVariableTypeNode(server, id, parentId, parentReferenceId,
-                                  qn,
+    UA_Server_addVariableTypeNode(server, id, parentId, parentReferenceId, qn,
                                   typeDefId, attr, nullptr, nullptr);
 }
 
@@ -296,8 +293,7 @@ static void handleDataTypeNode(const TDataTypeNode *node, const UA_NodeId &id,
     UA_DataTypeAttributes attr = UA_DataTypeAttributes_default;
     attr.displayName = lt;
 
-    UA_Server_addDataTypeNode(server, id, parentId, parentReferenceId,
-                              qn, attr,
+    UA_Server_addDataTypeNode(server, id, parentId, parentReferenceId, qn, attr,
                               nullptr, nullptr);
 }
 
@@ -308,7 +304,8 @@ void importNodesCallback(void *userContext, const TNode *node)
     UA_NodeId parentReferenceId = UA_NODEID_NULL;
     UA_NodeId parentId = getParentId(node, parentReferenceId);
     UA_LocalizedText lt = UA_LOCALIZEDTEXT(nullptr, node->displayName);
-    UA_QualifiedName qn = UA_QUALIFIEDNAME(node->browseName.nsIdx, node->browseName.name);
+    UA_QualifiedName qn =
+        UA_QUALIFIEDNAME(node->browseName.nsIdx, node->browseName.name);
     switch (node->nodeClass)
     {
     case NODECLASS_OBJECT:
@@ -322,18 +319,20 @@ void importNodesCallback(void *userContext, const TNode *node)
         break;
 
     case NODECLASS_OBJECTTYPE:
-        handleObjectTypeNode(reinterpret_cast<const TObjectTypeNode *>(node), id,
-                             parentId, parentReferenceId, lt, qn, server);
+        handleObjectTypeNode(reinterpret_cast<const TObjectTypeNode *>(node),
+                             id, parentId, parentReferenceId, lt, qn, server);
         break;
 
     case NODECLASS_REFERENCETYPE:
-        handleReferenceTypeNode(reinterpret_cast<const TReferenceTypeNode *>(node), id,
-                                parentId, parentReferenceId, lt, qn, server);
+        handleReferenceTypeNode(
+            reinterpret_cast<const TReferenceTypeNode *>(node), id, parentId,
+            parentReferenceId, lt, qn, server);
         break;
 
     case NODECLASS_VARIABLETYPE:
-        handleVariableTypeNode(reinterpret_cast<const TVariableTypeNode *>(node),
-                               id, parentId, parentReferenceId, lt, qn, server);
+        handleVariableTypeNode(
+            reinterpret_cast<const TVariableTypeNode *>(node), id, parentId,
+            parentReferenceId, lt, qn, server);
         break;
 
     case NODECLASS_VARIABLE:
@@ -348,7 +347,9 @@ void importNodesCallback(void *userContext, const TNode *node)
 
 int addNamespaceCallback(void *userContext, const char *namespaceUri)
 {
-    int idx =
-        static_cast<int>(UA_Server_addNamespace(static_cast<UA_Server *>(userContext), namespaceUri));
+    int idx = static_cast<int>(UA_Server_addNamespace(
+        static_cast<UA_Server *>(userContext), namespaceUri));
     return idx;
 }
+
+} // namespace opc

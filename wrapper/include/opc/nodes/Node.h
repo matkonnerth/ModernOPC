@@ -1,7 +1,8 @@
 #pragma once
-#include <opc/types/NodeId.h>
-#include <opc/types/LocalizedText.h>
 #include <opc/Server.h>
+#include <opc/types/LocalizedText.h>
+#include <opc/types/NodeId.h>
+#include <opc/types/QualifiedName.h>
 #include <vector>
 
 namespace opc
@@ -15,6 +16,7 @@ class Node
 
     const NodeId &getId() const;
     LocalizedText displayName() const;
+    QualifiedName browseName() const;
 
   protected:
     Server *server;
