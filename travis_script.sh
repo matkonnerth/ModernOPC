@@ -17,7 +17,7 @@ if ! [ -z ${GCC_RELEASE+x} ]; then
     mkdir -p build
     cd build
     conan install -s compiler.libcxx=libstdc++11 ..
-    cmake -DCMAKE_BUILD_TYPE=RelWithDebInfomake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_SHARED_LIBS=ON .. 
+    cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_SHARED_LIBS=ON .. 
     make -j
     make test
 fi
@@ -37,7 +37,7 @@ if ! [ -z ${CLANG_RELEASE+x} ]; then
     mkdir -p build
     cd build
     conan install -s compiler.libcxx=libstdc++11 .. --build libxml2 --build gtest --build benchmark
-    cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release ..
+    cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
     make VERBOSE=ON open62541
     make VERBOSE=ON
     make test

@@ -26,7 +26,7 @@ endif()
 #open62541 configuration
 SET(UA_ENABLE_SUBSCRIPTIONS_EVENTS ON CACHE BOOL "Enable event support")
 SET(BUILD_SHARED_LIBS ON CACHE BOOL "build open shared")
-SET(UA_NAMESPACE_ZERO REDUCED CACHE STRING "generate full namespace zero")
+SET(UA_NAMESPACE_ZERO REDUCED CACHE STRING "reduced namespace zero")
 
 add_subdirectory(open62541)
 add_subdirectory(nodesetLoader)
