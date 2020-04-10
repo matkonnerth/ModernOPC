@@ -22,3 +22,4 @@ Indices and tables
 
 .. doxygenclass:: opc::Server
    :project: ModernOPC
+   :members:

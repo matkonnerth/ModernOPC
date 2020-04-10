@@ -60,4 +60,9 @@ target_include_directories(demo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/inclu
 target_link_libraries(demo PRIVATE open62541)
 target_compile_features(demo PRIVATE cxx_std_17)
 
-add_subdirectory(docs)
+
+option(BUILD_DOC "Build documentation" OFF)
+
+if(${BUILD_DOC})
+    add_subdirectory(docs)
+endif()

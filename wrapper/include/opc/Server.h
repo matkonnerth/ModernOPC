@@ -18,7 +18,7 @@ class DataSource;
 class Variant;
 
 /**
-  OPC UA Server
+  Main interface for the server implementation.
 */
 class Server
 {
