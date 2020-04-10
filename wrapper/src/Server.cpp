@@ -2,7 +2,7 @@
 #include <import/import.h>
 #include <import/value.h>
 #include <nodesetLoader/nodesetLoader.h>
-#include <opc/NodeMetaInfo.h>
+#include <opc/DataSource.h>
 #include <opc/Server.h>
 #include <opc/Variant.h>
 #include <opc/events/BaseEventType.h>
@@ -57,14 +57,6 @@ void Server::run()
 {
     isRunning = true;
     UA_Server_run(server, &isRunning);
-}
-
-void Server::registerDataSource(
-    const std::string &key,
-    std::function<void(const NodeId &id, Variant &var)> read,
-    std::function<void(const NodeId &id, Variant &var)> write)
-{
-    datasources.push_back(std::make_unique<DataSource>(key, read, write));
 }
 
 bool Server::loadNodeset(const std::string &path)
@@ -171,19 +163,10 @@ Server::internalRead(UA_Server *server, const UA_NodeId *sessionId,
     if (!nodeContext)
         return UA_STATUSCODE_BADNODATA;
 
-    auto info = static_cast<NodeMetaInfo *>(nodeContext);
-
-    Server *s = getServerFromContext(server);
-    for (auto &ds : s->getDataSources())
-    {
-        if (info->getDataSourceKey().compare(ds->getKey()) == 0)
-        {
-            Variant var{&value->value};
-            ds->read(fromUaNodeId(*nodeId), var);
-            return UA_STATUSCODE_GOOD;
-        }
-    }
-    return UA_STATUSCODE_BADNODATA;
+    auto ds = static_cast<DataSource *>(nodeContext);
+    Variant var{&value->value, false};
+    ds->read(fromUaNodeId(*nodeId), var);
+    return UA_STATUSCODE_GOOD;
 }
 
 UA_StatusCode Server::internalWrite(UA_Server *server,
@@ -193,11 +176,10 @@ UA_StatusCode Server::internalWrite(UA_Server *server,
                                     const UA_NumericRange *range,
                                     const UA_DataValue *value)
 {
-    // TODO: !!!
-    auto &ds = getServerFromContext(server)->getDataSources().at(0);
-    // TODO: can we avoid this copy?
-    // we can avoid it at the moment, because it's copied in Variant.get<>()
-    Variant var{const_cast<UA_Variant *>(&value->value)};
+    if (!nodeContext)
+        return UA_STATUSCODE_BADNODATA;
+    auto ds = static_cast<DataSource *>(nodeContext);
+    Variant var{const_cast<UA_Variant*>(&value->value),false};
     ds->write(fromUaNodeId(*nodeId), var);
     return UA_STATUSCODE_GOOD;
 }
@@ -426,11 +408,10 @@ std::shared_ptr<VariableNode> Server::getVariable(const NodeId &id)
 }
 
 void Server::connectVariableDataSource(const NodeId &id,
-                                       std::unique_ptr<NodeMetaInfo> info)
+                                       DataSource* src)
 {
     UA_Server_setVariableNode_dataSource(server, fromNodeId(id), internalSrc);
-    UA_Server_setNodeContext(server, fromNodeId(id), info.get());
-    nodeMetaInfos.emplace_back(std::move(info));
+    UA_Server_setNodeContext(server, fromNodeId(id), src);
 }
 
 void Server::connectMethodCallback(const NodeId &id, ICallable *callable)

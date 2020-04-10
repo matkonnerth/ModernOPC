@@ -104,7 +104,7 @@ class Variant
     bool isScalar();
     bool isEmpty() const;
     template <typename T>
-    bool is_a()
+    bool is_a() const
     {
         if constexpr (opc::is_vector<T>::value)
         {

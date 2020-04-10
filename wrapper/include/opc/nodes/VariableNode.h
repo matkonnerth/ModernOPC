@@ -1,6 +1,7 @@
 #pragma once
+#include <opc/DataSource.h>
 #include <opc/nodes/Node.h>
-#include <opc/NodeMetaInfo.h>
+#include <memory>
 
 namespace opc
 {
@@ -11,9 +12,10 @@ class VariableNode : public Node
     using Node::Node;
     bool write(const Variant &var);
     bool read(Variant &var) const;
-    void connectCallback(std::unique_ptr<NodeMetaInfo> info);
+    void connectCallback(std::unique_ptr<DataSource> dataSource);
 
   private:
+    std::unique_ptr<DataSource> ds {};
 };
 
 } // namespace opc

@@ -1,15 +1,13 @@
 #pragma once
 #include <memory>
-#include <opc/DataSource.h>
-#include <opc/NodeMetaInfo.h>
 #include <opc/types/NodeId.h>
 #include <opc/types/QualifiedName.h>
-//#include <opc/types/LocalizedText.h>
 #include <open62541/plugin/log_stdout.h>
 #include <open62541/server.h>
 #include <open62541/server_config.h>
 #include <open62541/types.h>
 #include <unordered_map>
+#include <opc/Variant.h>
 
 struct UA_Server;
 
@@ -20,6 +18,7 @@ class MethodNode;
 class ObjectNode;
 class VariableNode;
 class ICallable;
+class DataSource;
 
 class Server
 {
@@ -47,14 +46,6 @@ class Server
               std::vector<Variant> &outputArgs);
 
     
-
-    void registerDataSource(
-        const std::string &key,
-        std::function<void(const NodeId &id, Variant &var)> read,
-        std::function<void(const NodeId &id, Variant &var)> write);
-
-    auto &getDataSources() { return datasources; }
-    
     uint16_t getNamespaceIndex(const std::string &uri);
     UA_Server *getUAServer();
     const UA_Server *getUAServer() const;
@@ -67,11 +58,6 @@ class Server
                                              void *context);
     std::shared_ptr<ObjectNode> getObjectsFolder();
     std::shared_ptr<MethodNode> getMethod(const NodeId &id);
-    /*
-    std::shared_ptr<MethodNode> createMethod(const NodeId &objectId,
-                                             const NodeId &methodId,
-                                             QualifiedName browseName);
-                                             */
 
     std::shared_ptr<VariableNode>
     createVariable(const NodeId &parentId, const NodeId &requestedId,
@@ -88,7 +74,7 @@ class Server
 
   private:
     void connectVariableDataSource(const NodeId &id,
-                                   std::unique_ptr<NodeMetaInfo> info);
+                                   DataSource* info);
     void connectMethodCallback(const NodeId &id, ICallable* c);
     UA_Server *server{nullptr};
     UA_DataSource internalSrc{internalRead, internalWrite};
@@ -98,8 +84,6 @@ class Server
         const UA_NodeId *methodId, void *methodContext,
         const UA_NodeId *objectId, void *objectContext, size_t inputSize,
         const UA_Variant *input, size_t outputSize, UA_Variant *output);
-    std::vector<std::unique_ptr<DataSource>> datasources{};
-    std::vector<std::unique_ptr<NodeMetaInfo>> nodeMetaInfos{};
     void create(uint16_t port);
     static UA_StatusCode
     internalRead(UA_Server *server, const UA_NodeId *sessionId,

@@ -2,11 +2,13 @@
 #include <opc/Variant.h>
 #include <opc/nodes/VariableNode.h>
 
+
 namespace opc
 {
-void VariableNode::connectCallback(std::unique_ptr<NodeMetaInfo> info)
+void VariableNode::connectCallback(std::unique_ptr<DataSource> dataSource)
 {
-    server->connectVariableDataSource(id, std::move(info));
+    server->connectVariableDataSource(id, dataSource.get());
+    ds.reset(dataSource.release());
 }
 
 bool VariableNode::read(Variant &var) const

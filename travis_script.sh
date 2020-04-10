@@ -12,7 +12,7 @@ if ! [ -z ${GCC_MEMCHECK+x} ]; then
     ctest --overwrite MemoryCheckCommandOptions="--leak-check=full --error-exitcode=100" -T memcheck
 fi
 
-# gcc, test, memcheck
+# gcc, test
 if ! [ -z ${GCC_RELEASE+x} ]; then
     mkdir -p build
     cd build
