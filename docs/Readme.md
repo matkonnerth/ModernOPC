@@ -2,7 +2,8 @@
 [![Build Status](https://travis-ci.org/matkonnerth/openWrapper.svg?branch=master)](https://travis-ci.org/matkonnerth/openWrapper)
 [![codecov](https://codecov.io/gh/matkonnerth/openWrapper/branch/master/graph/badge.svg)](https://codecov.io/gh/matkonnerth/openWrapper)
 
-# a lightweight c++ opc ua library which uses open62541 for the heavy lifting
+## a lightweight c++ opc ua library
+which uses open62541 (https://github.com/open62541/open62541) for the heavy lifting
 
 # goals
 * make use of opc ua in c++ projects as easy as possible
@@ -32,35 +33,17 @@
 # Quick start
 
 # Build
-https://github.com/matkonnerth/ModernOPC.git
-git submodule init && git submodule update
-mkdir build && cd build
-conan install ..
-make -j
-make test
-
-# todos
-* support for statemachines
-* support user defined datatypes:
-  * structures
-  * enumerations
-  Solution 1) let open62541 generate the datatype, manually implement the conversion functions
-  Solution 2) generate the conversion functions
-* security
-* client
-* closer look on method template implementation, lots of tuples in binary
-* support binding to specific interface / port: more general, config object
-* add clang build
-* add support for guid and bytestring nodeids
-* add Logger
-* return StatusCodes (use the native open62541)
+* git clone https://github.com/matkonnerth/ModernOPC.git
+* git submodule init && git submodule update
+* mkdir build && cd build
+* conan install ..
+* make -j
+* make test
 
 # tutorials
-* suppport creating Objects from Object types
-As a developer I want to load a nodeset with the ObjectType of a service.
-When I create an instance of this ObjectType, I want to bind it to the service implementation.
-There can be several instances of the service
--> take a look on tutorial->serviceObject
-
-* add support for Events
+* Nodeset import
+* Methods
+* Events
+* Adding custom types
+* Adding variables and connecting to Datasources
 
