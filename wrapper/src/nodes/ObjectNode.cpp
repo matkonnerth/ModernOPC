@@ -3,6 +3,7 @@
 #include <opc/methods/Method.h>
 #include <opc/Server.h>
 #include <opc/events/BaseEventType.h>
+#include <open62541/plugin/log_stdout.h>
 
 namespace opc
 {

@@ -1,5 +1,4 @@
 #include <benchmark/benchmark.h>
-#include <iostream>
 #include <opc/DataSource.h>
 #include <opc/Server.h>
 #include <opc/Variant.h>
@@ -130,6 +129,7 @@ static void writeWrapped(benchmark::State &state)
         benchmark::DoNotOptimize(UA_Server_writeValue(server, id, v));
     }
     UA_Variant_clear(&v);
+    
 }
 
 BENCHMARK(readRaw);

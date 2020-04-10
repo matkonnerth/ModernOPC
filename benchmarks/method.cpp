@@ -1,5 +1,4 @@
 #include <benchmark/benchmark.h>
-#include <iostream>
 #include <open62541/client_config_default.h>
 #include <open62541/plugin/log_stdout.h>
 #include <open62541/server.h>
@@ -75,7 +74,6 @@ static void serverRaw(benchmark::State &state)
 
 static int32_t callback(int32_t val)
 {
-    //std::cout << val << std::endl;
     return val+1;
 }
 
@@ -127,7 +125,6 @@ int32_t manyArgs(int a0, int a1, int a2, int a3, int a4, int a5, int a6,
                   int a98, int a99)
 {
     return a99;
-    std::cout << "called" << "\n";
 }
 
 static void serverManyArgs(benchmark::State &state)

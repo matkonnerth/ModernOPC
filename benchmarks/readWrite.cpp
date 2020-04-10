@@ -1,5 +1,4 @@
 #include <benchmark/benchmark.h>
-#include <iostream>
 #include <opc/Variant.h>
 #include <open62541/server.h>
 #include <vector>

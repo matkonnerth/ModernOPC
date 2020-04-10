@@ -3,6 +3,7 @@
 #include <opc/events/BaseEventType.h>
 #include <opc/nodes/MethodNode.h>
 #include <opc/nodes/ObjectNode.h>
+#include <iostream>
 
 using opc::ObjectNode;
 using namespace std::string_literals;

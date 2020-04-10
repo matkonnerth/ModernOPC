@@ -1,9 +1,12 @@
 #pragma once
 #include <opc/DataType.h>
 #include <opc/util.h>
-#include <open62541/server.h>
+#include <open62541/types.h>
+#include <open62541/types_generated_handling.h>
 #include <string>
 #include <vector>
+#include <utility>
+#include <type_traits>
 
 namespace opc
 {

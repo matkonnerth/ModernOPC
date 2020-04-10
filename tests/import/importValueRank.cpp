@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 #include <opc/Server.h>
-#include <iostream>
 #include <opc/Variant.h>
 #include <opc/nodes/VariableNode.h>
 
@@ -29,7 +28,6 @@ int main(int argc, char**argv)
     
     if(!(argc>1))
         return 1;
-    std::cout << argv[1] << std::endl;
     path = argv[1];
 
 

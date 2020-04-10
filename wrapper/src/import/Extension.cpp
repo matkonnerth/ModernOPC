@@ -1,10 +1,7 @@
 #include "import/Extension.h"
-#include <iostream>
 #include <map>
 #include <nodesetLoader/nodesetLoader.h>
 #include <string>
-
-
 
 struct Extension
 {
@@ -24,13 +21,6 @@ void Extension_end(Extension *val, const char *localname, char *value)
     val->values.insert(
         std::make_pair<std::string, std::string>(localname, value));
 }
-void Extension_finish(Extension *val)
-{
-    for (auto &v : val->values)
-    {
-        std::cout << v.first << ": " << v.second << std::endl;
-    }
-    delete val;
-}
+void Extension_finish(Extension *val) { delete val; }
 
 } // namespace opc

@@ -3,7 +3,6 @@
 #include <string>
 #include <opc/Server.h>
 #include <opc/nodes/Node.h>
-#include <iostream>
 #include <optional>
 #include <opc/nodes/ObjectNode.h>
 
@@ -25,15 +24,11 @@ TEST(Object, get)
 { 
     opc::Server s; 
     auto obj = s.getObject(NodeId(0,85));
-    std::cout << obj->displayName() << std::endl;
+    ASSERT_EQ(obj->displayName().text(), "Objects");
 }
 
 TEST(Object, get_noObjectFound)
 {
     opc::Server s;
     auto obj = s.getObject(NodeId(233, 85));
-    if(obj)
-    {
-        std::cout << obj->displayName() << std::endl;
-    }    
 }

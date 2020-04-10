@@ -1,7 +1,6 @@
 #include <benchmark/benchmark.h>
 #include <vector>
 #include <opc/Variant.h>
-#include <iostream>
 #include <open62541/server.h>
 
 static void IntVectorToVariant(benchmark::State &state)

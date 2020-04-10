@@ -1,6 +1,7 @@
 #include <opc/Server.h>
 #include <functional>
 #include <opc/nodes/ObjectNode.h>
+#include <iostream>
 
 
 using opc::QualifiedName;

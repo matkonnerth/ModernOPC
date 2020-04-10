@@ -2,12 +2,8 @@
 #include <memory>
 #include <opc/types/NodeId.h>
 #include <opc/types/QualifiedName.h>
-#include <open62541/plugin/log_stdout.h>
 #include <open62541/server.h>
-#include <open62541/server_config.h>
-#include <open62541/types.h>
 #include <unordered_map>
-#include <opc/Variant.h>
 
 struct UA_Server;
 
@@ -19,6 +15,7 @@ class ObjectNode;
 class VariableNode;
 class ICallable;
 class DataSource;
+class Variant;
 
 class Server
 {

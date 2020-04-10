@@ -1,6 +1,5 @@
 #include "import/value.h"
 #include <import/conversion.h>
-#include <iostream>
 #include <nodesetLoader/nodesetLoader.h>
 #include <open62541/server.h>
 #include <string>

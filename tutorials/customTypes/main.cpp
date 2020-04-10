@@ -2,6 +2,7 @@
 #include "AppTypes.h"
 #include <opc/nodes/ObjectNode.h>
 #include <opc/nodes/VariableNode.h>
+#include <iostream>
 
 using opc::NodeId;
 using opc::QualifiedName;

@@ -1,13 +1,11 @@
 #pragma once
-#include <opc/Server.h>
 #include <opc/types/LocalizedText.h>
 #include <opc/types/NodeId.h>
 #include <opc/types/QualifiedName.h>
-#include <vector>
 
 namespace opc
 {
-
+class Server;
 class Node
 {
   public:

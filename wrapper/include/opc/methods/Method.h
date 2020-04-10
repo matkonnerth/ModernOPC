@@ -1,7 +1,5 @@
 #pragma once
 #include <functional>
-#include <iostream>
-#include <open62541/server.h>
 #include <open62541/types.h>
 #include <type_traits>
 #include <typeinfo>

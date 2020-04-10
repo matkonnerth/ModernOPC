@@ -5,7 +5,6 @@
 #include <opc/DataSource.h>
 #include <opc/Server.h>
 #include <opc/Variant.h>
-#include <opc/events/BaseEventType.h>
 #include <opc/nodes/MethodNode.h>
 #include <opc/nodes/ObjectNode.h>
 #include <opc/nodes/VariableNode.h>
