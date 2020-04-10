@@ -113,19 +113,6 @@ uint16_t Server::getNamespaceIndex(const std::string &uri)
     return 0;
 }
 
-bool Server::call(void *objectContext, const NodeId &id,
-                  const std::vector<Variant> &inputArgs,
-                  std::vector<Variant> &outputArgs)
-{
-
-    auto it = methods.find(id);
-    if (it != methods.end())
-    {
-        return it->second->invoke(objectContext, inputArgs, outputArgs);
-    }
-    return false;
-}
-
 UA_StatusCode Server::internalMethodCallback(
     UA_Server *server, const UA_NodeId *sessionId, void *sessionContext,
     const UA_NodeId *methodId, void *methodContext, const UA_NodeId *objectId,

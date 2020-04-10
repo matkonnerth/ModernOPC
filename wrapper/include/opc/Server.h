@@ -38,14 +38,7 @@ class Server
 
     void run();
     bool loadNodeset(const std::string &path);
-
-    
-
-    bool call(void *objectContext, const NodeId &id,
-              const std::vector<Variant> &inputArgs,
-              std::vector<Variant> &outputArgs);
-
-    
+  
     uint16_t getNamespaceIndex(const std::string &uri);
     UA_Server *getUAServer();
     const UA_Server *getUAServer() const;
