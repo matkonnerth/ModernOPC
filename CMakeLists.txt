@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(open62541Wrapper)
+project(ModernOPC)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)
@@ -59,3 +59,5 @@ add_executable(demo test.cpp)
 target_include_directories(demo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
 target_link_libraries(demo PRIVATE open62541)
 target_compile_features(demo PRIVATE cxx_std_17)
+
+add_subdirectory(docs)

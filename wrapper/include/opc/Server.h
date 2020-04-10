@@ -17,6 +17,9 @@ class ICallable;
 class DataSource;
 class Variant;
 
+/**
+  OPC UA Server
+*/
 class Server
 {
 
