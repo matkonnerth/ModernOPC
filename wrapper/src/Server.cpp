@@ -202,29 +202,6 @@ UA_StatusCode Server::internalWrite(UA_Server *server,
     return UA_STATUSCODE_GOOD;
 }
 
-bool Server::readValue(const NodeId &id, Variant &var) const
-{
-    UA_Variant *v = UA_Variant_new();
-    if (UA_STATUSCODE_GOOD == UA_Server_readValue(server, fromNodeId(id), v))
-    {
-        var.set(v);
-        return true;
-    }
-    UA_Variant_delete(v);
-    return false;
-}
-
-bool Server::writeValue(const NodeId &id, const Variant &var)
-{
-    if (UA_STATUSCODE_GOOD ==
-        UA_Server_writeValue(server, fromNodeId(id), *var.getUAVariant()))
-        ;
-    {
-        return true;
-    }
-    return false;
-}
-
 UA_Server *Server::getUAServer() { return server; }
 
 UA_StatusCode Server::getNodeIdForPath(const UA_NodeId &startId,
@@ -418,6 +395,33 @@ Server::createVariable(const NodeId &parentId, const NodeId &requestedId,
     }
     auto ptr = std::make_shared<VariableNode>(this, requestedId);
     variables.emplace(requestedId, ptr);
+    return ptr;
+}
+
+std::shared_ptr<VariableNode> Server::getVariable(const NodeId &id)
+{
+    auto it = variables.find(id);
+    if (it != variables.end())
+    {
+        return it->second;
+    }
+    UA_NodeClass nodeClass;
+    auto status = UA_Server_readNodeClass(server, fromNodeId(id), &nodeClass);
+    if (status != UA_STATUSCODE_GOOD)
+    {
+        UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+                       "getObject failed. StatusCode %s",
+                       UA_StatusCode_name(status));
+        return nullptr;
+    }
+    if (nodeClass != UA_NODECLASS_VARIABLE)
+    {
+        UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+                       "Nodeclass mismatch.");
+        return nullptr;
+    }
+    auto ptr = std::make_shared<VariableNode>(this, id);
+    variables.emplace(id, ptr);
     return ptr;
 }
 

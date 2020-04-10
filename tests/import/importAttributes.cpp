@@ -3,8 +3,10 @@
 #include <iostream>
 #include <open62541/server.h>
 #include <opc/Variant.h>
+#include <opc/nodes/VariableNode.h>
 
 std::string path = "";
+using opc::NodeId;
 
 TEST(import, nodeclass)
 {
@@ -12,7 +14,7 @@ TEST(import, nodeclass)
     ASSERT_TRUE(server.loadNodeset(path + "/" + "basicNodeClassTest.xml"));
 
     opc::Variant var;
-    ASSERT_TRUE(server.readValue(opc::NodeId(2, 6005), var));
+    ASSERT_TRUE(server.getVariable(opc::NodeId(2, 6005))->read(var));
 
     UA_Byte accessLevel=0;
     UA_Server_readAccessLevel(server.getUAServer(), UA_NODEID_NUMERIC(2,6005), &accessLevel);

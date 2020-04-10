@@ -5,3 +5,7 @@ target_compile_features(variant_bench PRIVATE cxx_std_17)
 add_executable(method_bench method.cpp)
 target_link_libraries(method_bench PRIVATE ${LIB_ASAN} ${LIB_GCOV} wrapper CONAN_PKG::benchmark open62541)
 target_compile_features(method_bench PRIVATE cxx_std_17)
+
+add_executable(readWrite_bench readWrite.cpp)
+target_link_libraries(readWrite_bench PRIVATE ${LIB_ASAN} ${LIB_GCOV} wrapper CONAN_PKG::benchmark open62541)
+target_compile_features(readWrite_bench PRIVATE cxx_std_17)

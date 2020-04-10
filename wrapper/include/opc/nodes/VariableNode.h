@@ -4,16 +4,14 @@
 
 namespace opc
 {
-
+class Variant;
 class VariableNode : public Node
 {
   public:
     using Node::Node;
-    void connectCallback(std::unique_ptr<NodeMetaInfo> info)
-    {
-
-        server->connectVariableDataSource(id, std::move(info));
-    }
+    bool write(const Variant &var);
+    bool read(Variant &var) const;
+    void connectCallback(std::unique_ptr<NodeMetaInfo> info);
 
   private:
 };

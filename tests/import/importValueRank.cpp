@@ -2,8 +2,10 @@
 #include <opc/Server.h>
 #include <iostream>
 #include <opc/Variant.h>
+#include <opc/nodes/VariableNode.h>
 
 std::string path = "";
+using opc::NodeId;
 
 TEST(import, valueRank)
 {
@@ -12,11 +14,11 @@ TEST(import, valueRank)
 
 
     opc::Variant var;
-    ASSERT_TRUE(server.readValue(opc::NodeId(2, 6002), var));
+    ASSERT_TRUE(server.getVariable(NodeId(2, 6002))->read(var));
     ASSERT_TRUE(var.get<int>()==1);
-    ASSERT_TRUE(server.readValue(opc::NodeId(2, 6003), var));
+    ASSERT_TRUE(server.getVariable(NodeId(2, 6003))->read(var));
     ASSERT_TRUE(var.get<std::vector<int>>()[1] == 13);
-    ASSERT_TRUE(server.readValue(opc::NodeId(2, 6004), var));
+    ASSERT_TRUE(server.getVariable(opc::NodeId(2, 6004))->read(var));
     ASSERT_TRUE(var.get<std::vector<int>>()[2] == 300);
 }
 

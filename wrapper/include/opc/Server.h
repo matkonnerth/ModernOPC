@@ -40,20 +40,13 @@ class Server
     void run();
     bool loadNodeset(const std::string &path);
 
-    std::shared_ptr<MethodNode>
-    createMethod(const NodeId &objId, const NodeId &methodId,
-                 const QualifiedName &browseName,
-                 const std::vector<UA_Argument> &in,
-                 const std::vector<UA_Argument> &outArgs);
+    
 
     bool call(void *objectContext, const NodeId &id,
               const std::vector<Variant> &inputArgs,
               std::vector<Variant> &outputArgs);
 
-    std::shared_ptr<VariableNode>
-    createVariable(const NodeId &parentId, const NodeId &requestedId,
-                   const NodeId &typeId, const QualifiedName &browseName,
-                   const UA_VariableAttributes &attr);
+    
 
     void registerDataSource(
         const std::string &key,
@@ -61,8 +54,7 @@ class Server
         std::function<void(const NodeId &id, Variant &var)> write);
 
     auto &getDataSources() { return datasources; }
-    bool writeValue(const NodeId &id, const Variant &var);
-    bool readValue(const NodeId &id, Variant &var) const;
+    
     uint16_t getNamespaceIndex(const std::string &uri);
     UA_Server *getUAServer();
     const UA_Server *getUAServer() const;
@@ -75,10 +67,24 @@ class Server
                                              void *context);
     std::shared_ptr<ObjectNode> getObjectsFolder();
     std::shared_ptr<MethodNode> getMethod(const NodeId &id);
+    /*
     std::shared_ptr<MethodNode> createMethod(const NodeId &objectId,
                                              const NodeId &methodId,
                                              QualifiedName browseName);
-    
+                                             */
+
+    std::shared_ptr<VariableNode>
+    createVariable(const NodeId &parentId, const NodeId &requestedId,
+                   const NodeId &typeId, const QualifiedName &browseName,
+                   const UA_VariableAttributes &attr);
+
+    std::shared_ptr<MethodNode>
+    createMethod(const NodeId &objId, const NodeId &methodId,
+                 const QualifiedName &browseName,
+                 const std::vector<UA_Argument> &in,
+                 const std::vector<UA_Argument> &outArgs);
+
+    std::shared_ptr<VariableNode> getVariable(const NodeId &);
 
   private:
     void connectVariableDataSource(const NodeId &id,

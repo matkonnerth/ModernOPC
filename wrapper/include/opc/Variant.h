@@ -90,9 +90,16 @@ class Variant
 
     void set(UA_Variant *var);
 
-    void copyToUaVariant(UA_Variant *var);
+    void copy(UA_Variant *var) const;
 
-    const UA_Variant *getUAVariant() const;
+    inline const UA_Variant *getUAVariant() const
+    {
+        return variant;
+    }
+    inline UA_Variant *getUAVariant()
+    {
+        return variant;
+    }
 
     bool isScalar();
     bool isEmpty() const;

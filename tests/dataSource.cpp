@@ -26,9 +26,9 @@ TEST(DataSource, simple)
     var->connectCallback(std::make_unique<opc::NodeMetaInfo>("simpleVal"));
 
     opc::Variant v;
-    ASSERT_TRUE(s.readValue(opc::NodeId(1, "demoInt"), v));
+    ASSERT_TRUE(s.getVariable(opc::NodeId(1, "demoInt"))->read(v));
     ASSERT_TRUE(v.is_a<int32_t>());
     ASSERT_EQ(v.get<int32_t>(), 42);
 
-    ASSERT_TRUE(s.writeValue(opc::NodeId(1, "demoInt"), v));
+    ASSERT_TRUE(s.getVariable(opc::NodeId(1, "demoInt"))->write(v));
 }
