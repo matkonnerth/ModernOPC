@@ -66,9 +66,9 @@ add_subdirectory(tests)
 add_subdirectory(tutorials)
 add_subdirectory(benchmarks)
 
-#add_executable(demo test.cpp) 
+add_executable(demo test.cpp) 
 #target_include_directories(demo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
-#target_link_libraries(demo PRIVATE open62541)
+target_link_libraries(demo PRIVATE CONAN_PKG::open62541)
 #target_compile_features(demo PRIVATE cxx_std_17)
 
 option(BUILD_DOC "Build documentation" OFF)

@@ -13,11 +13,11 @@ using opc::DataSource;
 using opc::NodeId;
 using opc::QualifiedName;
 
-UA_StatusCode getValue(const opc::NodeId &id, opc::Variant &var) { var(27.23); return UA_STATUSCODE_GOOD; }
+UA_StatusCode getValue(const opc::NodeId &id, opc::Variant &var) { var((uint64_t)27); return UA_STATUSCODE_GOOD; }
 
 UA_StatusCode setValue(const opc::NodeId &id, const opc::Variant &var)
 {
-    auto test = var.get<double>();
+    auto test = var.get<int>();
     return UA_STATUSCODE_GOOD;
 }
 
@@ -54,9 +54,9 @@ int main()
     var->connectCallback(std::make_unique<DataSource>(
         "vectorDataSource", getVectorValue, setVectorValue));
 
-    var = root->addVariable(opc::NodeId(1, "demoInt"),
+    var = root->addVariable(opc::NodeId(1, 42),
                             NodeId(0, UA_NS0ID_BASEDATAVARIABLETYPE),
-                            QualifiedName(1, "demoInt"), 23.12);
+                            QualifiedName(1, "myVar"), (uint64_t)23);
     var->connectCallback(
         std::make_unique<DataSource>("simple", getValue, setValue));
 
