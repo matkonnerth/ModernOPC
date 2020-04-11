@@ -33,6 +33,7 @@ endmacro()
 
 generate_rst(${PROJECT_SOURCE_DIR}/tutorials/nodesets/nodeset.cpp tutorial_nodeset.rst)
 generate_rst(${PROJECT_SOURCE_DIR}/tutorials/methods/methods.cpp tutorial_methods.rst)
+generate_rst(${PROJECT_SOURCE_DIR}/tutorials/variables/main.cpp tutorial_variables.rst)
 
 find_package(Sphinx REQUIRED)
 
