@@ -32,13 +32,7 @@ which uses open62541 (https://github.com/open62541/open62541) for the heavy lift
 
 # Quick start
 
-# Build
-* git clone https://github.com/matkonnerth/ModernOPC.git
-* git submodule init && git submodule update
-* mkdir build && cd build
-* conan install ..
-* make -j
-* make test
+# [Build](https://github.com/matkonnerth/ModernOPC/blob/master/docs/building.rst)
 
 # tutorials
 * Nodeset import
