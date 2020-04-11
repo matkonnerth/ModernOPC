@@ -20,8 +20,6 @@ struct removeConstRef
     using type = std::remove_const_t<std::remove_reference_t<T>>;
 };
 
-template<typename T>
-using typename removeConstRef_t<T> = removeConstRef<T>;
-
-
+template <class T>
+using removeConstRef_t = typename removeConstRef<T>::type;
 } // namespace opc
