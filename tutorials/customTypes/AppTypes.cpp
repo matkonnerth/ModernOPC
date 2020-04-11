@@ -16,7 +16,7 @@ namespace app
 namespace types
 {
 
-void convertToUAVariantImpl(const Range2 &m, UA_Variant *var)
+void toUAVariantImpl(const Range2 &m, UA_Variant *var)
 {
     UA_Range range;
     range.high = m.max;

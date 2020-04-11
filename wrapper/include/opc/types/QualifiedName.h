@@ -21,7 +21,7 @@ class QualifiedName
     std::string n;
 
     friend std::ostream &operator<<(std::ostream &os, const QualifiedName &qn);
-    friend void convertToUAVariantImpl(const QualifiedName &qn,
+    friend void toUAVariantImpl(const QualifiedName &qn,
                                        UA_Variant *var);
     friend const UA_QualifiedName fromQualifiedName(const QualifiedName &qn);
 };

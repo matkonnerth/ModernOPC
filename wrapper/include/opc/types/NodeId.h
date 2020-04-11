@@ -30,7 +30,7 @@ class NodeId
     friend std::size_t getHash(const NodeId &id);
 
     friend std::ostream &operator<<(std::ostream &os, const NodeId &id);
-    friend void convertToUAVariantImpl(const NodeId &qn, UA_Variant *var);
+    friend void toUAVariantImpl(const NodeId &qn, UA_Variant *var);
     friend UA_NodeId fromNodeId(NodeId &nodeId);
     friend const UA_NodeId fromNodeId(const NodeId &nodeId);
 

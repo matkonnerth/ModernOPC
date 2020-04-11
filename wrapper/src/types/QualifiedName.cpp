@@ -24,7 +24,7 @@ QualifiedName fromUAQualifiedName(const UA_QualifiedName *qn)
     return QualifiedName(qn->namespaceIndex, fromUAString(&qn->name));
 }
 
-void convertToUAVariantImpl(const QualifiedName &qn, UA_Variant *var)
+void toUAVariantImpl(const QualifiedName &qn, UA_Variant *var)
 {
     UA_QualifiedName n = fromQualifiedName(qn);
     UA_Variant_setScalarCopy(var, &n, opc::getDataType<QualifiedName>());

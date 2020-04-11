@@ -24,7 +24,7 @@ std::vector<LocalizedText> Variant::get<std::vector<LocalizedText>>() const
     return vec;
 }
 
-void convertToUAVariantImpl(const LocalizedText &m, UA_Variant *var)
+void toUAVariantImpl(const LocalizedText &m, UA_Variant *var)
 {
     UA_LocalizedText lt = fromLocalizedText(m);
     UA_Variant_setScalarCopy(var, &lt, getDataType<LocalizedText>());

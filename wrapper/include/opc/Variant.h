@@ -13,13 +13,10 @@ namespace opc
 {
 
 template <typename T>
-T toStdType(UA_Variant *variant);
+void toUAVariantImpl(T val, UA_Variant *var);
 
 template <typename T>
-void convertToUAVariantImpl(T val, UA_Variant *var);
-
-template <typename T>
-void convertToUAVariantImpl(std::vector<T> val, UA_Variant *var)
+void toUAVariantImpl(std::vector<T> val, UA_Variant *var)
 {
     static_assert(std::is_arithmetic_v<removeConstRef_t<T>>,
                   "Type not integral");
@@ -29,21 +26,21 @@ void convertToUAVariantImpl(std::vector<T> val, UA_Variant *var)
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
 
-void convertToUAVariantImpl(std::vector<std::string> v, UA_Variant *var);
-void convertToUAVariantImpl(std::string &v, UA_Variant *var);
-void convertToUAVariantImpl(std::string &&v, UA_Variant *var);
-void convertToUAVariantImpl(const std::string &v, UA_Variant *var);
+void toUAVariantImpl(std::vector<std::string> v, UA_Variant *var);
+void toUAVariantImpl(std::string &v, UA_Variant *var);
+void toUAVariantImpl(std::string &&v, UA_Variant *var);
+void toUAVariantImpl(const std::string &v, UA_Variant *var);
 
 template <typename T>
 typename std::enable_if<!std::is_arithmetic_v<removeConstRef_t<T>>, void>::type
-convertToUAVariant(T &&t, UA_Variant *var)
+toUAVariant(T &&t, UA_Variant *var)
 {
-    convertToUAVariantImpl(std::forward<T>(t), var);
+    toUAVariantImpl(std::forward<T>(t), var);
 }
 
 template <typename T>
 typename std::enable_if<std::is_arithmetic_v<removeConstRef_t<T>>, void>::type
-convertToUAVariant(T &&val, UA_Variant *var)
+toUAVariant(T &&val, UA_Variant *var)
 {
     static_assert(std::is_arithmetic_v<removeConstRef_t<T>>,
                   "Type not integral");
@@ -62,13 +59,13 @@ class Variant
     {
         variant = UA_Variant_new();
         owned = true;
-        convertToUAVariant(std::forward<T>(val), variant);
+        toUAVariant(std::forward<T>(val), variant);
     }
     template<typename T>
     Variant(T &&val, bool owned)
     {
         variant = UA_Variant_new();
-        convertToUAVariant(std::forward<T>(val), variant);
+        tUAVariant(std::forward<T>(val), variant);
     }
     ~Variant();
     Variant(const Variant &other) = delete;
@@ -79,7 +76,7 @@ class Variant
     template <typename T>
     void operator()(T &&val)
     {
-        convertToUAVariant(std::forward<T>(val), variant);
+        toUAVariant(std::forward<T>(val), variant);
     }
 
     template <typename T>

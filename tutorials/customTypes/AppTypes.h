@@ -11,7 +11,7 @@ struct Range2
     double min;
     double max;
 
-    friend void convertToUAVariantImpl(const Range2 &m,
+    friend void toUAVariantImpl(const Range2 &m,
                                        UA_Variant *var);
 };
 

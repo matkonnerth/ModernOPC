@@ -75,7 +75,7 @@ const UA_NodeId fromNodeId(const NodeId &nodeId)
     return id;
 }
 
-void convertToUAVariantImpl(const NodeId &id, UA_Variant *var)
+void toUAVariantImpl(const NodeId &id, UA_Variant *var)
 {
     const UA_NodeId uaId = fromNodeId(id);
     UA_Variant_setScalarCopy(var, &uaId, opc::getDataType<NodeId>());

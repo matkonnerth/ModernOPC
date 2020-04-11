@@ -22,7 +22,7 @@ class LocalizedText
     std::string txt{};
 
     friend std::ostream &operator<<(std::ostream &os, const LocalizedText &qn);
-    friend void convertToUAVariantImpl(const LocalizedText &m, UA_Variant *var);
+    friend void toUAVariantImpl(const LocalizedText &m, UA_Variant *var);
     friend UA_LocalizedText fromLocalizedText(const LocalizedText &lt);
 };
 
