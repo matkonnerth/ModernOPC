@@ -4,7 +4,6 @@ macro(opc_add_test arg)
     target_compile_features(${arg} PRIVATE cxx_std_17)
     target_link_libraries(${arg} PRIVATE ${LIB_ASAN} ${LIB_GCOV} CONAN_PKG::gtest)
     target_link_libraries(${arg} PRIVATE wrapper)
-    target_link_libraries(${arg} PRIVATE open62541)
     add_test(NAME ${arg}_Test WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin COMMAND ${arg} ${CMAKE_CURRENT_LIST_DIR})
 endmacro()
 

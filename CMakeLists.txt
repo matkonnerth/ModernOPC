@@ -28,7 +28,7 @@ SET(UA_ENABLE_SUBSCRIPTIONS_EVENTS ON CACHE BOOL "Enable event support")
 SET(BUILD_SHARED_LIBS ON CACHE BOOL "build open shared")
 SET(UA_NAMESPACE_ZERO REDUCED CACHE STRING "reduced namespace zero")
 
-add_subdirectory(open62541)
+#add_subdirectory(open62541)
 add_subdirectory(nodesetLoader)
 
 add_library(wrapper SHARED
@@ -47,7 +47,8 @@ add_library(wrapper SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/nodes/Node.cpp)
 target_include_directories(wrapper PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
 target_include_directories(wrapper PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src)
-target_link_libraries(wrapper PRIVATE ${LIB_GCOV} open62541 xmlImport)
+target_link_libraries(wrapper PRIVATE ${LIB_GCOV} CONAN_PKG::open62541 xmlImport)
+target_link_libraries(wrapper PUBLIC CONAN_PKG::open62541)
 target_compile_features(wrapper PRIVATE cxx_std_17)
 target_compile_options(wrapper PRIVATE ${COMPILER_OPTIONS})
 
@@ -55,10 +56,10 @@ add_subdirectory(tests)
 add_subdirectory(tutorials)
 add_subdirectory(benchmarks)
 
-add_executable(demo test.cpp) 
-target_include_directories(demo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
-target_link_libraries(demo PRIVATE open62541)
-target_compile_features(demo PRIVATE cxx_std_17)
+#add_executable(demo test.cpp) 
+#target_include_directories(demo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
+#target_link_libraries(demo PRIVATE open62541)
+#target_compile_features(demo PRIVATE cxx_std_17)
 
 
 option(BUILD_DOC "Build documentation" OFF)
