@@ -1,3 +1,12 @@
+/**
+ * Adding variables to objects
+ * ---------------------------
+ * This tutorial describes how to add variables and connect to Datasources. Datasources
+ * are the glue between a read/write request on a variable, no matter if triggered from
+ * a read request from a remote client or from a MonitoredItem. Especiall for sampling 
+ * with a low intervall (e.g. 50ms, means a high frequency) this code must be really 
+ * performant.*/
+
 #include <functional>
 #include <iostream>
 #include <opc/DataSource.h>
