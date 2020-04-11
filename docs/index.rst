@@ -10,6 +10,9 @@ Welcome to ModernOPC's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   building
+   tutorials
+
 
 
 
@@ -20,6 +23,3 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-.. doxygenclass:: opc::Server
-   :project: ModernOPC
-   :members:

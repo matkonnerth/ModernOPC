@@ -37,6 +37,11 @@ class Server
     Server &operator=(Server &&) = delete;
 
     void run();
+
+    /**
+     * loads a nodeset xml into server address space.
+     * \param path path to nodeset file
+     * \return true on success, otherwise false. */
     bool loadNodeset(const std::string &path);
   
     uint16_t getNamespaceIndex(const std::string &uri);

@@ -35,3 +35,5 @@ add_custom_target(Sphinx ALL
                   ${SPHINX_SOURCE} ${SPHINX_BUILD}
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                   COMMENT "Generating documentation with Sphinx")
+                
+add_dependencies(Sphinx doc_doxygen)

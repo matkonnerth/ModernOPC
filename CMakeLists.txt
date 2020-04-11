@@ -71,7 +71,6 @@ add_subdirectory(benchmarks)
 #target_link_libraries(demo PRIVATE open62541)
 #target_compile_features(demo PRIVATE cxx_std_17)
 
-
 option(BUILD_DOC "Build documentation" OFF)
 
 if(${BUILD_DOC})
