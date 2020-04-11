@@ -13,10 +13,10 @@ namespace opc
 {
 
 template <typename T>
-void toUAVariantImpl(T val, UA_Variant *var);
+void toUAVariantImpl(const T& val, UA_Variant *var);
 
 template <typename T>
-void toUAVariantImpl(std::vector<T> val, UA_Variant *var)
+void toUAVariantImpl(const std::vector<T>& val, UA_Variant *var)
 {
     static_assert(std::is_arithmetic_v<removeConstRef_t<T>>,
                   "Type not integral");
@@ -26,21 +26,19 @@ void toUAVariantImpl(std::vector<T> val, UA_Variant *var)
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
 
-void toUAVariantImpl(std::vector<std::string> v, UA_Variant *var);
-void toUAVariantImpl(std::string &v, UA_Variant *var);
-void toUAVariantImpl(std::string &&v, UA_Variant *var);
 void toUAVariantImpl(const std::string &v, UA_Variant *var);
+void toUAVariantImpl(const std::vector<std::string> &v, UA_Variant *var);
 
 template <typename T>
 typename std::enable_if<!std::is_arithmetic_v<removeConstRef_t<T>>, void>::type
-toUAVariant(T &&t, UA_Variant *var)
+toUAVariant(const T& val, UA_Variant *var)
 {
-    toUAVariantImpl(std::forward<T>(t), var);
+    toUAVariantImpl(val, var);
 }
 
 template <typename T>
 typename std::enable_if<std::is_arithmetic_v<removeConstRef_t<T>>, void>::type
-toUAVariant(T &&val, UA_Variant *var)
+toUAVariant(const T &val, UA_Variant *var)
 {
     static_assert(std::is_arithmetic_v<removeConstRef_t<T>>,
                   "Type not integral");
@@ -74,9 +72,9 @@ class Variant
     Variant &operator=(Variant &&other) noexcept;
 
     template <typename T>
-    void operator()(T &&val)
+    void operator()(const T& val)
     {
-        toUAVariant(std::forward<T>(val), variant);
+        toUAVariant(val, variant);
     }
 
     template <typename T>

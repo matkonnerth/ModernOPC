@@ -14,6 +14,8 @@ inline std::string fromUAString(const UA_String *s)
     }
     return std::string{};
 }
+
+
 } // namespace opc
 
 
