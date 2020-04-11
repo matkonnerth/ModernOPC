@@ -9,8 +9,6 @@
 namespace opc
 {
 
-
-
 const NodeId fromUaNodeId(const UA_NodeId &id)
 {
 

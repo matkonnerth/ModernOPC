@@ -22,35 +22,12 @@ void toUAVariantImpl(const std::vector<std::string>& v, UA_Variant *var)
     UA_free(strings);
 }
 
-/*
-void toUAVariantImpl(std::string &v, UA_Variant *var)
-{
-    UA_Variant_init(var);
-    UA_String s;
-    s.length = v.length();
-    s.data = (UA_Byte *)(v.data());
-    UA_Variant_setScalarCopy(var, &s, opc::getDataType<std::string>());
-    var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
-}
-
-
-void toUAVariantImpl(std::string &&v, UA_Variant *var)
-{
-    UA_Variant_init(var);
-    UA_String s;
-    s.length = v.length();
-    s.data = (UA_Byte *)(v.data());
-    UA_Variant_setScalarCopy(var, &s, opc::getDataType<std::string>());
-    var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
-}
-*/
-
 void toUAVariantImpl(const std::string &v, UA_Variant *var)
 {
     UA_Variant_init(var);
     UA_String s;
     s.length = v.length();
-    s.data = (UA_Byte *)(v.data());
+    s.data = reinterpret_cast<UA_Byte *>(const_cast<char *>(v.data()));
     UA_Variant_setScalarCopy(var, &s, opc::getDataType<std::string>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
