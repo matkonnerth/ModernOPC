@@ -28,17 +28,11 @@ which uses open62541 (https://github.com/open62541/open62541) for the heavy lift
 [![codecov](https://codecov.io/gh/matkonnerth/ModernOPC/branch/master/graph/badge.svg)](https://codecov.io/gh/matkonnerth/ModernOPC)
 
 # license
-??
+MPL 2.0, take a look on [license](https://github.com/matkonnerth/ModernOPC/blob/master/LICENSE.md) for further information.
 
 # Quick start
 
-# Build
-* git clone https://github.com/matkonnerth/ModernOPC.git
-* git submodule init && git submodule update
-* mkdir build && cd build
-* conan install ..
-* make -j
-* make test
+# [Build](https://github.com/matkonnerth/ModernOPC/blob/master/docs/building.rst)
 
 # tutorials
 * Nodeset import
