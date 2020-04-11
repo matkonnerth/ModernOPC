@@ -1,8 +1,16 @@
 cmake_minimum_required(VERSION 3.0)
 project(ModernOPC)
 
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup(TARGETS)
+if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
+   message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
+   file(DOWNLOAD "https://github.com/conan-io/cmake-conan/raw/v0.15/conan.cmake"
+                 "${CMAKE_BINARY_DIR}/conan.cmake")
+endif()
+
+include(${CMAKE_BINARY_DIR}/conan.cmake)
+conan_cmake_run(CONANFILE conanfile.txt
+                BASIC_SETUP CMAKE_TARGETS
+                BUILD missing)
 
 include(CTest)
 enable_testing()
@@ -20,7 +28,6 @@ endif()
 set(${COMPILER_OPTIONS} -Wall -Wextra -pedantic-errors -Wconversion -Wsign-conversion -Wpedantic -Weffc++ -Wno-unused-parameter)
 if(ENABLE_ASAN)
     set(COMPILER_OPTIONS -fsanitize=address -fsanitize-address-use-after-scope)
-    set(LIB_ASAN asan)
 endif()
 
 #open62541 configuration
@@ -51,6 +58,9 @@ target_link_libraries(wrapper PRIVATE ${LIB_GCOV} CONAN_PKG::open62541 xmlImport
 target_link_libraries(wrapper PUBLIC CONAN_PKG::open62541)
 target_compile_features(wrapper PRIVATE cxx_std_17)
 target_compile_options(wrapper PRIVATE ${COMPILER_OPTIONS})
+if(${ENABLE_ASAN})
+    target_link_libraries(wrapper INTERFACE "-fsanitize=address")
+endif()
 
 add_subdirectory(tests)
 add_subdirectory(tutorials)

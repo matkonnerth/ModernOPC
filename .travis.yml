@@ -47,6 +47,7 @@ install:
 - pip install conan
 - conan user
 - conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
+- conan remote add openRepo https://api.bintray.com/conan/matkonnerth/cpprepo
 
 script:
   sh ./travis_script.sh
