@@ -28,7 +28,7 @@ which uses open62541 (https://github.com/open62541/open62541) for the heavy lift
 [![codecov](https://codecov.io/gh/matkonnerth/ModernOPC/branch/master/graph/badge.svg)](https://codecov.io/gh/matkonnerth/ModernOPC)
 
 # license
-??
+MPL 2.0, take a look on [license](https://github.com/matkonnerth/ModernOPC/blob/master/LICENSE.md) for further information.
 
 # Quick start
 
