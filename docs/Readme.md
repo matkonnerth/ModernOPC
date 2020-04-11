@@ -32,12 +32,5 @@ MPL 2.0, take a look on [license](https://github.com/matkonnerth/ModernOPC/blob/
 
 # Quick start
 
-# [Build](https://github.com/matkonnerth/ModernOPC/blob/master/docs/building.rst)
-
-# tutorials
-* Nodeset import
-* Methods
-* Events
-* Adding custom types
-* Adding variables and connecting to Datasources
+# [Documentation](https://matkonnerth.github.io/ModernOPC-Docu/)
 
