@@ -22,18 +22,19 @@ endif (DOXYGEN_FOUND)
 # Add the cmake folder so the FindSphinx module is found
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
+list(APPEND GENERATED_RST "")
 #generate rst
 macro(generate_rst in out)
     add_custom_command(OUTPUT ${out}
-                       DEPENDS c2rst.py ${in}
+                       DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/c2rst.py ${in}
                        PRE_BUILD
-                       COMMAND ${PYTHON_EXECUTABLE} c2rst.py ${in} ${out})
+                       COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/c2rst.py ${in} ${out})
     list(APPEND GENERATED_RST "${out}")
 endmacro()
 
-generate_rst(${PROJECT_SOURCE_DIR}/tutorials/nodesets/nodeset.cpp tutorial_nodeset.rst)
-generate_rst(${PROJECT_SOURCE_DIR}/tutorials/methods/methods.cpp tutorial_methods.rst)
-generate_rst(${PROJECT_SOURCE_DIR}/tutorials/variables/main.cpp tutorial_variables.rst)
+generate_rst(${PROJECT_SOURCE_DIR}/tutorials/nodesets/nodeset.cpp ${CMAKE_CURRENT_SOURCE_DIR}/tutorials/nodeset.rst)
+generate_rst(${PROJECT_SOURCE_DIR}/tutorials/methods/methods.cpp ${CMAKE_CURRENT_SOURCE_DIR}/tutorials/methods.rst)
+generate_rst(${PROJECT_SOURCE_DIR}/tutorials/variables/main.cpp ${CMAKE_CURRENT_SOURCE_DIR}/tutorials/variables.rst)
 
 find_package(Sphinx REQUIRED)
 
@@ -46,8 +47,9 @@ add_custom_target(Sphinx ALL
                   /usr/local/bin/sphinx-build -v -b html
                   -Dbreathe_projects.ModernOPC=${CMAKE_CURRENT_BINARY_DIR}/doc_doxygen/xml/
                   ${SPHINX_SOURCE} ${SPHINX_BUILD}
+                  DEPENDS ${GENERATED_RST}
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                   COMMENT "Generating documentation with Sphinx")
                 
 add_dependencies(Sphinx doc_doxygen)
-add_dependencies(Sphinx GENERATED_RST)
+#add_dependencies(Sphinx ${GENERATED_RST})

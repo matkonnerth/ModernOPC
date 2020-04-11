@@ -5,5 +5,6 @@ Tutorials
 
 .. toctree::
 
-   tutorial_nodeset.rst
-
+   tutorials/nodeset.rst
+   tutorials/methods.rst
+   tutorials/variables.rst

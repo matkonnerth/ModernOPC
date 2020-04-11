@@ -1,6 +1,6 @@
 /**
  * Importing a nodeset.xml
- * -------------------------------------
+ * -----------------------
  * By providing a path a valid nodeset xml can be loaded into the addresspace of the server. */
 
 #include <opc/Server.h>
@@ -25,6 +25,6 @@ int main()
 
 /**
  * Used methods
+ *
  * .. doxygenfunction:: opc::Server::loadNodeset
- * .. doxygenfunction:: opc::Server::getMethod
-*/
+ * .. doxygenfunction:: opc::Server::getMethod */
