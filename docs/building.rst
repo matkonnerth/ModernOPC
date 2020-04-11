@@ -9,6 +9,14 @@ Installation guidelines for conan: https://docs.conan.io/en/latest/installation.
 Building the Library
 --------------------
 
+Setup conan for using prebuilt binary packages
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+add remote for open62541 prebuilt binaries
+
+.. code-block:: bash
+
+    conan remote add openRepo https://api.bintray.com/conan/matkonnerth/cpprepo 
+
 Building with CMake on Ubuntu or Debian
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -18,12 +26,18 @@ Building with CMake on Ubuntu or Debian
     cd modernOPC
     git submodule init
     git submodule update
- 
-   cd modernOPC
-   mkdir build
-   cd build
-   cmake ..
-   make
+
+    cd modernOPC
+    mkdir build
+    cd build
+    conan install ..
+    cmake ..
+    make
+    make test
+    
+
+    
+
 
 
 
