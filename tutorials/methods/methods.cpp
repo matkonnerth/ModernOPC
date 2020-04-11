@@ -1,3 +1,9 @@
+/**
+ * Using OPC UA Methods
+ * -----------------------
+ * This example shows how to add method nodes and connect it to the implementation.
+ * Free Functions, member functions and lambdas are supported. */
+
 #include <opc/Server.h>
 #include <functional>
 #include <opc/nodes/ObjectNode.h>

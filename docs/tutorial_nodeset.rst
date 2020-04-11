@@ -2,8 +2,6 @@ Importing a nodeset.xml
 -------------------------------------
 By providing a path a valid nodeset xml can be loaded into the addresspace of the server.
 
-.. doxygenfunction:: opc::Server::loadNodeset
-
 .. code-block:: c
 
    
@@ -26,3 +24,7 @@ By providing a path a valid nodeset xml can be loaded into the addresspace of th
    
        s.run();
    }
+
+.. doxygenfunction:: opc::Server::loadNodeset
+
+.. doxygenfunction:: opc::Server::getMethod

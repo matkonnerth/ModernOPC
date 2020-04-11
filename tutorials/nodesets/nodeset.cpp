@@ -22,3 +22,9 @@ int main()
 
     s.run();
 }
+
+/**
+ * Used methods
+ * .. doxygenfunction:: opc::Server::loadNodeset
+ * .. doxygenfunction:: opc::Server::getMethod
+*/

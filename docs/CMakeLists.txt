@@ -22,6 +22,18 @@ endif (DOXYGEN_FOUND)
 # Add the cmake folder so the FindSphinx module is found
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
+#generate rst
+macro(generate_rst in out)
+    add_custom_command(OUTPUT ${out}
+                       DEPENDS c2rst.py ${in}
+                       PRE_BUILD
+                       COMMAND ${PYTHON_EXECUTABLE} c2rst.py ${in} ${out})
+    list(APPEND GENERATED_RST "${out}")
+endmacro()
+
+generate_rst(${PROJECT_SOURCE_DIR}/tutorials/nodesets/nodeset.cpp tutorial_nodeset.rst)
+generate_rst(${PROJECT_SOURCE_DIR}/tutorials/methods/methods.cpp tutorial_methods.rst)
+
 find_package(Sphinx REQUIRED)
 
 set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR})
@@ -37,3 +49,4 @@ add_custom_target(Sphinx ALL
                   COMMENT "Generating documentation with Sphinx")
                 
 add_dependencies(Sphinx doc_doxygen)
+add_dependencies(Sphinx GENERATED_RST)
