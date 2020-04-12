@@ -4,6 +4,8 @@
 #include <opc/Server.h>
 #include <opc/events/BaseEventType.h>
 #include <open62541/plugin/log_stdout.h>
+#include <optional>
+#include <cstddef>
 
 namespace opc
 {
@@ -98,6 +100,12 @@ void ObjectNode::setEvent(BaseEventType &event)
                        "Trigger event failed. StatusCode %s",
                        UA_StatusCode_name(retval));
     }
+}
+
+UA_StatusCode ObjectNode::eventNotifier(std::byte& value)
+{
+    UA_Byte eventNotifier;
+    return UA_Server_readEventNotifier(server->getUAServer(), fromNodeId(id), reinterpret_cast<UA_Byte*>(&value));
 }
 
 } // namespace opc

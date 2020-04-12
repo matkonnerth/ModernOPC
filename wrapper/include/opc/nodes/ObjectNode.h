@@ -60,12 +60,12 @@ class ObjectNode : public Node
                            std::forward<T>(initialValue));
     }
 
+    // Statuscode Missing
     void setEvent(BaseEventType &event);
+    UA_StatusCode eventNotifier(std::byte& value);
 
   private:
     UA_StatusCode setUpEvent(UA_NodeId *outId, const BaseEventType &event);
-
-    
 };
 
 } // namespace opc

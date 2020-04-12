@@ -12,8 +12,6 @@ conan_cmake_run(CONANFILE conanfile.txt
                 BASIC_SETUP CMAKE_TARGETS
                 BUILD missing)
 
-    
-
 include(CTest)
 enable_testing()
 
@@ -70,6 +68,7 @@ endif()
 
 add_executable(demo test.cpp) 
 target_link_libraries(demo PRIVATE CONAN_PKG::open62541)
+#target_link_libraries(demo INTERFACE "-fsanitize=address")
 
 option(BUILD_DOC "Build documentation" OFF)
 
