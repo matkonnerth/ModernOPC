@@ -9,6 +9,7 @@
 #include <opc/nodes/ObjectNode.h>
 #include <opc/nodes/VariableNode.h>
 #include <opc/types/NodeId.h>
+#include <opc/types/StdTypes.h>
 #include <open62541/plugin/log_stdout.h>
 #include <open62541/server.h>
 #include <open62541/server_config_default.h>
@@ -98,15 +99,15 @@ uint16_t Server::getNamespaceIndex(const std::string &uri)
     std::vector<UA_String> namespaces{static_cast<UA_String *>(v.data),
                                       static_cast<UA_String *>(v.data) +
                                           v.arrayLength};
-    for (size_t i = 0; i < namespaces.size(); i++)
+    uint16_t nsIdx = 0;
+    for (const auto &ns : namespaces)
     {
-        std::string s{reinterpret_cast<char *>(namespaces[i].data),
-                      namespaces[i].length};
-        if (uri.compare(s) == 0)
+        if (uri.compare(fromUAString(ns)) == 0)
         {
             UA_Variant_clear(&v);
-            return static_cast<uint16_t>(i);
+            return static_cast<uint16_t>(nsIdx);
         }
+        nsIdx++;
     }
     UA_Variant_clear(&v);
     return 0;
@@ -127,8 +128,7 @@ UA_StatusCode Server::internalMethodCallback(
         outputArgs.emplace_back(Variant(const_cast<UA_Variant *>(output)));
         for (auto it = input; it != input + inputSize; it++)
         {
-            inputArgs.emplace_back(
-                Variant(const_cast<UA_Variant *>(it)));
+            inputArgs.emplace_back(Variant(const_cast<UA_Variant *>(it)));
         }
         if (s->call(objectContext, inputArgs, outputArgs))
         {
@@ -165,21 +165,19 @@ UA_StatusCode Server::internalWrite(UA_Server *server,
     if (!nodeContext)
         return UA_STATUSCODE_BADNODATA;
     auto ds = static_cast<DataSource *>(nodeContext);
-    Variant var{const_cast<UA_Variant*>(&value->value),false};
+    Variant var{const_cast<UA_Variant *>(&value->value), false};
     ds->write(fromUaNodeId(*nodeId), var);
     return UA_STATUSCODE_GOOD;
 }
 
 UA_Server *Server::getUAServer() { return server; }
 
-UA_StatusCode
-Server::translatePathToNodeId(const NodeId &startId,
-                              const std::vector<QualifiedName> &qn,
-                              NodeId &outId)
+UA_StatusCode Server::translatePathToNodeId(
+    const NodeId &startId, const std::vector<QualifiedName> &qn, NodeId &outId)
 {
     std::vector<UA_RelativePathElement> pathElements;
     std::transform(qn.begin(), qn.end(), std::back_inserter(pathElements),
-                   [](const QualifiedName& qn) {
+                   [](const QualifiedName &qn) {
                        UA_RelativePathElement path;
                        UA_RelativePathElement_init(&path);
                        path.referenceTypeId = UA_NODEID_NUMERIC(
@@ -188,7 +186,7 @@ Server::translatePathToNodeId(const NodeId &startId,
                        path.includeSubtypes = true;
                        path.targetName = fromQualifiedName(qn);
                        return path;
-                   }); 
+                   });
 
     UA_BrowsePath bp;
     UA_BrowsePath_init(&bp);
@@ -290,7 +288,6 @@ std::shared_ptr<MethodNode> Server::getMethod(const NodeId &id)
     return ptr;
 }
 
-// template<typename M>
 std::shared_ptr<MethodNode>
 Server::createMethod(const NodeId &objId, const NodeId &methodId,
                      const QualifiedName &browseName,
@@ -378,8 +375,7 @@ std::shared_ptr<VariableNode> Server::getVariable(const NodeId &id)
     return ptr;
 }
 
-void Server::connectVariableDataSource(const NodeId &id,
-                                       DataSource* src)
+void Server::connectVariableDataSource(const NodeId &id, DataSource *src)
 {
     UA_Server_setVariableNode_dataSource(server, fromNodeId(id), internalSrc);
     UA_Server_setNodeContext(server, fromNodeId(id), src);

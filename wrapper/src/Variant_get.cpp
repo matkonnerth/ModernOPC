@@ -1,10 +1,11 @@
+#include <algorithm>
 #include <opc/Variant.h>
 #include <opc/types/LocalizedText.h>
 #include <opc/types/NodeId.h>
 #include <opc/types/QualifiedName.h>
+#include <opc/types/StdTypes.h>
 #include <string>
 #include <vector>
-#include <opc/types/StdTypes.h>
 
 namespace opc
 {
@@ -44,7 +45,7 @@ int16_t Variant::get<int16_t>() const
 template <>
 uint16_t Variant::get<uint16_t>() const
 {
-    return *static_cast<uint16_t*>(variant->data);
+    return *static_cast<uint16_t *>(variant->data);
 }
 
 template <>
@@ -86,7 +87,7 @@ double Variant::get<double>() const
 template <>
 std::string Variant::get<std::string>() const
 {
-    return fromUAString(static_cast<UA_String *>(variant->data));
+    return fromUAString(*static_cast<UA_String *>(variant->data));
 }
 
 template <>
@@ -109,11 +110,11 @@ template <>
 std::vector<std::string> Variant::get<std::vector<std::string>>() const
 {
     std::vector<std::string> vec;
-    for (size_t i = 0; i < variant->arrayLength; i++)
-    {
-        UA_String *s = ((UA_String *)variant->data) + i;
-        vec.emplace_back(fromUAString(s));
-    }
+    std::transform(
+        static_cast<UA_String *>(variant->data),
+        static_cast<UA_String *>(variant->data) + variant->arrayLength,
+        std::back_inserter(vec), [](const UA_String &s) { return fromUAString(s); });
+
     return vec;
 }
 

@@ -21,7 +21,7 @@ const UA_QualifiedName fromQualifiedName(const QualifiedName &qn)
 
 QualifiedName fromUAQualifiedName(const UA_QualifiedName *qn)
 {
-    return QualifiedName(qn->namespaceIndex, fromUAString(&qn->name));
+    return QualifiedName(qn->namespaceIndex, fromUAString(qn->name));
 }
 
 void toUAVariantImpl(const QualifiedName &qn, UA_Variant *var)

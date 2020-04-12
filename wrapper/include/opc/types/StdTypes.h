@@ -6,11 +6,11 @@
 
 namespace opc
 {
-inline std::string fromUAString(const UA_String *s)
+inline std::string fromUAString(const UA_String& s)
 {
-    if (s->length > 0)
+    if (s.length > 0)
     {
-        return std::string{reinterpret_cast<char *>(s->data), s->length};
+        return std::string{reinterpret_cast<char *>(s.data), s.length};
     }
     return std::string{};
 }

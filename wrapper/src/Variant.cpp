@@ -54,18 +54,8 @@ void Variant::set(UA_Variant *var)
     owned = true;
 }
 
-void Variant::copy(UA_Variant *var) const
-{
-    UA_Variant_copy(variant, var);
-}
-
-//const UA_Variant *Variant::getUAVariant() const { return variant; }
-//UA_Variant *Variant::getUAVariant(){ return variant; }
-bool Variant::isScalar()
-{
-    return UA_Variant_isScalar(variant);
-}
-
+void Variant::copy(UA_Variant *var) const { UA_Variant_copy(variant, var); }
+bool Variant::isScalar() { return UA_Variant_isScalar(variant); }
 bool Variant::isEmpty() const { return UA_Variant_isEmpty(variant); }
 
 } // namespace opc
