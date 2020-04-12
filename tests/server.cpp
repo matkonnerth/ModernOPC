@@ -26,3 +26,12 @@ TEST(Server, translate)
     ASSERT_EQ(UA_STATUSCODE_GOOD, s.translatePathToNodeId(NodeId(0, 86), path, outId));
     ASSERT_EQ(NodeId(0,24), outId);
 }
+
+TEST(Server, translateFail)
+{
+    opc::Server s;
+    std::vector<QualifiedName> path{};
+    NodeId outId;
+    ASSERT_TRUE(UA_STATUSCODE_GOOD!=
+              s.translatePathToNodeId(NodeId(0, 86), path, outId));
+}
