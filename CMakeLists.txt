@@ -12,11 +12,14 @@ conan_cmake_run(CONANFILE conanfile.txt
                 BASIC_SETUP CMAKE_TARGETS
                 BUILD missing)
 
+    
+
 include(CTest)
 enable_testing()
 
 option(ENABLE_ASAN off "enable address sanitizer")
 option(CALC_COVERAGE off "calculate code coverage")
+option(BUILD_Benchmark "Build benchmark tests" OFF)
 
 if(CALC_COVERAGE)
     set(COMPILER_OPTIONS -g -O0 -fno-inline -fno-inline-small-functions -fno-default-inline -fprofile-arcs -ftest-coverage)
@@ -30,12 +33,6 @@ if(ENABLE_ASAN)
     set(COMPILER_OPTIONS -fsanitize=address -fsanitize-address-use-after-scope)
 endif()
 
-#open62541 configuration
-SET(UA_ENABLE_SUBSCRIPTIONS_EVENTS ON CACHE BOOL "Enable event support")
-SET(BUILD_SHARED_LIBS ON CACHE BOOL "build open shared")
-SET(UA_NAMESPACE_ZERO REDUCED CACHE STRING "reduced namespace zero")
-
-#add_subdirectory(open62541)
 add_subdirectory(nodesetLoader)
 
 add_library(wrapper SHARED
@@ -64,12 +61,15 @@ endif()
 
 add_subdirectory(tests)
 add_subdirectory(tutorials)
-add_subdirectory(benchmarks)
+if(${BUILD_Benchmark})
+    if(CMAKE_BUILD_TYPE MATCHES "^(Debug)$")
+        message(ERROR "It makes no sense to build benchmarks with build type DEBUG")
+    endif()
+    add_subdirectory(benchmarks)
+endif()
 
 add_executable(demo test.cpp) 
-#target_include_directories(demo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
 target_link_libraries(demo PRIVATE CONAN_PKG::open62541)
-#target_compile_features(demo PRIVATE cxx_std_17)
 
 option(BUILD_DOC "Build documentation" OFF)
 

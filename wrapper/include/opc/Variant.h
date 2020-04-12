@@ -80,10 +80,6 @@ class Variant
     template <typename T>
     T get() const;
 
-    void set(UA_Variant *var);
-
-    void copy(UA_Variant *var) const;
-
     inline const UA_Variant *getUAVariant() const
     {
         return variant;

@@ -24,7 +24,8 @@ TEST(Object, get)
 { 
     opc::Server s; 
     auto obj = s.getObject(NodeId(0,85));
-    ASSERT_EQ(obj->displayName().text(), "Objects");
+    ASSERT_EQ(obj->displayName().text(), "Objects"s);
+    ASSERT_EQ(obj->browseName().name(), "Objects"s);
 }
 
 TEST(Object, get_noObjectFound)

@@ -23,6 +23,7 @@ Server::Server(uint16_t port) { create(port); }
 
 Server::~Server() { UA_Server_delete(server); }
 
+/*
 Server *getServerFromContext(UA_Server *server)
 {
     Server *s = nullptr;
@@ -35,6 +36,7 @@ void setServerContext(UA_Server *server, Server *s)
 {
     UA_Server_setNodeContext(server, UA_NODEID_NUMERIC(0, UA_NS0ID_SERVER), s);
 }
+*/
 
 void Server::create(uint16_t port)
 {
@@ -47,10 +49,6 @@ void Server::create(uint16_t port)
                        "Setting serer config failed with StatusCode %s",
                        UA_StatusCode_name(status));
     }
-    // UA_ServerConfig_addNetworkLayerWS(UA_Server_getConfig(server), 7681, 0,
-    // 0);
-
-    setServerContext(server, this);
 }
 
 void Server::run()

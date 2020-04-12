@@ -56,6 +56,12 @@ TEST(import, primitiveValues)
     opc::Variant var;
     ASSERT_TRUE(server.getVariable(opc::NodeId(2, 6005))->read(var));
     ASSERT_EQ(var.get<int32_t>(), -3434);
+    ASSERT_TRUE(server.getVariable(opc::NodeId(2, 6012))->read(var));
+    ASSERT_EQ(var.get<int8_t>(), -128);
+    ASSERT_TRUE(server.getVariable(opc::NodeId(2, 6011))->read(var));
+    ASSERT_EQ(var.get<double>(), -1.0);
+    ASSERT_TRUE(server.getVariable(opc::NodeId(2, 6010))->read(var));
+    ASSERT_EQ(var.get<float>(), -1.0f);
 }
 
 TEST(import, unknownDataType)

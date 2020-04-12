@@ -5,6 +5,7 @@
     </NamespaceUris>
     <Aliases>
         <Alias Alias="Boolean">i=1</Alias>
+        <Alias Alias="SByte">i=2</Alias>
         <Alias Alias="Byte">i=3</Alias>
         <Alias Alias="Int16">i=4</Alias>
         <Alias Alias="UInt16">i=5</Alias>
@@ -12,6 +13,9 @@
         <Alias Alias="UInt32">i=7</Alias>
         <Alias Alias="Int64">i=8</Alias>
         <Alias Alias="UInt64">i=9</Alias>
+        <Alias Alias="Float">i=10</Alias>
+        <Alias Alias="Double">i=11</Alias>
+        <Alias Alias="SByte">i=2</Alias>
         <Alias Alias="Organizes">i=35</Alias>
         <Alias Alias="HasTypeDefinition">i=40</Alias>
     </Aliases>
@@ -98,6 +102,36 @@
         </References>
         <Value>
             <uax:UInt64>444</uax:UInt64>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="Float" NodeId="ns=1;i=6010" BrowseName="1:Float" AccessLevel="3">
+        <DisplayName>Float</DisplayName>
+        <References>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+            <Reference ReferenceType="Organizes" IsForward="false">i=85</Reference>
+        </References>
+        <Value>
+            <uax:Float>-1.0</uax:Float>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="Double" NodeId="ns=1;i=6011" BrowseName="1:Double" AccessLevel="3">
+        <DisplayName>Double</DisplayName>
+        <References>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+            <Reference ReferenceType="Organizes" IsForward="false">i=85</Reference>
+        </References>
+        <Value>
+            <uax:Double>-1.0</uax:Double>
+        </Value>
+    </UAVariable>
+    <UAVariable DataType="SByte" NodeId="ns=1;i=6012" BrowseName="1:SByte" AccessLevel="3">
+        <DisplayName>SByte</DisplayName>
+        <References>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+            <Reference ReferenceType="Organizes" IsForward="false">i=85</Reference>
+        </References>
+        <Value>
+            <uax:SByte>-128</uax:SByte>
         </Value>
     </UAVariable>
 </UANodeSet>

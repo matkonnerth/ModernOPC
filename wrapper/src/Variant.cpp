@@ -44,17 +44,6 @@ Variant &Variant::operator=(Variant &&other) noexcept
     return *this;
 }
 
-void Variant::set(UA_Variant *var)
-{
-    if (variant && owned)
-    {
-        UA_Variant_delete(variant);
-    }
-    variant = var;
-    owned = true;
-}
-
-void Variant::copy(UA_Variant *var) const { UA_Variant_copy(variant, var); }
 bool Variant::isScalar() { return UA_Variant_isScalar(variant); }
 bool Variant::isEmpty() const { return UA_Variant_isEmpty(variant); }
 
