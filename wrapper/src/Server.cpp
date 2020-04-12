@@ -125,10 +125,10 @@ UA_StatusCode Server::internalMethodCallback(
         std::vector<Variant> inputArgs;
         std::vector<Variant> outputArgs;
         outputArgs.emplace_back(Variant(const_cast<UA_Variant *>(output)));
-        for (size_t i = 0; i < inputSize; i++)
+        for (auto it = input; it != input + inputSize; it++)
         {
             inputArgs.emplace_back(
-                Variant(const_cast<UA_Variant *>(&input[i])));
+                Variant(const_cast<UA_Variant *>(it)));
         }
         if (s->call(objectContext, inputArgs, outputArgs))
         {
@@ -172,30 +172,27 @@ UA_StatusCode Server::internalWrite(UA_Server *server,
 
 UA_Server *Server::getUAServer() { return server; }
 
-UA_StatusCode Server::getNodeIdForPath(const UA_NodeId &startId,
-                                       const std::vector<QualifiedName> &qn,
-                                       UA_NodeId *outId)
+UA_StatusCode
+Server::translatePathToNodeId(const NodeId &startId,
+                              const std::vector<QualifiedName> &qn,
+                              NodeId &outId)
 {
-    auto *elements = static_cast<UA_RelativePathElement *>(
-        calloc(qn.size(), sizeof(UA_RelativePathElement)));
-    std::vector<UA_RelativePathElement> pathElements{elements,
-                                                     elements + qn.size()};
-
-    std::size_t cnt = 0;
-    for (auto &path : pathElements)
-    {
-        UA_RelativePathElement_init(&path);
-        path.referenceTypeId =
-            UA_NODEID_NUMERIC(0, UA_NS0ID_HIERARCHICALREFERENCES);
-        path.isInverse = false;
-        path.includeSubtypes = true;
-        path.targetName = fromQualifiedName(qn[cnt]);
-        cnt++;
-    }
+    std::vector<UA_RelativePathElement> pathElements;
+    std::transform(qn.begin(), qn.end(), std::back_inserter(pathElements),
+                   [](const QualifiedName& qn) {
+                       UA_RelativePathElement path;
+                       UA_RelativePathElement_init(&path);
+                       path.referenceTypeId = UA_NODEID_NUMERIC(
+                           0, UA_NS0ID_HIERARCHICALREFERENCES);
+                       path.isInverse = false;
+                       path.includeSubtypes = true;
+                       path.targetName = fromQualifiedName(qn);
+                       return path;
+                   }); 
 
     UA_BrowsePath bp;
     UA_BrowsePath_init(&bp);
-    bp.startingNode = startId;
+    bp.startingNode = fromNodeId(startId);
     bp.relativePath.elementsSize = qn.size();
     bp.relativePath.elements = pathElements.data();
 
@@ -205,24 +202,12 @@ UA_StatusCode Server::getNodeIdForPath(const UA_NodeId &startId,
     if (bpr.statusCode != UA_STATUSCODE_GOOD || bpr.targetsSize < 1)
     {
         retval = bpr.statusCode;
-        for (auto &path : pathElements)
-        {
-            cnt++;
-        }
         UA_BrowsePathResult_clear(&bpr);
-        free(elements);
         return retval;
     }
     retval = bpr.statusCode;
-    *outId = bpr.targets[0].targetId.nodeId;
-    cnt = 0;
-    for (auto &path : pathElements)
-    {
-
-        cnt++;
-    }
+    outId = fromUaNodeId(bpr.targets[0].targetId.nodeId);
     UA_BrowsePathResult_clear(&bpr);
-    free(elements);
     return retval;
 }
 

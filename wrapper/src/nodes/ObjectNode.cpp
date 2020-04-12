@@ -54,8 +54,8 @@ UA_StatusCode ObjectNode::setUpEvent(UA_NodeId *outId, const BaseEventType &even
 
     for (const auto &field : event.getEventFields())
     {
-        UA_NodeId pathId;
-        auto status = server->getNodeIdForPath(*outId, field.first, &pathId);
+        NodeId pathId;
+        auto status = server->translatePathToNodeId(fromUaNodeId(*outId), field.first, pathId);
         if (status != UA_STATUSCODE_GOOD)
         {
             UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
@@ -65,7 +65,7 @@ UA_StatusCode ObjectNode::setUpEvent(UA_NodeId *outId, const BaseEventType &even
         }
 
         status =
-            UA_Server_writeValue(server->getUAServer(), pathId, *field.second.getUAVariant());
+            UA_Server_writeValue(server->getUAServer(), fromNodeId(pathId), *field.second.getUAVariant());
         if (status != UA_STATUSCODE_GOOD)
         {
             UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
@@ -79,7 +79,6 @@ UA_StatusCode ObjectNode::setUpEvent(UA_NodeId *outId, const BaseEventType &even
 
 void ObjectNode::setEvent(BaseEventType &event)
 {
-    //add sourceNode
     event.setSourceNode(id);
 
     UA_NodeId eventNodeId;

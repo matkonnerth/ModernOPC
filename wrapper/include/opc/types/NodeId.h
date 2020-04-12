@@ -14,6 +14,11 @@ class NodeId
         NUMERIC,
         STRING
     };
+    NodeId()
+        : nsIdx(0), type(NodeId::IdentifierType::NUMERIC), i(0)
+    {
+    }
+
     NodeId(uint16_t nsIdx, int id)
         : nsIdx(nsIdx), type(NodeId::IdentifierType::NUMERIC), i(id)
     {

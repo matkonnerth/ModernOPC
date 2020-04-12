@@ -43,7 +43,7 @@ class Server
      * \param path path to nodeset file
      * \return true on success, otherwise false. */
     bool loadNodeset(const std::string &path);
-  
+
     uint16_t getNamespaceIndex(const std::string &uri);
     UA_Server *getUAServer();
     const UA_Server *getUAServer() const;
@@ -70,10 +70,13 @@ class Server
 
     std::shared_ptr<VariableNode> getVariable(const NodeId &);
 
+    UA_StatusCode translatePathToNodeId(const NodeId &id,
+                                        const std::vector<QualifiedName> &qn,
+                                        NodeId &outId);
+
   private:
-    void connectVariableDataSource(const NodeId &id,
-                                   DataSource* info);
-    void connectMethodCallback(const NodeId &id, ICallable* c);
+    void connectVariableDataSource(const NodeId &id, DataSource *info);
+    void connectMethodCallback(const NodeId &id, ICallable *c);
     UA_Server *server{nullptr};
     UA_DataSource internalSrc{internalRead, internalWrite};
     bool isRunning{false};
@@ -95,12 +98,8 @@ class Server
                   void *nodeContext, const UA_NumericRange *range,
                   const UA_DataValue *value);
 
-
     std::unordered_map<NodeId, std::shared_ptr<ObjectNode>> objects{};
     std::unordered_map<NodeId, std::shared_ptr<MethodNode>> methods{};
     std::unordered_map<NodeId, std::shared_ptr<VariableNode>> variables{};
-
-    UA_StatusCode getNodeIdForPath(const UA_NodeId& id, const std::vector<QualifiedName> &qn,
-                                   UA_NodeId *outId);
 };
 } // namespace opc
