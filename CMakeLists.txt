@@ -32,6 +32,7 @@ if(ENABLE_ASAN)
 endif()
 
 add_subdirectory(nodesetLoader)
+add_subdirectory(TypeGenerator)
 
 add_library(wrapper SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Server.cpp
@@ -46,9 +47,11 @@ add_library(wrapper SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/types/NodeId.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/nodes/ObjectNode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/nodes/VariableNode.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/nodes/Node.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/nodes/Node.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/generated/generated.cpp)
 target_include_directories(wrapper PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
 target_include_directories(wrapper PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src)
+target_include_directories(wrapper PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/generated)
 target_link_libraries(wrapper PRIVATE ${LIB_GCOV} CONAN_PKG::open62541 xmlImport)
 target_link_libraries(wrapper PUBLIC CONAN_PKG::open62541)
 target_compile_features(wrapper PRIVATE cxx_std_17)
