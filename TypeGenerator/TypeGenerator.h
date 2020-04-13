@@ -4,6 +4,7 @@
 #include <iostream>
 #include <ostream>
 #include <unordered_map>
+#include <unordered_set>
 
 namespace gen
 {
@@ -17,6 +18,7 @@ class TypeGenerator
         : cppTargetNamespace{cppTargetNamespace}, types{types}, header{hdr},
           impl{impl}
     {
+        openNamespace();
     }
 
     void addConversionHeader(const DataType &type)
@@ -146,19 +148,22 @@ class TypeGenerator
 
     void addFromConversionImpl(const DataType &type)
     {
-        //friend const UA_ApplicationInstanceCertificate
-        //fromApplicationInstanceCertificate(
+        // friend const UA_ApplicationInstanceCertificate
+        // fromApplicationInstanceCertificate(
         //    const ApplicationInstanceCertificate &val);
-        impl << "const UA_"<<type.name << " from" << type.name << "(const " << type.name << " &val) {" << "\n";
+        impl << "const UA_" << type.name << " from" << type.name << "(const "
+             << type.name << " &val) {"
+             << "\n";
         impl << "UA_" << type.name << " uaval;\n";
         for (const auto &field : type.fields)
         {
             addFromConversionFunction(field);
         }
         std::string nameToUpper = str_toupper(type.name);
-        //impl << "UA_Variant_setScalarCopy(var, &uaval, &UA_TYPES[UA_TYPES_"
+        // impl << "UA_Variant_setScalarCopy(var, &uaval, &UA_TYPES[UA_TYPES_"
         //     << nameToUpper << "]);\n";
-        impl << "return uaval;" << "\n";
+        impl << "return uaval;"
+             << "\n";
         impl << "}\n\n";
     }
 
@@ -177,7 +182,7 @@ class TypeGenerator
 
     void addPrivateMember(const DataType &type)
     {
-        header << "private:\n";
+        header << "public:\n";
         for (const auto &field : type.fields)
         {
             auto t = baseDataTypes.find(field.dataType);
@@ -230,12 +235,12 @@ class TypeGenerator
         }
     }
 
-    void buildOrder(const DataType &type)
+    bool buildOrder(const DataType &type)
     {
         if (type.isEnum)
         {
             order.push_back(type.id);
-            return;
+            return true;
         }
         for (const auto &field : type.fields)
         {
@@ -245,16 +250,20 @@ class TypeGenerator
                 auto t2 = types.find(field.dataType);
                 if (t2 != types.end())
                 {
-                    buildOrder(t2->second);
+                    if(!buildOrder(t2->second))
+                    {
+                        return false;
+                    }
                 }
                 else
                 {
                     std::cout << "unknown type -> exit";
-                    std::exit(2);
+                    return false;
                 }
             }
         }
         order.push_back(type.id);
+        return true;
     }
 
     void openNamespace()
@@ -284,13 +293,42 @@ class TypeGenerator
         newLine(impl, "#include <opc/types/QualifiedName.h>");
     }
 
+    void addDataTypeTemplate(const DataType &type)
+    {
+        // template <>
+        // inline const UA_DataType *getDataType<QualifiedName>()
+        //{
+        //    return &UA_TYPES[UA_TYPES_QUALIFIEDNAME];
+        //}
+        header << "template<>"
+               << "\n";
+        header << "inline const UA_DataType* getDataType<" << type.name
+               << ">() {"
+               << "\n";
+        header << "return &UA_TYPES[UA_TYPES_" << str_toupper(type.name) << "];"
+               << "\n";
+        header << "}"
+               << "\n";
+    }
+
     void generateClass(const DataType &type)
     {
-        buildOrder(type);
+        
+
+        order.clear();
+        if(!buildOrder(type))
+        {
+            std::cout << "could build ordering for data " << type.name << " " << type.id << "\n";
+            return;
+        }
         addIncludes();
-        openNamespace();
+        
         for (const auto &id : order)
         {
+            if (generated.find(id) != generated.end())
+            {
+                continue;
+            }
             auto t = types.find(id);
             if (!t->second.isEnum)
             {
@@ -300,6 +338,7 @@ class TypeGenerator
                 addFromConversionImpl(t->second);
                 addPrivateMember(t->second);
                 header << "};\n\n";
+                addDataTypeTemplate(t->second);
             }
             else
             {
@@ -309,14 +348,16 @@ class TypeGenerator
                 addEnumConversionHeader(t->second);
                 addEnumConversionImpl(t->second);
             }
+            generated.emplace(id);
         }
-        closeNamespace();
     }
+
+    void finish() { closeNamespace(); }
 
     void addHeader(const DataType &type)
     {
         header << "class " << type.name << "\n";
-        header << "{\n";
+        header << "{\npublic:\n";
     }
 
     void addEnumHeader(const DataType &type)
@@ -340,6 +381,7 @@ class TypeGenerator
     const std::unordered_map<opc::NodeId, gen::DataType> &types{};
 
     std::vector<NodeId> order{};
+    std::unordered_set<NodeId> generated {};
 
     std::ostream &header;
     std::ostream &impl;

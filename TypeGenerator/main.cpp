@@ -42,17 +42,17 @@ int main(int argc, char *argv[])
     }
     std::cout << "Types count: " << types.size() << std::endl;
 
-    //std::ostringstream header, impl;
     std::ofstream header("/home/matzy/git/modernOPC/generated/generated.h",
                          std::ios::out);
     std::ofstream impl("/home/matzy/git/modernOPC/generated/generated.cpp",
                        std::ios::out);
     gen::TypeGenerator g{"opc", types, header, impl};
-    g.generateClass(types[opc::NodeId(0, 312)]);
 
-    //std::cout << "header: \n" << header.str() << "\n";
-    //std::cout << "impl\n" << impl.str() << "\n";
-    //std::cout << impl.str() << "\n";
+    //for(const auto&p:types)
+    //{
+        g.generateClass(types[opc::NodeId(0,308)]);
+    //}
+    g.finish();
     header.close();
     impl.close();
     

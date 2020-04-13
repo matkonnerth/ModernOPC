@@ -51,7 +51,7 @@ add_library(wrapper SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/generated/generated.cpp)
 target_include_directories(wrapper PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
 target_include_directories(wrapper PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src)
-target_include_directories(wrapper PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/generated)
+target_include_directories(wrapper PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/generated)
 target_link_libraries(wrapper PRIVATE ${LIB_GCOV} CONAN_PKG::open62541 xmlImport)
 target_link_libraries(wrapper PUBLIC CONAN_PKG::open62541)
 target_compile_features(wrapper PRIVATE cxx_std_17)
