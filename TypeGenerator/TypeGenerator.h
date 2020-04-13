@@ -24,6 +24,18 @@ class TypeGenerator
         header << "friend void toUAVariantImpl(const " << type.name
                << "& val, UA_Variant "
                   "*var);\n\n";
+
+        //friend const UA_QualifiedName fromQualifiedName(
+        //    const QualifiedName &qn);
+
+        header << "friend const UA_"<< type.name << " from" << type.name <<"(const " << type.name << "& val);" << "\n";
+    }
+
+    void addEnumConversionHeader(const DataType &type)
+    {
+        header << "void toUAVariantImpl(const " << type.name
+               << "& val, UA_Variant "
+                  "*var);\n\n";
     }
 
     std::string str_toupper(std::string s)
@@ -38,25 +50,40 @@ class TypeGenerator
         return s;
     }
 
+    std::string firstToLow(std::string s)
+    {
+        s[0] = std::tolower(s[0]);
+        return s;
+    }
+
     void addFromConversionFunction(const NodeId &type,
                                    const std::string fieldName)
     {
-        impl << "uaval." << fieldName << "=";
+        impl << "uaval." << firstToLow(fieldName) << "=";
         if (type.getIdType() == NodeId::IdentifierType::NUMERIC &&
             std::get<int>(type.getIdentifier()) <= 11)
         {
-            impl << "val." << fieldName << ";\n";
+            impl << "val." << firstToLow(fieldName) << ";\n";
             return;
         }
         // get type name
         auto t = types.find(type);
-        impl << "from" << t->second.name << "("
-             << "val." << fieldName << ");\n";
+        if(t->second.isEnum)
+        {
+            impl << "static_cast<UA_" << t->second.name   <<">(val."
+                 << firstToLow(fieldName) << ");" << "\n";
+        }
+        else
+        {
+            impl << "from" << t->second.name << "("
+                 << "val." << firstToLow(fieldName) << ");\n";
+        }
+        
     }
 
     void addConversionImpl(const DataType &type)
     {
-        impl << "void " << type.name << "::toUAVariantImpl(const " << type.name
+        impl << "void toUAVariantImpl(const " << type.name
              << "& val, UA_Variant "
                 "*var)\n{\n";
 
@@ -66,21 +93,20 @@ class TypeGenerator
             addFromConversionFunction(field.dataType, field.name);
         }
         std::string nameToUpper = str_toupper(type.name);
-        impl << "UA_Variant_SetScalarCopy(var, &uavar, &UA_TYPES[UA_TYPES_"
+        impl << "UA_Variant_setScalarCopy(var, &uaval, &UA_TYPES[UA_TYPES_"
              << nameToUpper << "]);\n";
         impl << "}\n\n";
     }
 
     void addEnumConversionImpl(const DataType &type)
     {
-        impl << "void " << type.name << "::toUAVariantImpl(const " << type.name
+        impl << "void toUAVariantImpl(const " << type.name
              << "& val, UA_Variant "
                 "*var)\n{\n";
 
-        impl << "UA_Int32" << type.name
-             << " uaval = static_cast<UA_Int32>(val);\n";
+        impl << "UA_Int32 uaval = static_cast<UA_" << type.name << ">(val);\n";
         std::string nameToUpper = str_toupper(type.name);
-        impl << "UA_Variant_SetScalarCopy(var, &uavar, &UA_TYPES[UA_INT32]);\n";
+        impl << "UA_Variant_setScalarCopy(var, &uaval, &UA_TYPES[UA_TYPES_INT32]);\n";
         impl << "}\n\n";
     }
 
@@ -92,14 +118,15 @@ class TypeGenerator
             auto t = baseDataTypes.find(field.dataType);
             if (t != baseDataTypes.end())
             {
-                header << t->second << " " << field.name << ";\n";
+                header << t->second << " " << firstToLow(field.name) << ";\n";
             }
             else
             {
                 auto t2 = types.find(field.dataType);
                 if (t2 != types.end())
                 {
-                    header << t2->second.name << " " << field.name << ";\n";
+                    header << t2->second.name << " " << firstToLow(field.name)
+                           << ";\n";
                 }
                 else
                 {
@@ -194,10 +221,10 @@ class TypeGenerator
             else
             {
                 addEnumHeader(t->second);
-                addConversionHeader(t->second);
-                addEnumConversionImpl(t->second);
                 addEnumOrdinals(t->second);
                 header << "};\n\n";
+                addEnumConversionHeader(t->second);
+                addEnumConversionImpl(t->second);
             }
         }
         closeNamespace();

@@ -15,6 +15,10 @@ inline std::string fromUAString(const UA_String& s)
     return std::string{};
 }
 
+inline UA_String fromString(const std::string &v)
+{
+    return UA_STRING(const_cast<char *>(v.c_str()));
+}
 
 } // namespace opc
 
