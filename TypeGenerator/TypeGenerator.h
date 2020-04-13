@@ -25,10 +25,12 @@ class TypeGenerator
                << "& val, UA_Variant "
                   "*var);\n\n";
 
-        //friend const UA_QualifiedName fromQualifiedName(
+        // friend const UA_QualifiedName fromQualifiedName(
         //    const QualifiedName &qn);
 
-        header << "friend const UA_"<< type.name << " from" << type.name <<"(const " << type.name << "& val);" << "\n";
+        header << "friend const UA_" << type.name << " from" << type.name
+               << "(const " << type.name << "& val);"
+               << "\n";
     }
 
     void addEnumConversionHeader(const DataType &type)
@@ -56,29 +58,73 @@ class TypeGenerator
         return s;
     }
 
-    void addFromConversionFunction(const NodeId &type,
-                                   const std::string fieldName)
+    void addFromConversionFunction(const gen::DataTypeDefinitionField &field)
     {
-        impl << "uaval." << firstToLow(fieldName) << "=";
-        if (type.getIdType() == NodeId::IdentifierType::NUMERIC &&
-            std::get<int>(type.getIdentifier()) <= 11)
+        /*
+        impl << "uaval." << firstToLow(field.name) << "=";
+        if (field.dataType.getIdType() == NodeId::IdentifierType::NUMERIC &&
+            std::get<int>(field.dataType.getIdentifier()) <= 11)
         {
-            impl << "val." << firstToLow(fieldName) << ";\n";
+            impl << " val." << firstToLow(field.name) << ";\n";
             return;
         }
+        */
         // get type name
-        auto t = types.find(type);
-        if(t->second.isEnum)
+        auto t = types.find(field.dataType);
+
+        if (field.valueRank > 0)
         {
-            impl << "static_cast<UA_" << t->second.name   <<">(val."
-                 << firstToLow(fieldName) << ");" << "\n";
+            impl << "uaval." << firstToLow(field.name) << "Size = val."
+                 << firstToLow(field.name) << ".size();"
+                 << "\n";
+            impl << "uaval." << firstToLow(field.name) << " = static_cast<UA_"
+                 << t->second.name << "*>(UA_Array_new(val."
+                 << firstToLow(field.name) << ".size(), &UA_TYPES[UA_TYPES_"
+                 << str_toupper(t->second.name) << "]));"
+                 << "\n";
+            impl << "for(auto i=0; i< "
+                 << "val." << firstToLow(field.name) << ".size(); i++){";
+            impl << "uaval." << firstToLow(field.name) << "[i] = ";
+            if (t->second.isEnum)
+            {
+                impl << "static_cast<UA_" << t->second.name << ">(val."
+                     << firstToLow(field.name) << ");"
+                     << "\n";
+            }
+            else
+            {
+                impl << "from" << t->second.name << "("
+                     << "val." << firstToLow(field.name) << "[i]);\n";
+            }
+            impl << "}"
+                 << "\n";
         }
         else
         {
-            impl << "from" << t->second.name << "("
-                 << "val." << firstToLow(fieldName) << ");\n";
+            impl << "uaval." << firstToLow(field.name) << " = ";
+            if (t->second.isEnum)
+            {
+                impl << "static_cast<UA_" << t->second.name << ">(val."
+                     << firstToLow(field.name) << ");"
+                     << "\n";
+            }
+            else
+            {
+                if (field.dataType.getIdType() ==
+                        NodeId::IdentifierType::NUMERIC &&
+                    std::get<int>(field.dataType.getIdentifier()) <= 11)
+                {
+                    impl << " static_cast<UA_" << t->second.name << ">(val."
+                         << firstToLow(field.name) << ");\n";
+                    return;
+                }
+                else
+                {
+                    impl << "from" << t->second.name << "("
+                         << "val." << firstToLow(field.name) << ");\n";
+                }
+            }
         }
-        
     }
 
     void addConversionImpl(const DataType &type)
@@ -90,11 +136,29 @@ class TypeGenerator
         impl << "UA_" << type.name << " uaval;\n";
         for (const auto &field : type.fields)
         {
-            addFromConversionFunction(field.dataType, field.name);
+            addFromConversionFunction(field);
         }
         std::string nameToUpper = str_toupper(type.name);
         impl << "UA_Variant_setScalarCopy(var, &uaval, &UA_TYPES[UA_TYPES_"
              << nameToUpper << "]);\n";
+        impl << "}\n\n";
+    }
+
+    void addFromConversionImpl(const DataType &type)
+    {
+        //friend const UA_ApplicationInstanceCertificate
+        //fromApplicationInstanceCertificate(
+        //    const ApplicationInstanceCertificate &val);
+        impl << "const UA_"<<type.name << " from" << type.name << "(const " << type.name << " &val) {" << "\n";
+        impl << "UA_" << type.name << " uaval;\n";
+        for (const auto &field : type.fields)
+        {
+            addFromConversionFunction(field);
+        }
+        std::string nameToUpper = str_toupper(type.name);
+        //impl << "UA_Variant_setScalarCopy(var, &uaval, &UA_TYPES[UA_TYPES_"
+        //     << nameToUpper << "]);\n";
+        impl << "return uaval;" << "\n";
         impl << "}\n\n";
     }
 
@@ -106,7 +170,8 @@ class TypeGenerator
 
         impl << "UA_Int32 uaval = static_cast<UA_" << type.name << ">(val);\n";
         std::string nameToUpper = str_toupper(type.name);
-        impl << "UA_Variant_setScalarCopy(var, &uaval, &UA_TYPES[UA_TYPES_INT32]);\n";
+        impl << "UA_Variant_setScalarCopy(var, &uaval, "
+                "&UA_TYPES[UA_TYPES_INT32]);\n";
         impl << "}\n\n";
     }
 
@@ -118,15 +183,32 @@ class TypeGenerator
             auto t = baseDataTypes.find(field.dataType);
             if (t != baseDataTypes.end())
             {
-                header << t->second << " " << firstToLow(field.name) << ";\n";
+                if (field.valueRank > -1)
+                {
+                    header << "std::vector<" << t->second << ">"
+                           << " " << firstToLow(field.name) << ";\n";
+                }
+                else
+                {
+                    header << t->second << " " << firstToLow(field.name)
+                           << ";\n";
+                }
             }
             else
             {
                 auto t2 = types.find(field.dataType);
                 if (t2 != types.end())
                 {
-                    header << t2->second.name << " " << firstToLow(field.name)
-                           << ";\n";
+                    if (field.valueRank > -1)
+                    {
+                        header << "std::vector<" << t2->second.name << ">"
+                               << " " << firstToLow(field.name) << ";\n";
+                    }
+                    else
+                    {
+                        header << t2->second.name << " "
+                               << firstToLow(field.name) << ";\n";
+                    }
                 }
                 else
                 {
@@ -215,6 +297,7 @@ class TypeGenerator
                 addHeader(t->second);
                 addConversionHeader(t->second);
                 addConversionImpl(t->second);
+                addFromConversionImpl(t->second);
                 addPrivateMember(t->second);
                 header << "};\n\n";
             }
@@ -246,7 +329,7 @@ class TypeGenerator
     std::string cppTargetNamespace{};
     const std::unordered_map<opc::NodeId, std::string> baseDataTypes{
         {NodeId(0, 1), "bool"},           {NodeId(0, 2), "char"},
-        {NodeId(0, 3), "std::byte"},      {NodeId(0, 4), "int16_t"},
+        {NodeId(0, 3), "unsigned char"},  {NodeId(0, 4), "int16_t"},
         {NodeId(0, 5), "uint16_t"},       {NodeId(0, 6), "int32_t"},
         {NodeId(0, 7), "uint32_t"},       {NodeId(0, 8), "int64_t"},
         {NodeId(0, 9), "uint64_t"},       {NodeId(0, 10), "float"},
