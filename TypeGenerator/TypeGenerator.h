@@ -1,8 +1,11 @@
-#include "DataType.h"
-#include "NodeId.h"
+#pragma once
+#include <ConversionFrom.h>
+#include <NodeId.h>
 #include <algorithm>
 #include <iostream>
+#include <memory>
 #include <ostream>
+#include <types/DataType.h>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -12,65 +15,77 @@ using opc::NodeId;
 class TypeGenerator
 {
   public:
-    TypeGenerator(std::string cppTargetNamespace,
-                  const std::unordered_map<opc::NodeId, gen::DataType> &types,
-                  std::ostream &hdr, std::ostream &impl)
+    TypeGenerator(
+        std::string cppTargetNamespace,
+        const std::unordered_map<opc::NodeId, std::unique_ptr<gen::DataType>>
+            &types,
+        std::ostream &hdr, std::ostream &impl)
         : cppTargetNamespace{cppTargetNamespace}, types{types}, header{hdr},
           impl{impl}
     {
         openNamespace();
     }
 
-    void addConversionHeader(const DataType &type)
+    void addConversionDecl(const StructureDataType &type)
     {
         header << "friend void toUAVariantImpl(const " << type.name
                << "& val, UA_Variant "
                   "*var);\n\n";
-
-        // friend const UA_QualifiedName fromQualifiedName(
-        //    const QualifiedName &qn);
 
         header << "friend const UA_" << type.name << " from" << type.name
                << "(const " << type.name << "& val);"
                << "\n";
     }
 
-    void addEnumConversionHeader(const DataType &type)
+    void addConversionDecl(const EnumDataType &type)
     {
         header << "void toUAVariantImpl(const " << type.name
                << "& val, UA_Variant "
                   "*var);\n\n";
+        header << "const UA_" << type.name << " from" << type.name << "(const "
+               << type.name << "& val);"
+               << "\n";
     }
 
-    std::string str_toupper(std::string s)
+    void addFromConversionFunction(const gen::EnumDefinitionField &field)
     {
-        std::transform(
-            s.begin(), s.end(), s.begin(),
-            // static_cast<int(*)(int)>(std::toupper)         // wrong
-            // [](int c){ return std::toupper(c); }           // wrong
-            // [](char c){ return std::toupper(c); }          // wrong
-            [](unsigned char c) { return std::toupper(c); } // correct
-        );
-        return s;
-    }
+        // get type name
+        auto t = types.find(field.dataType);
 
-    std::string firstToLow(std::string s)
-    {
-        s[0] = std::tolower(s[0]);
-        return s;
-    }
-
-    void addFromConversionFunction(const gen::DataTypeDefinitionField &field)
-    {
-        /*
-        impl << "uaval." << firstToLow(field.name) << "=";
-        if (field.dataType.getIdType() == NodeId::IdentifierType::NUMERIC &&
-            std::get<int>(field.dataType.getIdentifier()) <= 11)
+        if (t == types.end())
         {
-            impl << " val." << firstToLow(field.name) << ";\n";
+            std::cout << "could not find type for " << field.name
+                      << field.dataType << std::endl;
             return;
         }
-        */
+
+        if (field.valueRank > 0)
+        {
+            impl << "uaval." << firstToLow(field.name) << "Size = val."
+                 << firstToLow(field.name) << ".size();"
+                 << "\n";
+            impl << "uaval." << firstToLow(field.name) << " = static_cast<UA_"
+                 << t->second->name << "*>(UA_Array_new(val."
+                 << firstToLow(field.name) << ".size(), &UA_TYPES[UA_TYPES_"
+                 << str_toupper(t->second->name) << "]));"
+                 << "\n";
+            impl << "for(auto i=0; i<"
+                 << "val." << firstToLow(field.name) << ".size(); i++){";
+            impl << "uaval." << firstToLow(field.name) << "[i] = ";
+
+            t->second->getArrayConversion(impl, firstToLow(field.name));
+            impl << "}"
+                 << "\n";
+        }
+        else
+        {
+
+            t->second->getScalarConversion(impl, firstToLow(field.name));
+        }
+    }
+
+    void addFromConversionFunction(const gen::StructureDefinitionField &field)
+    {
         // get type name
         auto t = types.find(field.dataType);
 
@@ -80,73 +95,26 @@ class TypeGenerator
                  << firstToLow(field.name) << ".size();"
                  << "\n";
             impl << "uaval." << firstToLow(field.name) << " = static_cast<UA_"
-                 << t->second.name << "*>(UA_Array_new(val."
+                 << t->second->name << "*>(UA_Array_new(val."
                  << firstToLow(field.name) << ".size(), &UA_TYPES[UA_TYPES_"
-                 << str_toupper(t->second.name) << "]));"
+                 << str_toupper(t->second->name) << "]));"
                  << "\n";
-            impl << "for(auto i=0; i< "
+            impl << "for(auto i=0; i<"
                  << "val." << firstToLow(field.name) << ".size(); i++){";
             impl << "uaval." << firstToLow(field.name) << "[i] = ";
-            if (t->second.isEnum)
-            {
-                impl << "static_cast<UA_" << t->second.name << ">(val."
-                     << firstToLow(field.name) << ");"
-                     << "\n";
-            }
-            else
-            {
-                impl << "from" << t->second.name << "("
-                     << "val." << firstToLow(field.name) << "[i]);\n";
-            }
+
+            t->second->getArrayConversion(impl, firstToLow(field.name));
             impl << "}"
                  << "\n";
         }
         else
         {
             impl << "uaval." << firstToLow(field.name) << " = ";
-            if (t->second.isEnum)
-            {
-                impl << "static_cast<UA_" << t->second.name << ">(val."
-                     << firstToLow(field.name) << ");"
-                     << "\n";
-            }
-            else
-            {
-                if (field.dataType.getIdType() ==
-                        NodeId::IdentifierType::NUMERIC &&
-                    std::get<int>(field.dataType.getIdentifier()) <= 11)
-                {
-                    impl << " static_cast<UA_" << t->second.name << ">(val."
-                         << firstToLow(field.name) << ");\n";
-                    return;
-                }
-                else
-                {
-                    impl << "from" << t->second.name << "("
-                         << "val." << firstToLow(field.name) << ");\n";
-                }
-            }
+            t->second->getScalarConversion(impl, firstToLow(field.name));
         }
     }
 
-    void addConversionImpl(const DataType &type)
-    {
-        impl << "void toUAVariantImpl(const " << type.name
-             << "& val, UA_Variant "
-                "*var)\n{\n";
-
-        impl << "UA_" << type.name << " uaval;\n";
-        for (const auto &field : type.fields)
-        {
-            addFromConversionFunction(field);
-        }
-        std::string nameToUpper = str_toupper(type.name);
-        impl << "UA_Variant_setScalarCopy(var, &uaval, &UA_TYPES[UA_TYPES_"
-             << nameToUpper << "]);\n";
-        impl << "}\n\n";
-    }
-
-    void addFromConversionImpl(const DataType &type)
+    void addFromConversionImpl(const EnumDataType &type)
     {
         // friend const UA_ApplicationInstanceCertificate
         // fromApplicationInstanceCertificate(
@@ -167,7 +135,45 @@ class TypeGenerator
         impl << "}\n\n";
     }
 
-    void addEnumConversionImpl(const DataType &type)
+    void addFromConversionImpl(const StructureDataType &type)
+    {
+        // friend const UA_ApplicationInstanceCertificate
+        // fromApplicationInstanceCertificate(
+        //    const ApplicationInstanceCertificate &val);
+        impl << "const UA_" << type.name << " from" << type.name << "(const "
+             << type.name << " &val) {"
+             << "\n";
+        impl << "UA_" << type.name << " uaval;\n";
+        for (const auto &field : type.fields)
+        {
+            addFromConversionFunction(field);
+        }
+        std::string nameToUpper = str_toupper(type.name);
+        // impl << "UA_Variant_setScalarCopy(var, &uaval, &UA_TYPES[UA_TYPES_"
+        //     << nameToUpper << "]);\n";
+        impl << "return uaval;"
+             << "\n";
+        impl << "}\n\n";
+    }
+
+    void addToUAVariantImpl(const StructureDataType &type)
+    {
+        impl << "void toUAVariantImpl(const " << type.name
+             << "& val, UA_Variant "
+                "*var)\n{\n";
+
+        impl << "UA_" << type.name << " uaval;\n";
+        for (const auto &field : type.fields)
+        {
+            addFromConversionFunction(field);
+        }
+        std::string nameToUpper = str_toupper(type.name);
+        impl << "UA_Variant_setScalarCopy(var, &uaval, &UA_TYPES[UA_TYPES_"
+             << nameToUpper << "]);\n";
+        impl << "}\n\n";
+    }
+
+    void addToUAVariantImpl(const EnumDataType &type)
     {
         impl << "void toUAVariantImpl(const " << type.name
              << "& val, UA_Variant "
@@ -180,51 +186,35 @@ class TypeGenerator
         impl << "}\n\n";
     }
 
-    void addPrivateMember(const DataType &type)
+    void addPrivateMember(const StructureDataType &type)
     {
         header << "public:\n";
         for (const auto &field : type.fields)
         {
-            auto t = baseDataTypes.find(field.dataType);
-            if (t != baseDataTypes.end())
+
+            auto t2 = types.find(field.dataType);
+            if (t2 != types.end())
             {
                 if (field.valueRank > -1)
                 {
-                    header << "std::vector<" << t->second << ">"
+                    header << "std::vector<" << t2->second->name << ">"
                            << " " << firstToLow(field.name) << ";\n";
                 }
                 else
                 {
-                    header << t->second << " " << firstToLow(field.name)
+                    header << t2->second->name << " " << firstToLow(field.name)
                            << ";\n";
                 }
             }
             else
             {
-                auto t2 = types.find(field.dataType);
-                if (t2 != types.end())
-                {
-                    if (field.valueRank > -1)
-                    {
-                        header << "std::vector<" << t2->second.name << ">"
-                               << " " << firstToLow(field.name) << ";\n";
-                    }
-                    else
-                    {
-                        header << t2->second.name << " "
-                               << firstToLow(field.name) << ";\n";
-                    }
-                }
-                else
-                {
-                    header << "unknown type"
-                           << "\n";
-                }
+                header << "unknown type"
+                       << "\n";
             }
         }
     }
 
-    void addEnumOrdinals(const DataType &type)
+    void addEnumOrdinals(const EnumDataType &type)
     {
         // header << "private:\n";
         for (const auto &field : type.fields)
@@ -235,31 +225,29 @@ class TypeGenerator
         }
     }
 
-    bool buildOrder(const DataType &type)
+    bool buildOrder(const EnumDataType &type)
     {
-        if (type.isEnum)
-        {
-            order.push_back(type.id);
-            return true;
-        }
+        order.push_back(type.id);
+        return true;
+    }
+
+    bool buildOrder(const StructureDataType &type)
+    {
         for (const auto &field : type.fields)
         {
-            auto t = baseDataTypes.find(field.dataType);
-            if (t == baseDataTypes.end())
+
+            auto t2 = types.find(field.dataType);
+            if (t2 != types.end())
             {
-                auto t2 = types.find(field.dataType);
-                if (t2 != types.end())
+                if (!t2->second->buildOrder(*this))
                 {
-                    if(!buildOrder(t2->second))
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    std::cout << "unknown type -> exit";
                     return false;
                 }
+            }
+            else
+            {
+                std::cout << "unknown type -> exit";
+                return false;
             }
         }
         order.push_back(type.id);
@@ -295,11 +283,6 @@ class TypeGenerator
 
     void addDataTypeTemplate(const DataType &type)
     {
-        // template <>
-        // inline const UA_DataType *getDataType<QualifiedName>()
-        //{
-        //    return &UA_TYPES[UA_TYPES_QUALIFIEDNAME];
-        //}
         header << "template<>"
                << "\n";
         header << "inline const UA_DataType* getDataType<" << type.name
@@ -311,18 +294,51 @@ class TypeGenerator
                << "\n";
     }
 
+    void addImpl(const StructureDataType &type)
+    {
+        addToUAVariantImpl(type);
+        addFromConversionImpl(type);
+    }
+
+    void addImpl(const EnumDataType &type)
+    {
+        addToUAVariantImpl(type);
+        addFromConversionImpl(type);
+    }
+
+    void addHeader(const StructureDataType &type)
+    {
+        addConversionDecl(type);
+        addPrivateMember(type);
+    }
+
+    void afterHeader(const StructureDataType &type)
+    {
+        addDataTypeTemplate(type);
+    }
+
+    void afterHeader(const EnumDataType &type) { addConversionDecl(type); }
+
+    void addHeader(const EnumDataType &type)
+    {
+        // addEnumConversionHeader(t->second);
+        addEnumOrdinals(type);
+    }
+
+    void closeHeader() { header << "};\n\n"; }
+
     void generateClass(const DataType &type)
     {
-        
 
         order.clear();
-        if(!buildOrder(type))
+        if (!type.buildOrder(*this))
         {
-            std::cout << "could build ordering for data " << type.name << " " << type.id << "\n";
+            std::cout << "could build ordering for data " << type.name << " "
+                      << type.id << "\n";
             return;
         }
         addIncludes();
-        
+
         for (const auto &id : order)
         {
             if (generated.find(id) != generated.end())
@@ -330,37 +346,20 @@ class TypeGenerator
                 continue;
             }
             auto t = types.find(id);
-            if (!t->second.isEnum)
-            {
-                addHeader(t->second);
-                addConversionHeader(t->second);
-                addConversionImpl(t->second);
-                addFromConversionImpl(t->second);
-                addPrivateMember(t->second);
-                header << "};\n\n";
-                addDataTypeTemplate(t->second);
-            }
-            else
-            {
-                addEnumHeader(t->second);
-                addEnumOrdinals(t->second);
-                header << "};\n\n";
-                addEnumConversionHeader(t->second);
-                addEnumConversionImpl(t->second);
-            }
+            t->second->generate(*this);
             generated.emplace(id);
         }
     }
 
     void finish() { closeNamespace(); }
 
-    void addHeader(const DataType &type)
+    void openHeader(const StructureDataType &type)
     {
         header << "class " << type.name << "\n";
         header << "{\npublic:\n";
     }
 
-    void addEnumHeader(const DataType &type)
+    void openHeader(const EnumDataType &type)
     {
         header << "enum class " << type.name << "\n";
         header << "{\n";
@@ -368,20 +367,12 @@ class TypeGenerator
 
   private:
     std::string cppTargetNamespace{};
-    const std::unordered_map<opc::NodeId, std::string> baseDataTypes{
-        {NodeId(0, 1), "bool"},           {NodeId(0, 2), "char"},
-        {NodeId(0, 3), "unsigned char"},  {NodeId(0, 4), "int16_t"},
-        {NodeId(0, 5), "uint16_t"},       {NodeId(0, 6), "int32_t"},
-        {NodeId(0, 7), "uint32_t"},       {NodeId(0, 8), "int64_t"},
-        {NodeId(0, 9), "uint64_t"},       {NodeId(0, 10), "float"},
-        {NodeId(0, 11), "double"},        {NodeId(0, 12), "std::string"},
-        {NodeId(0, 13), "uint64_t"},      {NodeId(0, 17), "NodeId"},
-        {NodeId(0, 20), "QualifiedName"}, {NodeId(0, 21), "LocalizedText"}};
 
-    const std::unordered_map<opc::NodeId, gen::DataType> &types{};
+    const std::unordered_map<opc::NodeId, std::unique_ptr<gen::DataType>>
+        &types{};
 
     std::vector<NodeId> order{};
-    std::unordered_set<NodeId> generated {};
+    std::unordered_set<NodeId> generated{};
 
     std::ostream &header;
     std::ostream &impl;
