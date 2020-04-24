@@ -1,7 +1,4 @@
 #include <import/Extension.h>
-#include <import/import.h>
-#include <import/value.h>
-#include <nodesetLoader/nodesetLoader.h>
 #include <opc/DataSource.h>
 #include <opc/Server.h>
 #include <opc/Variant.h>
@@ -13,6 +10,7 @@
 #include <open62541/plugin/log_stdout.h>
 #include <open62541/server.h>
 #include <open62541/server_config_default.h>
+#include <openBackend.h>
 
 namespace opc
 {
@@ -22,21 +20,6 @@ Server::Server() { create(4840); }
 Server::Server(uint16_t port) { create(port); }
 
 Server::~Server() { UA_Server_delete(server); }
-
-/*
-Server *getServerFromContext(UA_Server *server)
-{
-    Server *s = nullptr;
-    UA_Server_getNodeContext(server, UA_NODEID_NUMERIC(0, UA_NS0ID_SERVER),
-                             (void **)&s);
-    return s;
-}
-
-void setServerContext(UA_Server *server, Server *s)
-{
-    UA_Server_setNodeContext(server, UA_NODEID_NUMERIC(0, UA_NS0ID_SERVER), s);
-}
-*/
 
 void Server::create(uint16_t port)
 {
@@ -59,30 +42,7 @@ void Server::run()
 
 bool Server::loadNodeset(const std::string &path)
 {
-
-    FileContext handler;
-    handler.callback = importNodesCallback;
-    handler.addNamespace = addNamespaceCallback;
-    handler.userContext = server;
-    handler.file = path.c_str();
-
-    ValueInterface valIf;
-    valIf.userData = nullptr;
-    valIf.newValue = Value_new;
-    valIf.start = Value_start;
-    valIf.end = Value_end;
-    valIf.finish = Value_finish;
-    valIf.deleteValue = Value_delete;
-    handler.valueHandling = &valIf;
-
-    ExtensionInterface extIf;
-    extIf.userData = nullptr;
-    extIf.newExtension = Extension_new;
-    extIf.start = Extension_start;
-    extIf.end = Extension_end;
-    extIf.finish = Extension_finish;
-    handler.extensionHandling = &extIf;
-    return loadFile(&handler);
+    return NodesetLoader_loadFile(server, path.c_str(), nullptr);
 }
 
 uint16_t Server::getNamespaceIndex(const std::string &uri)

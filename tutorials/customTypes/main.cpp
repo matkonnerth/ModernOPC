@@ -3,7 +3,7 @@
 #include <opc/nodes/ObjectNode.h>
 #include <opc/nodes/VariableNode.h>
 #include <iostream>
-#include <generated.h>
+//#include <generated.h>
 
 using opc::NodeId;
 using opc::QualifiedName;
@@ -23,9 +23,9 @@ int main()
     std::cout << r2.min << " " << r2.max << std::endl;
 
     auto obj = s.getObjectsFolder();
-    opc::BuildInfo info;
-    info.productUri = "matkonnerth - modernOPC";
-    obj->addVariable(NodeId(1, "myBuildInfo"), NodeId(0, 0),
-                     QualifiedName(1, "test"), info);
+    //opc::BuildInfo info;
+    //info.productUri = "matkonnerth - modernOPC";
+    //obj->addVariable(NodeId(1, "myBuildInfo"), NodeId(0, 0),
+    //                 QualifiedName(1, "test"), info);
     s.run();
 }

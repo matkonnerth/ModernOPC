@@ -31,13 +31,13 @@ if(ENABLE_ASAN)
     set(COMPILER_OPTIONS -fsanitize=address -fsanitize-address-use-after-scope)
 endif()
 
+option(ENABLE_BACKEND_OPEN62541 on "enable nodesetLoader backend")
+
 add_subdirectory(nodesetLoader)
-add_subdirectory(TypeGenerator)
+#add_subdirectory(TypeGenerator)
 
 add_library(wrapper SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Server.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/import/import.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/import/value.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/import/Extension.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Variant.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Variant_get.cpp
@@ -47,13 +47,12 @@ add_library(wrapper SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/types/NodeId.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/nodes/ObjectNode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/nodes/VariableNode.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/nodes/Node.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/generated/generated.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/nodes/Node.cpp)
 target_include_directories(wrapper PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
 target_include_directories(wrapper PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src)
 target_include_directories(wrapper PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/generated)
-target_link_libraries(wrapper PRIVATE ${LIB_GCOV} CONAN_PKG::open62541 xmlImport)
-target_link_libraries(wrapper PUBLIC CONAN_PKG::open62541)
+target_link_libraries(wrapper PRIVATE ${LIB_GCOV} open62541 NodesetLoader)
+target_link_libraries(wrapper PUBLIC open62541)
 target_compile_features(wrapper PRIVATE cxx_std_17)
 target_compile_options(wrapper PRIVATE ${COMPILER_OPTIONS})
 if(${ENABLE_ASAN})
@@ -68,10 +67,6 @@ if(${BUILD_Benchmark})
     endif()
     add_subdirectory(benchmarks)
 endif()
-
-add_executable(demo test.cpp) 
-target_link_libraries(demo PRIVATE CONAN_PKG::open62541)
-#target_link_libraries(demo INTERFACE "-fsanitize=address")
 
 option(BUILD_DOC "Build documentation" OFF)
 

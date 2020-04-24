@@ -18,7 +18,7 @@ int main()
     }
     std::function load = [&](std::string path) { s.loadNodeset(path); };
 
-    s.getMethod(opc::NodeId(2, 7003))->bindCallable(load);
+    //s.getMethod(opc::NodeId(2, 7003))->bindCallable(load);
 
     s.run();
 }

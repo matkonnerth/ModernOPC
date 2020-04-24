@@ -14,7 +14,7 @@ opc_add_test("methods")
 opc_add_test("events")
 opc_add_test("nodeId")
 opc_add_test("object")
-opc_add_test("server")
+opc_add_test("server2")
 opc_add_test("dataSource")
 
 add_subdirectory(import)

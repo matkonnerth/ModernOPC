@@ -5,7 +5,7 @@
 #include <opc/nodes/Node.h>
 #include <optional>
 #include <opc/nodes/ObjectNode.h>
-#include <generated.h>
+//#include <generated.h>
 
 using opc::NodeId;
 using opc::QualifiedName;
@@ -64,6 +64,6 @@ TEST(Object, buildINfo)
 {
     opc::Server s;
     auto obj = s.getObjectsFolder();
-    opc::BuildInfo info;
-    obj->addVariable(NodeId(1, "myBuildInfo"), NodeId(0,0), QualifiedName(1, "test"), info);
+    //opc::BuildInfo info;
+    //obj->addVariable(NodeId(1, "myBuildInfo"), NodeId(0,0), QualifiedName(1, "test"), info);
 }
