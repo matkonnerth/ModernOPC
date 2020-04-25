@@ -15,6 +15,7 @@ matrix:
         apt:
           packages:
             - cmake
+            - check
             - valgrind
       env:
         - GCC_MEMCHECK=true
