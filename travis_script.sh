@@ -5,7 +5,7 @@ set -e
 if ! [ -z ${GCC_MEMCHECK+x} ]; then
     mkdir -p build
     cd build
-    cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON .. 
+    cmake -DCMAKE_BUILD_TYPE=Debug .. 
     make -j
     make test
     ctest --overwrite MemoryCheckCommandOptions="--leak-check=full --error-exitcode=100" -T memcheck
@@ -15,7 +15,7 @@ fi
 if ! [ -z ${GCC_RELEASE+x} ]; then
     mkdir -p build
     cd build
-    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON .. 
+    cmake -DCMAKE_BUILD_TYPE=Release .. 
     make -j
     make test
 fi
@@ -24,7 +24,7 @@ fi
 if ! [ -z ${GCC_ASAN+x} ]; then
     mkdir -p build
     cd build
-    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DENABLE_ASAN=ON .. 
+    cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_ASAN=ON .. 
     make -j
     make test
 fi
@@ -34,7 +34,7 @@ if ! [ -z ${CLANG_RELEASE+x} ]; then
     mkdir -p build
     cd build
     conan install -s compiler.libcxx=libstdc++11 .. --build libxml2 --build gtest --build benchmark
-    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON  ..
+    cmake -DCMAKE_BUILD_TYPE=Release ..
     make
     make test
 fi
@@ -44,7 +44,7 @@ if ! [ -z ${COVERAGE+x} ]; then
     mkdir -p build
     cd build
     conan install -s compiler.libcxx=libstdc++11 ..
-    cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DCALC_COVERAGE=ON .. 
+    cmake -DCMAKE_BUILD_TYPE=Debug -DCALC_COVERAGE=ON .. 
     make -j
     make test
 fi
