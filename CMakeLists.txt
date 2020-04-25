@@ -31,7 +31,8 @@ if(ENABLE_ASAN)
     set(COMPILER_OPTIONS -fsanitize=address -fsanitize-address-use-after-scope)
 endif()
 
-option(ENABLE_BACKEND_OPEN62541 on "enable nodesetLoader backend")
+#nodesetloader options
+SET(ENABLE_BACKEND_OPEN62541 ON CACHE BOOL "Enable event support")
 
 add_subdirectory(nodesetLoader)
 #add_subdirectory(TypeGenerator)
