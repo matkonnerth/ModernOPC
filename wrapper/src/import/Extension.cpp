@@ -1,6 +1,6 @@
 #include "import/Extension.h"
 #include <map>
-#include <nodesetLoader/NodesetLoader.h>
+#include <NodesetLoader/NodesetLoader.h>
 #include <string>
 
 struct Extension
