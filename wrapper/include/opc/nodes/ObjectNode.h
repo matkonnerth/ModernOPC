@@ -62,7 +62,7 @@ class ObjectNode : public Node
 
     // Statuscode Missing
     void setEvent(BaseEventType &event);
-    UA_StatusCode eventNotifier(std::byte& value);
+    UA_StatusCode eventNotifier(UA_Byte& value);
 
   private:
     UA_StatusCode setUpEvent(UA_NodeId *outId, const BaseEventType &event);

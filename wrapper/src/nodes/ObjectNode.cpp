@@ -102,10 +102,9 @@ void ObjectNode::setEvent(BaseEventType &event)
     }
 }
 
-UA_StatusCode ObjectNode::eventNotifier(std::byte& value)
+UA_StatusCode ObjectNode::eventNotifier(UA_Byte& value)
 {
-    UA_Byte eventNotifier;
-    return UA_Server_readEventNotifier(server->getUAServer(), fromNodeId(id), reinterpret_cast<UA_Byte*>(&value));
+    return UA_Server_readEventNotifier(server->getUAServer(), fromNodeId(id), &value);
 }
 
 } // namespace opc
