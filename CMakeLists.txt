@@ -19,6 +19,8 @@ option(ENABLE_ASAN off "enable address sanitizer")
 option(CALC_COVERAGE off "calculate code coverage")
 option(BUILD_Benchmark "Build benchmark tests" OFF)
 
+#find_package(open62541 required)
+
 if(CALC_COVERAGE)
     set(COMPILER_OPTIONS -g -O0 -fno-inline -fno-inline-small-functions -fno-default-inline -fprofile-arcs -ftest-coverage)
     set(LIB_GCOV gcov)
@@ -32,10 +34,14 @@ if(ENABLE_ASAN)
 endif()
 
 #nodesetloader options
-SET(ENABLE_BACKEND_OPEN62541 ON CACHE BOOL "Enable event support")
+SET(ENABLE_BACKEND_OPEN62541 ON CACHE BOOL "Enable backend support")
 
+
+find_package(open62541 REQUIRED)
 add_subdirectory(nodesetLoader)
 #add_subdirectory(TypeGenerator)
+
+
 
 add_library(wrapper SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Server.cpp
@@ -53,7 +59,7 @@ target_include_directories(wrapper PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/in
 target_include_directories(wrapper PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src)
 target_include_directories(wrapper PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/generated)
 target_link_libraries(wrapper PRIVATE ${LIB_GCOV} NodesetLoader)
-target_link_libraries(wrapper PUBLIC CONAN_PKG::open62541)
+target_link_libraries(wrapper PUBLIC open62541::open62541)
 target_compile_features(wrapper PRIVATE cxx_std_17)
 target_compile_options(wrapper PRIVATE ${COMPILER_OPTIONS})
 if(${ENABLE_ASAN})
