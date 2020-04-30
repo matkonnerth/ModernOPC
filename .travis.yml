@@ -22,21 +22,45 @@ matrix:
     - os: linux
       dist: bionic
       compiler: gcc
+      addons:
+        apt:
+          packages:
+            - cmake
+            - check
+            - valgrind
       env:
        - COVERAGE=true
     - os: linux
       dist: bionic
       compiler: gcc
+      addons:
+        apt:
+          packages:
+            - cmake
+            - check
+            - valgrind
       env:
        - GCC_ASAN=true
     - os: linux
       dist: bionic
       compiler: gcc
+      addons:
+        apt:
+          packages:
+            - cmake
+            - check
+            - valgrind
       env:
        - GCC_RELEASE=true
     - os: linux
       dist: bionic
       compiler: clang
+      addons:
+        apt:
+          packages:
+            - cmake
+            - check
+            - valgrind
       env:
        - CLANG_RELEASE=true
 
