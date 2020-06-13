@@ -113,6 +113,7 @@
     <UAObject NodeId="ns=1;i=6001" BrowseName="1:Root">
         <DisplayName>Root</DisplayName>
         <References>
+            <Reference ReferenceType="HasTypeDefinition">ns=1;i=1002</Reference>
             <Reference ReferenceType="HasComponent" IsForward="false">i=85</Reference>
         </References>
     </UAObject>
