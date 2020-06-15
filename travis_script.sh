@@ -15,7 +15,7 @@ fi
 if ! [ -z ${GCC_RELEASE+x} ]; then
     mkdir -p build
     cd build
-    cmake -DCMAKE_BUILD_TYPE=Release .. 
+    cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .. 
     make -j
     make test
 fi
@@ -24,7 +24,7 @@ fi
 if ! [ -z ${GCC_ASAN+x} ]; then
     mkdir -p build
     cd build
-    cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_ASAN=ON .. 
+    cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo-DENABLE_ASAN=ON .. 
     make -j
     make test
 fi
@@ -33,7 +33,7 @@ fi
 if ! [ -z ${CLANG_RELEASE+x} ]; then
     mkdir -p build
     cd build
-    cmake -DCMAKE_BUILD_TYPE=Release ..
+    cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
     make
     make test
 fi
@@ -42,7 +42,7 @@ fi
 if ! [ -z ${COVERAGE+x} ]; then
     mkdir -p build
     cd build
-    cmake -DCMAKE_BUILD_TYPE=Debug -DCALC_COVERAGE=ON .. 
+    cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCALC_COVERAGE=ON .. 
     make -j
     make test
 fi
