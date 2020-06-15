@@ -52,17 +52,17 @@ matrix:
             - valgrind
       env:
        - GCC_RELEASE=true
-    - os: linux
-      dist: bionic
-      compiler: clang
-      addons:
-        apt:
-          packages:
-            - cmake
-            - check
-            - valgrind
-      env:
-       - CLANG_RELEASE=true
+#    - os: linux
+#      dist: bionic
+#      compiler: clang
+#      addons:
+#        apt:
+#          packages:
+#            - cmake
+#            - check
+#            - valgrind
+#      env:
+#       - CLANG_RELEASE=true
 
 before_install:
 - pyenv versions
