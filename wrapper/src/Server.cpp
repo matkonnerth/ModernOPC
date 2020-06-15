@@ -19,7 +19,43 @@ Server::Server() { create(4840); }
 
 Server::Server(uint16_t port) { create(port); }
 
-Server::~Server() { UA_Server_delete(server); }
+static void cleanupCustomTypes(const UA_DataTypeArray *types)
+{
+    while (types)
+    {
+        const UA_DataTypeArray *next = types->next;
+        if (types->types)
+        {
+            for (const UA_DataType *type = types->types;
+                 type != types->types + types->typesSize; type++)
+            {
+                free((void *)(uintptr_t)type->typeName);
+                UA_UInt32 mSize = type->membersSize;
+                if (type->typeKind == UA_DATATYPEKIND_UNION)
+                {
+                    mSize--;
+                }
+                for (UA_DataTypeMember *m = type->members;
+                     m != type->members + mSize; m++)
+                {
+                    free((void *)m->memberName);
+                    m->memberName = NULL;
+                }
+                free(type->members);
+            }
+        }
+        free((void *)(uintptr_t)types->types);
+        free((void *)types);
+        types = next;
+    }
+}
+
+Server::~Server() {
+    const UA_DataTypeArray *customTypes =
+        UA_Server_getConfig(server)->customDataTypes;
+    UA_Server_delete(server);
+    cleanupCustomTypes(customTypes);
+}
 
 void Server::create(uint16_t port)
 {
