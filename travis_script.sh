@@ -24,7 +24,7 @@ fi
 if ! [ -z ${GCC_ASAN+x} ]; then
     mkdir -p build
     cd build
-    cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo-DENABLE_ASAN=ON .. 
+    cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DENABLE_ASAN=ON .. 
     make -j
     make test
 fi
