@@ -1,7 +1,7 @@
 #include <opc/types/QualifiedName.h>
 #include <opc/Variant.h>
 #include <ostream>
-#include <opc/types/StdTypes.h>
+#include <opc/types/String.h>
 
 namespace opc
 {

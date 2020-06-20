@@ -3,7 +3,7 @@
 #include <opc/types/LocalizedText.h>
 #include <opc/types/NodeId.h>
 #include <opc/types/QualifiedName.h>
-#include <opc/types/StdTypes.h>
+#include <opc/types/String.h>
 #include <string>
 #include <vector>
 

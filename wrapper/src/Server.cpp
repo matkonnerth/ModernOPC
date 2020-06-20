@@ -6,7 +6,7 @@
 #include <opc/nodes/ObjectNode.h>
 #include <opc/nodes/VariableNode.h>
 #include <opc/types/NodeId.h>
-#include <opc/types/StdTypes.h>
+#include <opc/types/String.h>
 #include <open62541/plugin/log_stdout.h>
 #include <open62541/server.h>
 #include <open62541/server_config_default.h>
