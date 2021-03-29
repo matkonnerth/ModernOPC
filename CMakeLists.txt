@@ -38,6 +38,7 @@ find_package(NodesetLoader REQUIRED)
 
 add_library(wrapper SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Server.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/client/Client.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/import/Extension.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Variant.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Variant_get.cpp
@@ -52,6 +53,7 @@ target_include_directories(wrapper PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/in
 target_include_directories(wrapper PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src)
 target_include_directories(wrapper PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/generated)
 target_link_libraries(wrapper PRIVATE ${LIB_GCOV} NodesetLoader)
+target_link_libraries(wrapper PUBLIC CONAN_PKG::spdlog)
 target_link_libraries(wrapper PUBLIC open62541::open62541)
 target_compile_features(wrapper PRIVATE cxx_std_17)
 target_compile_options(wrapper PRIVATE ${COMPILER_OPTIONS})

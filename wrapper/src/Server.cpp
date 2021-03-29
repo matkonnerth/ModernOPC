@@ -51,10 +51,16 @@ static void cleanupCustomTypes(const UA_DataTypeArray *types)
 }
 
 Server::~Server() {
+    stop();
     const UA_DataTypeArray *customTypes =
         UA_Server_getConfig(server)->customDataTypes;
     UA_Server_delete(server);
     cleanupCustomTypes(customTypes);
+}
+
+void Server::stop()
+{
+    isRunning = false;
 }
 
 void Server::create(uint16_t port)

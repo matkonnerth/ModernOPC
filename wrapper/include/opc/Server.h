@@ -38,6 +38,8 @@ class Server
 
     void run();
 
+    void stop();
+
     /**
      * loads a nodeset xml into server address space.
      * \param path path to nodeset file

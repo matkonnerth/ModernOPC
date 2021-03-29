@@ -4,5 +4,6 @@ cmake
 [requires]
 gtest/1.10.0
 benchmark/1.5.0
+spdlog/1.7.0
 
 
