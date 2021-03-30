@@ -38,6 +38,7 @@ public:
 
    Variant read(const NodeId& id);
    void write(const NodeId& id, const Variant& var);
+   std::vector<Variant> call(const NodeId& objId, const NodeId& methodId, const std::vector<Variant>& inputArgs);
 
 private:
    UA_Client* client{ nullptr };

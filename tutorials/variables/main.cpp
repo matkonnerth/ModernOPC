@@ -22,15 +22,17 @@ using modernopc::DataSource;
 using modernopc::NodeId;
 using modernopc::QualifiedName;
 
+int val=27;
+
 UA_StatusCode getValue(const modernopc::NodeId &id, modernopc::Variant &var)
 {
-    var((uint64_t)27);
+    var(val);
     return UA_STATUSCODE_GOOD;
 }
 
 UA_StatusCode setValue(const modernopc::NodeId &id, const modernopc::Variant &var)
 {
-    auto test = var.get<int>();
+    val = var.get<int>();
     return UA_STATUSCODE_GOOD;
 }
 
@@ -69,7 +71,7 @@ int main()
 
     var = root->addVariable(modernopc::NodeId(1, 42),
                             NodeId(0, UA_NS0ID_BASEDATAVARIABLETYPE),
-                            QualifiedName(1, "myVar"), (uint64_t)23);
+                            QualifiedName(1, "myVar"), 23);
     var->connectCallback(
         std::make_unique<DataSource>("simple", getValue, setValue));
 

@@ -141,10 +141,45 @@ void Client::write(const NodeId &id, const Variant &var)
     if (status != UA_STATUSCODE_GOOD)
     {
         UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
-                     "could not read with NodeId %s",
+                     "could not write with NodeId %s",
                      UA_StatusCode_name(status));
         throw OpcException("Error on writeValueAttribute");
     }
+}
+
+std::vector<Variant> Client::call(const NodeId &objId, const NodeId &methodId,
+                          const std::vector<Variant> &inputArgs)
+{
+
+    UA_Variant input[inputArgs.size()];
+    size_t cnt = 0;
+    for(const auto& inputVar : inputArgs)
+    {
+        input[cnt] = *inputVar.getUAVariant();
+        cnt++;
+    }
+
+    size_t outputSize;
+    UA_Variant* output;
+
+
+    auto status = UA_Client_call(client, fromNodeId(objId), fromNodeId(methodId), 
+        inputArgs.size(), input, &outputSize, &output);
+
+    if (status != UA_STATUSCODE_GOOD)
+    {
+        UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+                     "error on call %s",
+                     UA_StatusCode_name(status));
+        throw OpcException("error on call");
+    }
+
+    std::vector<Variant> out;
+    for(auto var = output; var < output+outputSize; var++)
+    {
+        out.emplace_back(Variant(var, true));
+    }
+    return out;
 }
 
 } // namespace modernopc

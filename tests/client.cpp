@@ -8,6 +8,7 @@
 #include <modernOpc/nodes/ObjectNode.h>
 #include <modernOpc/nodes/VariableNode.h>
 #include <modernOpc/types/NodeId.h>
+#include <modernOpc/types/QualifiedName.h>
 #include <string>
 #include <vector>
 
@@ -15,6 +16,8 @@ using modernopc::NodeId;
 using modernopc::UnresolvedNodeId;
 using namespace std::string_literals;
 using modernopc::ObjectNode;
+using modernopc::QualifiedName;
+using modernopc::Variant;
 
 UA_StatusCode getValue(const modernopc::NodeId &id, modernopc::Variant &var)
 {
@@ -38,7 +41,13 @@ class ClientTest : public ::testing::Test {
                                  modernopc::QualifiedName(1, "demoInt"), 27);
     var->connectCallback(
         std::make_unique<modernopc::DataSource>("simpleVal", getValue, setValue));
-     f=std::async(std::launch::async, [&] { s.run(); });
+
+    test = []() { return "hello"s; };
+
+    auto objectsFolder = s.getObject(NodeId(0, 85));
+    objectsFolder->addMethod(modernopc::NodeId(1, "test"s),
+                             QualifiedName(1, "open"), test);
+    f = std::async(std::launch::async, [&] { s.run(); });
   }
 
   void TearDown() override {
@@ -49,6 +58,7 @@ class ClientTest : public ::testing::Test {
 
   modernopc::Server s;
   std::future<void> f;
+  std::function<std::string()> test;
 };
 
 TEST_F(ClientTest, read)
@@ -68,5 +78,17 @@ TEST_F(ClientTest, write)
     c.connect();
 
     c.write(modernopc::NodeId(1, "demoInt"), modernopc::Variant(20));
+    s.stop();
+}
+
+TEST_F(ClientTest, call)
+{
+    modernopc::Client c{"opc.tcp://localhost:4840"};
+    c.connect();
+
+    auto output = c.call(NodeId(0, 85), NodeId(1, "test"s), std::vector<Variant>{});
+    ASSERT_TRUE(output.size()==1);
+    ASSERT_TRUE(output[0].is_a<std::string>());
+    std::cout << output[0].get<std::string>() << "\n";
     s.stop();
 }
