@@ -86,9 +86,8 @@ if(NOT ${CALC_COVERAGE})
             RUNTIME
             INCLUDES DESTINATION include
             PUBLIC_HEADER DESTINATION include)
-    #install(FILES modernOpc-config.cmake DESTINATION lib/cmake/modernOpc)
 
     install(EXPORT modernOpc DESTINATION lib/cmake)
 
-    install(DIRECTORY ${PROJECT_SOURCE_DIR}/modernOpc/include/opc DESTINATION include/opc)
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/modernOpc/include/opc DESTINATION include)
 endif()
