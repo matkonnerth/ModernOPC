@@ -12,12 +12,15 @@
 #include <string>
 #include <vector>
 
+using modernopc::Server;
+using modernopc::Client;
 using modernopc::NodeId;
 using modernopc::UnresolvedNodeId;
 using namespace std::string_literals;
 using modernopc::ObjectNode;
 using modernopc::QualifiedName;
 using modernopc::Variant;
+using modernopc::DataSource;
 
 UA_StatusCode getValue(const modernopc::NodeId &id, modernopc::Variant &var)
 {
@@ -25,45 +28,49 @@ UA_StatusCode getValue(const modernopc::NodeId &id, modernopc::Variant &var)
     return UA_STATUSCODE_GOOD;
 }
 
-UA_StatusCode setValue(const modernopc::NodeId &id, const modernopc::Variant &var)
+UA_StatusCode setValue(const modernopc::NodeId &id,
+                       const modernopc::Variant &var)
 {
     auto test = var.get<int32_t>();
     std::cout << "setValue: " << test << "\n";
     return UA_STATUSCODE_GOOD;
 }
 
-class ClientTest : public ::testing::Test {
- protected:
-  void SetUp() override {
-      auto root = s.getObjectsFolder();
-    auto var = root->addVariable(modernopc::NodeId(1, "demoInt"),
-                                 modernopc::NodeId(0, UA_NS0ID_BASEDATAVARIABLETYPE),
-                                 modernopc::QualifiedName(1, "demoInt"), 27);
-    var->connectCallback(
-        std::make_unique<modernopc::DataSource>("simpleVal", getValue, setValue));
+class ClientTest : public ::testing::Test
+{
+  protected:
+    void SetUp() override
+    {
+        auto root = s.getObjectsFolder();
+        auto var = root->addVariable(
+            NodeId(1, "demoInt"),
+            NodeId(0, UA_NS0ID_BASEDATAVARIABLETYPE),
+            QualifiedName(1, "demoInt"), 27);
+        var->connectCallback(std::make_unique<DataSource>(
+            "simpleVal", getValue, setValue));
 
-    test = []() { return "hello"s; };
+        test = []() { return "hello"s; };
 
-    auto objectsFolder = s.getObject(NodeId(0, 85));
-    objectsFolder->addMethod(modernopc::NodeId(1, "test"s),
-                             QualifiedName(1, "open"), test);
-    f = std::async(std::launch::async, [&] { s.run(); });
-  }
+        auto objectsFolder = s.getObject(NodeId(0, 85));
+        objectsFolder->addMethod(NodeId(1, "test"s),
+                                 QualifiedName(1, "open"), test);
+        f = std::async(std::launch::async, [&] { s.run(); });
+    }
 
-  void TearDown() override {
-      s.stop();
-      f.wait();
+    void TearDown() override
+    {
+        s.stop();
+        f.wait();
+    }
 
-  }
-
-  modernopc::Server s;
-  std::future<void> f;
-  std::function<std::string()> test;
+    Server s;
+    std::future<void> f;
+    std::function<std::string()> test;
 };
 
 TEST_F(ClientTest, read)
 {
-    modernopc::Client c{"opc.tcp://localhost:4840"};
+    Client c{"opc.tcp://localhost:4840"};
     c.connect();
 
     auto id =
@@ -74,10 +81,10 @@ TEST_F(ClientTest, read)
 
 TEST_F(ClientTest, write)
 {
-    modernopc::Client c{"opc.tcp://localhost:4840"};
+    Client c{"opc.tcp://localhost:4840"};
     c.connect();
 
-    c.write(modernopc::NodeId(1, "demoInt"), modernopc::Variant(20));
+    c.write(NodeId(1, "demoInt"), Variant(20));
     s.stop();
 }
 
@@ -86,8 +93,9 @@ TEST_F(ClientTest, call)
     modernopc::Client c{"opc.tcp://localhost:4840"};
     c.connect();
 
-    auto output = c.call(NodeId(0, 85), NodeId(1, "test"s), std::vector<Variant>{});
-    ASSERT_TRUE(output.size()==1);
+    auto output =
+        c.call(NodeId(0, 85), NodeId(1, "test"s), std::vector<Variant>{});
+    ASSERT_TRUE(output.size() == 1);
     ASSERT_TRUE(output[0].is_a<std::string>());
     std::cout << output[0].get<std::string>() << "\n";
     s.stop();
