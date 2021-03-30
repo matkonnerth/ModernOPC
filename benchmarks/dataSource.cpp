@@ -1,9 +1,9 @@
 #include <benchmark/benchmark.h>
-#include <opc/DataSource.h>
-#include <opc/Server.h>
-#include <opc/Variant.h>
-#include <opc/nodes/ObjectNode.h>
-#include <opc/nodes/VariableNode.h>
+#include <modernOpc/DataSource.h>
+#include <modernOpc/Server.h>
+#include <modernOpc/Variant.h>
+#include <modernOpc/nodes/ObjectNode.h>
+#include <modernOpc/nodes/VariableNode.h>
 #include <open62541/server.h>
 #include <vector>
 

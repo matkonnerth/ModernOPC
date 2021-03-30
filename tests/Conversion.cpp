@@ -1,6 +1,6 @@
-#include <opc/DataType.h>
-#include <open62541/types_generated.h>
 #include <gtest/gtest.h>
+#include <modernOpc/DataType.h>
+#include <open62541/types_generated.h>
 
 TEST(TypeConverter, boolean) {
     auto t = opc::getDataType<bool>();

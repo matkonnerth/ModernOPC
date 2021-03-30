@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <opc/Server.h>
-#include <opc/nodes/Node.h>
-#include <opc/nodes/ObjectNode.h>
+#include <modernOpc/Server.h>
+#include <modernOpc/nodes/Node.h>
+#include <modernOpc/nodes/ObjectNode.h>
 
 std::string path = "";
 

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <opc/Server.h>
-#include <opc/Variant.h>
-#include <opc/nodes/VariableNode.h>
+#include <modernOpc/Server.h>
+#include <modernOpc/Variant.h>
+#include <modernOpc/nodes/VariableNode.h>
 
 std::string path = "";
 using opc::NodeId;

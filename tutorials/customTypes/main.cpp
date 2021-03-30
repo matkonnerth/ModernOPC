@@ -1,8 +1,8 @@
-#include <opc/Server.h>
 #include "AppTypes.h"
-#include <opc/nodes/ObjectNode.h>
-#include <opc/nodes/VariableNode.h>
 #include <iostream>
+#include <modernOpc/Server.h>
+#include <modernOpc/nodes/ObjectNode.h>
+#include <modernOpc/nodes/VariableNode.h>
 //#include <generated.h>
 
 using opc::NodeId;

@@ -9,13 +9,13 @@
 
 #include <functional>
 #include <iostream>
-#include <opc/DataSource.h>
-#include <opc/Server.h>
-#include <opc/Variant.h>
-#include <opc/nodes/ObjectNode.h>
-#include <opc/nodes/VariableNode.h>
-#include <opc/types/NodeId.h>
-#include <opc/types/QualifiedName.h>
+#include <modernOpc/DataSource.h>
+#include <modernOpc/Server.h>
+#include <modernOpc/Variant.h>
+#include <modernOpc/nodes/ObjectNode.h>
+#include <modernOpc/nodes/VariableNode.h>
+#include <modernOpc/types/NodeId.h>
+#include <modernOpc/types/QualifiedName.h>
 #include <vector>
 
 using opc::DataSource;

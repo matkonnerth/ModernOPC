@@ -1,6 +1,6 @@
 #include <cassert>
-#include <opc/Variant.h>
-#include <opc/types/NodeId.h>
+#include <modernOpc/Variant.h>
+#include <modernOpc/types/NodeId.h>
 #include <open62541/types.h>
 #include <open62541/types_generated_handling.h>
 #include <ostream>

@@ -1,7 +1,7 @@
 #pragma once
-#include <opc/Variant.h>
+#include <modernOpc/Variant.h>
+#include <modernOpc/util.h>
 #include <type_traits>
-#include <opc/util.h>
 
 namespace opc
 {

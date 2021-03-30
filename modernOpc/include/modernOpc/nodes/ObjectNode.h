@@ -1,11 +1,11 @@
 #pragma once
 #include <memory>
-#include <opc/Server.h>
-#include <opc/VariableAttributes.h>
-#include <opc/methods/Method.h>
-#include <opc/nodes/MethodNode.h>
-#include <opc/nodes/Node.h>
-#include <opc/types/QualifiedName.h>
+#include <modernOpc/Server.h>
+#include <modernOpc/VariableAttributes.h>
+#include <modernOpc/methods/Method.h>
+#include <modernOpc/nodes/MethodNode.h>
+#include <modernOpc/nodes/Node.h>
+#include <modernOpc/types/QualifiedName.h>
 
 namespace opc
 {

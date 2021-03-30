@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 #include <memory>
-#include <opc/Server.h>
-#include <opc/Variant.h>
-#include <opc/nodes/MethodNode.h>
-#include <opc/nodes/ObjectNode.h>
+#include <modernOpc/Server.h>
+#include <modernOpc/Variant.h>
+#include <modernOpc/nodes/MethodNode.h>
+#include <modernOpc/nodes/ObjectNode.h>
 #include <vector>
 
 using opc::NodeId;

@@ -1,9 +1,9 @@
-#include <opc/Server.h>
 #include <gtest/gtest.h>
-#include <opc/events/BaseEventType.h>
-#include <opc/types/NodeId.h>
-#include <opc/types/QualifiedName.h>
-#include <opc/nodes/ObjectNode.h>
+#include <modernOpc/Server.h>
+#include <modernOpc/events/BaseEventType.h>
+#include <modernOpc/nodes/ObjectNode.h>
+#include <modernOpc/types/NodeId.h>
+#include <modernOpc/types/QualifiedName.h>
 
 using opc::Variant;
 using opc::ObjectNode;

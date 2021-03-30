@@ -1,6 +1,6 @@
-#include <opc/Variant.h>
-#include <opc/types/LocalizedText.h>
-#include <opc/types/String.h>
+#include <modernOpc/Variant.h>
+#include <modernOpc/types/LocalizedText.h>
+#include <modernOpc/types/String.h>
 #include <ostream>
 
 namespace opc

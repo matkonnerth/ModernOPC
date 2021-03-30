@@ -1,15 +1,15 @@
 #pragma once
-#include <opc/UnresolvedNodeId.h>
-#include <opc/types/NodeId.h>
-#include <opc/Variant.h>
 #include <functional>
 #include <map>
+#include <modernOpc/Logger.h>
+#include <modernOpc/UnresolvedNodeId.h>
+#include <modernOpc/Variant.h>
+#include <modernOpc/types/NodeId.h>
+#include <optional>
 #include <string>
 #include <unordered_map>
-#include <vector>
-#include <optional>
 #include <variant>
-#include <opc/Logger.h>
+#include <vector>
 
 struct UA_Client;
 namespace opc {

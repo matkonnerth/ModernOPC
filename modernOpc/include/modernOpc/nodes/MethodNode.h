@@ -1,10 +1,10 @@
 #pragma once
 #include <memory>
-#include <opc/Variant.h>
-#include <opc/methods/Method.h>
-#include <opc/methods/MethodWrapper.h>
-#include <opc/nodes/Node.h>
-#include <opc/types/NodeId.h>
+#include <modernOpc/Variant.h>
+#include <modernOpc/methods/Method.h>
+#include <modernOpc/methods/MethodWrapper.h>
+#include <modernOpc/nodes/Node.h>
+#include <modernOpc/types/NodeId.h>
 #include <vector>
 
 namespace opc

@@ -1,10 +1,10 @@
 #pragma once
+#include <atomic>
 #include <memory>
-#include <opc/types/NodeId.h>
-#include <opc/types/QualifiedName.h>
+#include <modernOpc/types/NodeId.h>
+#include <modernOpc/types/QualifiedName.h>
 #include <open62541/server.h>
 #include <unordered_map>
-#include <atomic>
 
 struct UA_Server;
 

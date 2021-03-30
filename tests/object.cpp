@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
-#include <opc/types/NodeId.h>
-#include <string>
-#include <opc/Server.h>
-#include <opc/nodes/Node.h>
+#include <modernOpc/Server.h>
+#include <modernOpc/nodes/Node.h>
+#include <modernOpc/nodes/ObjectNode.h>
+#include <modernOpc/types/NodeId.h>
 #include <optional>
-#include <opc/nodes/ObjectNode.h>
+#include <string>
 //#include <generated.h>
 
 using opc::NodeId;

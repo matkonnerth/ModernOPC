@@ -83,11 +83,12 @@ if(NOT ${CALC_COVERAGE})
             EXPORT modernOpc
             LIBRARY DESTINATION lib
             ARCHIVE DESTINATION lib
-            RUNTIME
+            RUNTIME DESTINATION bin
             INCLUDES DESTINATION include
             PUBLIC_HEADER DESTINATION include)
 
-    install(EXPORT modernOpc DESTINATION lib/cmake)
+    install(EXPORT modernOpc DESTINATION lib/cmake/modernOpc)
+    install(FILES modernOpcConfig.cmake DESTINATION lib/cmake/modernOpc)
 
-    install(DIRECTORY ${PROJECT_SOURCE_DIR}/modernOpc/include/opc DESTINATION include)
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/modernOpc/include/modernOpc DESTINATION include)
 endif()

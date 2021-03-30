@@ -1,5 +1,5 @@
 #pragma once
-#include <opc/DataType.h>
+#include <modernOpc/DataType.h>
 #include <open62541/types.h>
 #include <variant>
 namespace opc

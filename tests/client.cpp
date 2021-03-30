@@ -1,15 +1,15 @@
+#include <chrono>
 #include <future>
 #include <gtest/gtest.h>
 #include <iostream>
-#include <opc/Server.h>
-#include <opc/Variant.h>
-#include <opc/client/Client.h>
-#include <opc/nodes/VariableNode.h>
-#include <opc/types/NodeId.h>
+#include <modernOpc/Server.h>
+#include <modernOpc/Variant.h>
+#include <modernOpc/client/Client.h>
+#include <modernOpc/nodes/ObjectNode.h>
+#include <modernOpc/nodes/VariableNode.h>
+#include <modernOpc/types/NodeId.h>
 #include <string>
 #include <vector>
-#include <opc/nodes/ObjectNode.h>
-#include <chrono>
 
 using opc::NodeId;
 using opc::UnresolvedNodeId;

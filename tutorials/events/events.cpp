@@ -1,9 +1,9 @@
 #include <functional>
-#include <opc/Server.h>
-#include <opc/events/BaseEventType.h>
-#include <opc/nodes/MethodNode.h>
-#include <opc/nodes/ObjectNode.h>
 #include <iostream>
+#include <modernOpc/Server.h>
+#include <modernOpc/nodes/MethodNode.h>
+#include <modernOpc/nodes/ObjectNode.h>
+#include <modernOpc/events/BaseEventType.h>
 
 using opc::ObjectNode;
 using namespace std::string_literals;

@@ -1,9 +1,8 @@
 #include <gtest/gtest.h>
-#include <opc/Server.h>
-#include <opc/nodes/ObjectNode.h>
-#include <opc/nodes/VariableNode.h>
-#include <opc/DataSource.h>
-
+#include <modernOpc/DataSource.h>
+#include <modernOpc/Server.h>
+#include <modernOpc/nodes/ObjectNode.h>
+#include <modernOpc/nodes/VariableNode.h>
 
 UA_StatusCode getValue(const opc::NodeId &id, opc::Variant &var)
 {

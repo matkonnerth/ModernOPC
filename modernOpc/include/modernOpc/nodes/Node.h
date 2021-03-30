@@ -1,7 +1,7 @@
 #pragma once
-#include <opc/types/LocalizedText.h>
-#include <opc/types/NodeId.h>
-#include <opc/types/QualifiedName.h>
+#include <modernOpc/types/LocalizedText.h>
+#include <modernOpc/types/NodeId.h>
+#include <modernOpc/types/QualifiedName.h>
 
 namespace opc
 {

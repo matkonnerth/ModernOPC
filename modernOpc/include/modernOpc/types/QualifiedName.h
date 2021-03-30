@@ -1,7 +1,7 @@
 #pragma once
-#include <string>
+#include <modernOpc/DataType.h>
 #include <open62541/types.h>
-#include <opc/DataType.h>
+#include <string>
 
 namespace opc
 {

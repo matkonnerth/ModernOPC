@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
-#include <opc/Server.h>
-#include <opc/types/NodeId.h>
+#include <modernOpc/Server.h>
+#include <modernOpc/Variant.h>
+#include <modernOpc/nodes/VariableNode.h>
+#include <modernOpc/types/NodeId.h>
 #include <string>
 #include <vector>
-#include <opc/Variant.h>
-#include <opc/nodes/VariableNode.h>
 
 using opc::NodeId;
 using opc::QualifiedName;

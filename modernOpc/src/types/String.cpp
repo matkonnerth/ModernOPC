@@ -1,6 +1,6 @@
-#include <opc/types/String.h>
+#include <modernOpc/Variant.h>
+#include <modernOpc/types/String.h>
 #include <vector>
-#include <opc/Variant.h>
 
 namespace opc
 {

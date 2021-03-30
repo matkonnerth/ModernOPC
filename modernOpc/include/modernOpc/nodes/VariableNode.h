@@ -1,7 +1,7 @@
 #pragma once
-#include <opc/DataSource.h>
-#include <opc/nodes/Node.h>
 #include <memory>
+#include <modernOpc/DataSource.h>
+#include <modernOpc/nodes/Node.h>
 
 namespace opc
 {

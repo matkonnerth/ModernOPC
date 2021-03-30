@@ -1,9 +1,9 @@
 #include <algorithm>
-#include <opc/Variant.h>
-#include <opc/types/LocalizedText.h>
-#include <opc/types/NodeId.h>
-#include <opc/types/QualifiedName.h>
-#include <opc/types/String.h>
+#include <modernOpc/Variant.h>
+#include <modernOpc/types/LocalizedText.h>
+#include <modernOpc/types/NodeId.h>
+#include <modernOpc/types/QualifiedName.h>
+#include <modernOpc/types/String.h>
 #include <string>
 #include <vector>
 

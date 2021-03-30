@@ -1,11 +1,11 @@
-#include <opc/nodes/ObjectNode.h>
-#include <opc/nodes/MethodNode.h>
-#include <opc/methods/Method.h>
-#include <opc/Server.h>
-#include <opc/events/BaseEventType.h>
+#include <cstddef>
+#include <modernOpc/Server.h>
+#include <modernOpc/events/BaseEventType.h>
+#include <modernOpc/methods/Method.h>
+#include <modernOpc/nodes/ObjectNode.h>
+#include <modernOpc/nodes/MethodNode.h>
 #include <open62541/plugin/log_stdout.h>
 #include <optional>
-#include <cstddef>
 
 namespace opc
 {

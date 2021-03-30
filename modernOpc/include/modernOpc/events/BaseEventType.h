@@ -1,8 +1,8 @@
 #pragma once
-#include <opc/Variant.h>
-#include <opc/types/NodeId.h>
-#include <opc/types/LocalizedText.h>
-#include <opc/types/QualifiedName.h>
+#include <modernOpc/Variant.h>
+#include <modernOpc/types/LocalizedText.h>
+#include <modernOpc/types/NodeId.h>
+#include <modernOpc/types/QualifiedName.h>
 #include <utility>
 #include <vector>
 

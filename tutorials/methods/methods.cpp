@@ -4,11 +4,10 @@
  * This example shows how to add method nodes and connect it to the implementation.
  * Free Functions, member functions and lambdas are supported. */
 
-#include <opc/Server.h>
 #include <functional>
-#include <opc/nodes/ObjectNode.h>
 #include <iostream>
-
+#include <modernOpc/Server.h>
+#include <modernOpc/nodes/ObjectNode.h>
 
 using opc::QualifiedName;
 struct Callable

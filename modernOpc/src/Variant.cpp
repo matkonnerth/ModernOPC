@@ -1,4 +1,4 @@
-#include <opc/Variant.h>
+#include <modernOpc/Variant.h>
 
 namespace opc
 {

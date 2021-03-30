@@ -1,5 +1,5 @@
-#include <opc/OpcException.h>
-#include <opc/client/Client.h>
+#include <modernOpc/OpcException.h>
+#include <modernOpc/client/Client.h>
 #include <open62541/client.h>
 #include <open62541/client_config_default.h>
 #include <open62541/client_highlevel.h>

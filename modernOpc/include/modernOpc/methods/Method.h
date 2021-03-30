@@ -1,11 +1,11 @@
 #pragma once
 #include <functional>
+#include <modernOpc/DataType.h>
+#include <modernOpc/util.h>
 #include <open62541/types.h>
 #include <type_traits>
 #include <typeinfo>
 #include <vector>
-#include <opc/DataType.h>
-#include <opc/util.h>
 
 namespace opc
 {

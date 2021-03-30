@@ -1,12 +1,12 @@
 #include <benchmark/benchmark.h>
+#include <modernOpc/Server.h>
+#include <modernOpc/nodes/MethodNode.h>
+#include <modernOpc/nodes/ObjectNode.h>
+#include <modernOpc/types/NodeId.h>
 #include <open62541/client_config_default.h>
 #include <open62541/plugin/log_stdout.h>
 #include <open62541/server.h>
 #include <open62541/server_config_default.h>
-#include <opc/Server.h>
-#include <opc/types/NodeId.h>
-#include <opc/nodes/MethodNode.h>
-#include <opc/nodes/ObjectNode.h>
 
 static UA_StatusCode helloWorldMethodCallback(
     UA_Server *server, const UA_NodeId *sessionId, void *sessionHandle,

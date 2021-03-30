@@ -1,7 +1,6 @@
-#include <opc/nodes/Node.h>
-#include <opc/types/NodeId.h>
-#include <opc/Server.h>
-
+#include <modernOpc/nodes/Node.h>
+#include <modernOpc/types/NodeId.h>
+#include <modernOpc/Server.h>
 
 namespace opc
 {
