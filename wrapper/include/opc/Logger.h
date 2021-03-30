@@ -8,6 +8,11 @@ class Logger final
 public:
     explicit Logger(const std::string& name):m_name{name}
     {
+        if(spdlog::get(m_name))
+        {
+            spdlogger = spdlog::get(m_name);
+            return;
+        }
        auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
        spdlogger = std::make_shared<spdlog::logger>(m_name, console_sink);
        spdlogger->set_level(spdlog::level::debug);

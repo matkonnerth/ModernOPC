@@ -4,6 +4,7 @@
 #include <opc/types/QualifiedName.h>
 #include <open62541/server.h>
 #include <unordered_map>
+#include <atomic>
 
 struct UA_Server;
 
