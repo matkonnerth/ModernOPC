@@ -1,6 +1,7 @@
 #pragma once
 #include <functional>
 #include <open62541/types.h>
+#include <string>
 
 namespace opc {
 class Variant;

@@ -16,5 +16,6 @@ opc_add_test("nodeId")
 opc_add_test("object")
 opc_add_test("server2")
 opc_add_test("dataSource")
+opc_add_test("client")
 
 add_subdirectory(import)

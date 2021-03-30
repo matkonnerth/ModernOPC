@@ -4,6 +4,7 @@
 #include <opc/types/QualifiedName.h>
 #include <open62541/server.h>
 #include <unordered_map>
+#include <atomic>
 
 struct UA_Server;
 
@@ -37,6 +38,8 @@ class Server
     Server &operator=(Server &&) = delete;
 
     void run();
+
+    void stop();
 
     /**
      * loads a nodeset xml into server address space.

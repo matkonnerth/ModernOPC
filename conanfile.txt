@@ -4,7 +4,6 @@ cmake
 [requires]
 gtest/1.10.0
 benchmark/1.5.0
-open62541/master@matkonnerth/testing
-nodesetloader/0.1@matkonnerth/testing
+spdlog/1.7.0
 
 

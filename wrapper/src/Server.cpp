@@ -51,10 +51,16 @@ static void cleanupCustomTypes(const UA_DataTypeArray *types)
 }
 
 Server::~Server() {
+    stop();
     const UA_DataTypeArray *customTypes =
         UA_Server_getConfig(server)->customDataTypes;
     UA_Server_delete(server);
     cleanupCustomTypes(customTypes);
+}
+
+void Server::stop()
+{
+    isRunning = false;
 }
 
 void Server::create(uint16_t port)
@@ -65,7 +71,7 @@ void Server::create(uint16_t port)
     if (status != UA_STATUSCODE_GOOD)
     {
         UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_SERVER,
-                       "Setting serer config failed with StatusCode %s",
+                       "Setting server config failed with StatusCode %s",
                        UA_StatusCode_name(status));
     }
 }
