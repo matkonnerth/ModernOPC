@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 #include <cassert>
-namespace opc
+namespace modernopc
 {
 template <typename T>
 inline const UA_DataType *getDataType();
@@ -119,4 +119,4 @@ inline const UA_DataType *getDataType<std::vector<int>>()
 {
     return getDataType<int>();
 }
-} // namespace opc
+} // namespace modernopc

@@ -1,7 +1,7 @@
 #pragma once
 #include <variant>
 #include <string>
-namespace opc
+namespace modernopc
 {
 
 class NodeId
@@ -41,14 +41,14 @@ class NodeId
     std::variant<int, std::string> i{0};
 };
 
-} // namespace opc
+} // namespace modernopc
 
 namespace std
 {
 template <>
-struct hash<opc::NodeId>
+struct hash<modernopc::NodeId>
 {
-    inline size_t operator()(const opc::NodeId &id) const
+    inline size_t operator()(const modernopc::NodeId &id) const
     {
         return getHash(id);
     }

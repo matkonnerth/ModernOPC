@@ -7,7 +7,7 @@
 #include <modernOpc/nodes/Node.h>
 #include <modernOpc/types/QualifiedName.h>
 
-namespace opc
+namespace modernopc
 {
 class BaseEventType;
 
@@ -68,4 +68,4 @@ class ObjectNode : public Node
     UA_StatusCode setUpEvent(UA_NodeId *outId, const BaseEventType &event);
 };
 
-} // namespace opc
+} // namespace modernopc

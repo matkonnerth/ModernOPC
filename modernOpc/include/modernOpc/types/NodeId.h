@@ -2,7 +2,7 @@
 #include <modernOpc/DataType.h>
 #include <open62541/types.h>
 #include <variant>
-namespace opc
+namespace modernopc
 {
 
 class NodeId
@@ -53,14 +53,14 @@ inline const UA_DataType *getDataType<NodeId>()
     return &UA_TYPES[UA_TYPES_NODEID];
 }
 
-} // namespace opc
+} // namespace modernopc
 
 namespace std
 {
 template <>
-struct hash<opc::NodeId>
+struct hash<modernopc::NodeId>
 {
-    inline size_t operator()(const opc::NodeId &id) const
+    inline size_t operator()(const modernopc::NodeId &id) const
     {
         return getHash(id);
     }

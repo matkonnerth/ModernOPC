@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-namespace opc
+namespace modernopc
 {
 
 template <>
@@ -118,4 +118,4 @@ std::vector<std::string> Variant::get<std::vector<std::string>>() const
     return vec;
 }
 
-} // namespace opc
+} // namespace modernopc

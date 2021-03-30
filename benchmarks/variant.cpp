@@ -8,7 +8,7 @@ static void IntVectorToVariant(benchmark::State &state)
     std::vector<int> vec{1000, 99};size_t cnt =0;
     for (auto _ : state)
     {
-        opc::Variant var;
+        modernopc::Variant var;
         var(vec);
     }
 }
@@ -19,14 +19,14 @@ static void StringVectorToVariant(benchmark::State &state)
     size_t cnt = 0;
     for (auto _ : state)
     {
-        opc::Variant var;
+        modernopc::Variant var;
         var(vec);
     }
 }
 
 static void VariantToIntVector(benchmark::State &state)
 {
-    opc::Variant var;
+    modernopc::Variant var;
     var(std::vector<int>(1000,99));
     for (auto _ : state)
     {
@@ -37,7 +37,7 @@ static void VariantToIntVector(benchmark::State &state)
 
 static void VariantToStringVector(benchmark::State &state)
 {
-    opc::Variant var;
+    modernopc::Variant var;
     var(std::vector<std::string>(1000, "adsfasdf"));
     for (auto _ : state)
     {

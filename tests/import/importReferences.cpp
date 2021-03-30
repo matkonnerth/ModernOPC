@@ -6,7 +6,7 @@ std::string path = "";
 
 TEST(import, reference)
 {
-    opc::Server server;
+    modernopc::Server server;
     ASSERT_TRUE(server.loadNodeset(path + "/" + "importreferences.xml"));
 
     UA_QualifiedName objectName;

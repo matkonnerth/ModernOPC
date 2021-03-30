@@ -7,27 +7,27 @@ std::string path = "";
 
 TEST(import, values)
 {
-    opc::Server server;
+    modernopc::Server server;
     ASSERT_TRUE(server.loadNodeset(path + "/" + "namespaceZeroValues.xml"));
 }
 
 TEST(import, nodeclass)
 {
-    opc::Server server;
+    modernopc::Server server;
     ASSERT_TRUE(server.loadNodeset(path + "/" + "basicNodeClassTest.xml"));
 }
 
 TEST(import, notFound)
 {
-    opc::Server server;
+    modernopc::Server server;
     ASSERT_FALSE(server.loadNodeset("someNotExisting.xml"));
 }
 
 TEST(import, displayname)
 {
-    opc::Server server;
+    modernopc::Server server;
     ASSERT_TRUE(server.loadNodeset(path + "/" + "Displayname.xml"));
-    ASSERT_TRUE(server.getObject(opc::NodeId(2, 6567))->displayName().text() ==
+    ASSERT_TRUE(server.getObject(modernopc::NodeId(2, 6567))->displayName().text() ==
                 "<GroupIdentifier>");
 }
 

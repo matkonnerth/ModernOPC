@@ -2,7 +2,7 @@
 #include <modernOpc/Variant.h>
 #include <modernOpc/nodes/VariableNode.h>
 
-namespace opc
+namespace modernopc
 {
 void VariableNode::connectCallback(std::unique_ptr<DataSource> dataSource)
 {
@@ -34,4 +34,4 @@ bool VariableNode::write(const Variant &var)
     return false;
 }
 
-} // namespace opc
+} // namespace modernopc

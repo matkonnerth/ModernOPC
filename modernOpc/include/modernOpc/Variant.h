@@ -8,7 +8,7 @@
 #include <utility>
 #include <vector>
 
-namespace opc
+namespace modernopc
 {
 
 template <typename T>
@@ -21,7 +21,7 @@ void toUAVariantImpl(const std::vector<T>& val, UA_Variant *var)
                   "Type not integral");
     UA_Variant_init(var);
     UA_Variant_setArrayCopy(var, val.data(), val.size(),
-                            opc::getDataType<removeConstRef_t<T>>());
+                            modernopc::getDataType<removeConstRef_t<T>>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
 
@@ -93,7 +93,7 @@ class Variant
     template <typename T>
     bool is_a() const
     {
-        if constexpr (opc::is_vector<T>::value)
+        if constexpr (modernopc::is_vector<T>::value)
         {
             return variant->type == getDataType<removeConstRef_t<T>>();
         }
@@ -104,4 +104,4 @@ class Variant
     UA_Variant *variant{nullptr};
     bool owned = false;
 };
-} // namespace opc
+} // namespace modernopc

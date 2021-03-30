@@ -7,7 +7,7 @@
 #include <modernOpc/types/NodeId.h>
 #include <vector>
 
-namespace opc
+namespace modernopc
 {
 
 class MethodNode : public Node
@@ -37,4 +37,4 @@ class MethodNode : public Node
     std::unique_ptr<ICallable> callable{};
 };
 
-} // namespace opc
+} // namespace modernopc

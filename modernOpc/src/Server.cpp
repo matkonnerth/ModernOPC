@@ -12,7 +12,7 @@
 #include <open62541/server.h>
 #include <open62541/server_config_default.h>
 
-namespace opc
+namespace modernopc
 {
 
 Server::Server() { create(4840); }
@@ -388,4 +388,4 @@ void Server::connectMethodCallback(const NodeId &id, ICallable *callable)
     UA_Server_setNodeContext(server, fromNodeId(id), callable);
 }
 
-} // namespace opc
+} // namespace modernopc

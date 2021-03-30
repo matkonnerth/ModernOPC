@@ -3,7 +3,7 @@
 #include <modernOpc/types/NodeId.h>
 #include <modernOpc/types/QualifiedName.h>
 
-namespace opc
+namespace modernopc
 {
 class Server;
 class Node
@@ -21,4 +21,4 @@ class Node
     const NodeId id;
 };
 
-} // namespace opc
+} // namespace modernopc

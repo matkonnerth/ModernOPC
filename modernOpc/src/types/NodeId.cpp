@@ -6,7 +6,7 @@
 #include <ostream>
 #include <variant>
 
-namespace opc
+namespace modernopc
 {
 
 const NodeId fromUaNodeId(const UA_NodeId &id)
@@ -76,7 +76,7 @@ const UA_NodeId fromNodeId(const NodeId &nodeId)
 void toUAVariantImpl(const NodeId &id, UA_Variant *var)
 {
     const UA_NodeId uaId = fromNodeId(id);
-    UA_Variant_setScalarCopy(var, &uaId, opc::getDataType<NodeId>());
+    UA_Variant_setScalarCopy(var, &uaId, modernopc::getDataType<NodeId>());
 }
 
 template <>
@@ -132,4 +132,4 @@ std::size_t getHash(const NodeId &id)
     return h1 ^ (h2 << 1);
 }
 
-} // namespace opc
+} // namespace modernopc

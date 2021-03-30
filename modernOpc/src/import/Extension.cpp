@@ -11,7 +11,7 @@ struct Extension
     const TNode *node;
     std::map<std::string, std::string> values{};
 };
-namespace opc
+namespace modernopc
 {
 Extension *Extension_new(const TNode *n) { return new Extension(n); }
 
@@ -23,4 +23,4 @@ void Extension_end(Extension *val, const char *localname, char *value)
 }
 void Extension_finish(Extension *val) { delete val; }
 
-} // namespace opc
+} // namespace modernopc

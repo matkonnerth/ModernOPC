@@ -3,7 +3,7 @@
 #include <modernOpc/DataSource.h>
 #include <modernOpc/nodes/Node.h>
 
-namespace opc
+namespace modernopc
 {
 class Variant;
 class VariableNode : public Node
@@ -18,4 +18,4 @@ class VariableNode : public Node
     std::unique_ptr<DataSource> ds {};
 };
 
-} // namespace opc
+} // namespace modernopc

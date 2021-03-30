@@ -2,7 +2,7 @@
 #include <open62541/plugin/log.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-namespace opc {
+namespace modernopc {
 class Logger final
 {
 public:
@@ -60,4 +60,4 @@ public:
     std::shared_ptr<spdlog::logger> spdlogger;
     const std::string m_name;
 };
-} // namespace opctest::client
+} // namespace modernopctest::client

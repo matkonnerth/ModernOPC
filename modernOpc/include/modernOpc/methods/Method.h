@@ -7,7 +7,7 @@
 #include <typeinfo>
 #include <vector>
 
-namespace opc
+namespace modernopc
 {
 
 template <typename ClassType, typename ReturnType, typename... Args>
@@ -95,4 +95,4 @@ struct MethodTraits<std::function<R(Args...)>>
     using type = std::function<R(Args...)>;
 };
 
-} // namespace opc
+} // namespace modernopc

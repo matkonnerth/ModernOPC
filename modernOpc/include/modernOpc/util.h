@@ -1,7 +1,7 @@
 #pragma once
 #include <type_traits>
 #include <vector>
-namespace opc
+namespace modernopc
 {
 
 template <class T>
@@ -22,4 +22,4 @@ struct removeConstRef
 
 template <class T>
 using removeConstRef_t = typename removeConstRef<T>::type;
-} // namespace opc
+} // namespace modernopc

@@ -18,11 +18,11 @@ struct Range2
 } // namespace types
 } // namespace app
 
-namespace opc
+namespace modernopc
 {
 template <>
 inline const UA_DataType *getDataType<app::types::Range2>()
 {
     return &UA_TYPES[UA_TYPES_RANGE];
 }
-} // namespace opc
+} // namespace modernopc

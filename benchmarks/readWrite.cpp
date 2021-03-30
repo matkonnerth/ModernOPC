@@ -6,14 +6,14 @@
 #include <open62541/server.h>
 #include <vector>
 
-using opc::Server;
-using opc::Variant;
+using modernopc::Server;
+using modernopc::Variant;
 static void readRaw(benchmark::State &state)
 {
     Server s;
 
-    auto var = s.getObjectsFolder()->addBaseDataTypeVariable(opc::NodeId(1, 123),
-                                  opc::QualifiedName(1, "demoInt"), 27);
+    auto var = s.getObjectsFolder()->addBaseDataTypeVariable(modernopc::NodeId(1, 123),
+                                  modernopc::QualifiedName(1, "demoInt"), 27);
 
 
     UA_Server* server = s.getUAServer();
@@ -31,7 +31,7 @@ static void readWrapped(benchmark::State &state)
     Server s;
 
     auto var = s.getObjectsFolder()->addBaseDataTypeVariable(
-        opc::NodeId(1, 123), opc::QualifiedName(1, "demoInt"), 27);
+        modernopc::NodeId(1, 123), modernopc::QualifiedName(1, "demoInt"), 27);
 
     Variant v;
     for (auto _ : state)
@@ -45,7 +45,7 @@ static void writeRaw(benchmark::State &state)
     Server s;
 
     auto var = s.getObjectsFolder()->addBaseDataTypeVariable(
-        opc::NodeId(1, 123), opc::QualifiedName(1, "demoInt"), 27);
+        modernopc::NodeId(1, 123), modernopc::QualifiedName(1, "demoInt"), 27);
 
     UA_Server *server = s.getUAServer();
     UA_Variant v;
@@ -63,7 +63,7 @@ static void writeWrapped(benchmark::State &state)
     Server s;
 
     auto var = s.getObjectsFolder()->addBaseDataTypeVariable(
-        opc::NodeId(1, 123), opc::QualifiedName(1, "demoInt"), 27);
+        modernopc::NodeId(1, 123), modernopc::QualifiedName(1, "demoInt"), 27);
 
     Variant v{(int32_t)1222};
     const UA_NodeId id = UA_NODEID_NUMERIC(1, 123);

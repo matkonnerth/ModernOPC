@@ -3,7 +3,7 @@
 #include <modernOpc/util.h>
 #include <type_traits>
 
-namespace opc
+namespace modernopc
 {
 
 template <typename T>
@@ -36,4 +36,4 @@ const UA_VariableAttributes getVariableAttributes(const std::vector<T> &v)
     return attr;
 }
 
-} // namespace opc
+} // namespace modernopc

@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-namespace opc {
+namespace modernopc {
 class UnresolvedNodeId
 {
 public:
@@ -20,4 +20,4 @@ public:
       return lhs.identifier < rhs.identifier;
 }
 };
-} // namespace opctest::client
+} // namespace modernopctest::client

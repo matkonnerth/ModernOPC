@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <string>
 
-namespace opc
+namespace modernopc
 {
 class OpcException : public std::runtime_error
 {
@@ -11,4 +11,4 @@ class OpcException : public std::runtime_error
 
     virtual ~OpcException() = default;
 };
-} // namespace opc
+} // namespace modernopc

@@ -7,8 +7,8 @@
 #include <open62541/server.h>
 #include <vector>
 
-using opc::Server;
-using opc::Variant;
+using modernopc::Server;
+using modernopc::Variant;
 
 static UA_StatusCode internalRead(UA_Server *server, const UA_NodeId *sessionId,
                                   void *sessionContext, const UA_NodeId *nodeId,
@@ -33,11 +33,11 @@ internalWrite(UA_Server *server, const UA_NodeId *sessionId,
 
 static void readRaw(benchmark::State &state)
 {
-    opc::Server s;
+    modernopc::Server s;
     auto root = s.getObjectsFolder();
-    auto var = root->addVariable(opc::NodeId(1, 123),
-                                 opc::NodeId(0, UA_NS0ID_BASEDATAVARIABLETYPE),
-                                 opc::QualifiedName(1, "demoInt"), 27);
+    auto var = root->addVariable(modernopc::NodeId(1, 123),
+                                 modernopc::NodeId(0, UA_NS0ID_BASEDATAVARIABLETYPE),
+                                 modernopc::QualifiedName(1, "demoInt"), 27);
 
     UA_Server *server = s.getUAServer();
     const UA_NodeId id = UA_NODEID_NUMERIC(1, 123);
@@ -52,27 +52,27 @@ static void readRaw(benchmark::State &state)
     }
 }
 
-UA_StatusCode getValue(const opc::NodeId &id, opc::Variant &var)
+UA_StatusCode getValue(const modernopc::NodeId &id, modernopc::Variant &var)
 {
     var(42);
     return UA_STATUSCODE_GOOD;
 }
 
-UA_StatusCode setValue(const opc::NodeId &id, const opc::Variant &var)
+UA_StatusCode setValue(const modernopc::NodeId &id, const modernopc::Variant &var)
 {
     return UA_STATUSCODE_GOOD;
 }
 
 static void readWrapped(benchmark::State &state)
 {
-    opc::Server s;
+    modernopc::Server s;
 
     auto root = s.getObjectsFolder();
-    auto var = root->addVariable(opc::NodeId(1, 123),
-                                 opc::NodeId(0, UA_NS0ID_BASEDATAVARIABLETYPE),
-                                 opc::QualifiedName(1, "demoInt"), 27);
+    auto var = root->addVariable(modernopc::NodeId(1, 123),
+                                 modernopc::NodeId(0, UA_NS0ID_BASEDATAVARIABLETYPE),
+                                 modernopc::QualifiedName(1, "demoInt"), 27);
     var->connectCallback(
-        std::make_unique<opc::DataSource>("simpleVal", getValue, setValue));
+        std::make_unique<modernopc::DataSource>("simpleVal", getValue, setValue));
 
     UA_Server *server = s.getUAServer();
     UA_Variant v;
@@ -86,11 +86,11 @@ static void readWrapped(benchmark::State &state)
 
 static void writeRaw(benchmark::State &state)
 {
-    opc::Server s;
+    modernopc::Server s;
     auto root = s.getObjectsFolder();
-    auto var = root->addVariable(opc::NodeId(1, 123),
-                                 opc::NodeId(0, UA_NS0ID_BASEDATAVARIABLETYPE),
-                                 opc::QualifiedName(1, "demoInt"), 27);
+    auto var = root->addVariable(modernopc::NodeId(1, 123),
+                                 modernopc::NodeId(0, UA_NS0ID_BASEDATAVARIABLETYPE),
+                                 modernopc::QualifiedName(1, "demoInt"), 27);
 
     UA_Server *server = s.getUAServer();
     const UA_NodeId id = UA_NODEID_NUMERIC(1, 123);
@@ -109,14 +109,14 @@ static void writeRaw(benchmark::State &state)
 
 static void writeWrapped(benchmark::State &state)
 {
-    opc::Server s;
+    modernopc::Server s;
     auto root = s.getObjectsFolder();
-    auto var = root->addVariable(opc::NodeId(1, 123),
-                                 opc::NodeId(0, UA_NS0ID_BASEDATAVARIABLETYPE),
-                                 opc::QualifiedName(1, "demoInt"), 27);
+    auto var = root->addVariable(modernopc::NodeId(1, 123),
+                                 modernopc::NodeId(0, UA_NS0ID_BASEDATAVARIABLETYPE),
+                                 modernopc::QualifiedName(1, "demoInt"), 27);
 
     var->connectCallback(
-        std::make_unique<opc::DataSource>("simpleVal", getValue, setValue));
+        std::make_unique<modernopc::DataSource>("simpleVal", getValue, setValue));
 
     UA_Server *server = s.getUAServer();
     const UA_NodeId id = UA_NODEID_NUMERIC(1, 123);

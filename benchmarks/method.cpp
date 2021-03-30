@@ -79,10 +79,10 @@ static int32_t callback(int32_t val)
 
 static void serverWrapped(benchmark::State &state)
 {
-    using opc::NodeId;
+    using modernopc::NodeId;
 
-    opc::Server s;
-    s.getObjectsFolder()->addMethod(NodeId(1, 62541), opc::QualifiedName(1,"test"),
+    modernopc::Server s;
+    s.getObjectsFolder()->addMethod(NodeId(1, 62541), modernopc::QualifiedName(1,"test"),
                                     &callback);
 
     auto server = s.getUAServer();
@@ -129,10 +129,10 @@ int32_t manyArgs(int a0, int a1, int a2, int a3, int a4, int a5, int a6,
 
 static void serverManyArgs(benchmark::State &state)
 {
-    using opc::NodeId;
+    using modernopc::NodeId;
 
-    opc::Server s;
-    s.getObjectsFolder()->addMethod(NodeId(1, 62541), opc::QualifiedName(1, "test"), &manyArgs);
+    modernopc::Server s;
+    s.getObjectsFolder()->addMethod(NodeId(1, 62541), modernopc::QualifiedName(1, "test"), &manyArgs);
 
     auto server = s.getUAServer();
     UA_StatusCode retval = UA_Server_run_startup(server);

@@ -4,7 +4,7 @@
 #include <tuple>
 #include <vector>
 
-namespace opc
+namespace modernopc
 {
 
 template <typename Tuple, typename F, std::size_t... Indices>
@@ -109,4 +109,4 @@ class Call<std::function<R(INARGS...)>> : public ICallable
   private:
     std::function<R(INARGS...)> m_f{};
 };
-} // namespace opc
+} // namespace modernopc

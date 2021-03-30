@@ -11,18 +11,18 @@
 #include <string>
 #include <vector>
 
-using opc::NodeId;
-using opc::UnresolvedNodeId;
+using modernopc::NodeId;
+using modernopc::UnresolvedNodeId;
 using namespace std::string_literals;
-using opc::ObjectNode;
+using modernopc::ObjectNode;
 
-UA_StatusCode getValue(const opc::NodeId &id, opc::Variant &var)
+UA_StatusCode getValue(const modernopc::NodeId &id, modernopc::Variant &var)
 {
     var(42);
     return UA_STATUSCODE_GOOD;
 }
 
-UA_StatusCode setValue(const opc::NodeId &id, const opc::Variant &var)
+UA_StatusCode setValue(const modernopc::NodeId &id, const modernopc::Variant &var)
 {
     auto test = var.get<int32_t>();
     std::cout << "setValue: " << test << "\n";
@@ -33,11 +33,11 @@ class ClientTest : public ::testing::Test {
  protected:
   void SetUp() override {
       auto root = s.getObjectsFolder();
-    auto var = root->addVariable(opc::NodeId(1, "demoInt"),
-                                 opc::NodeId(0, UA_NS0ID_BASEDATAVARIABLETYPE),
-                                 opc::QualifiedName(1, "demoInt"), 27);
+    auto var = root->addVariable(modernopc::NodeId(1, "demoInt"),
+                                 modernopc::NodeId(0, UA_NS0ID_BASEDATAVARIABLETYPE),
+                                 modernopc::QualifiedName(1, "demoInt"), 27);
     var->connectCallback(
-        std::make_unique<opc::DataSource>("simpleVal", getValue, setValue));
+        std::make_unique<modernopc::DataSource>("simpleVal", getValue, setValue));
      f=std::async(std::launch::async, [&] { s.run(); });
   }
 
@@ -47,13 +47,13 @@ class ClientTest : public ::testing::Test {
 
   }
 
-  opc::Server s;
+  modernopc::Server s;
   std::future<void> f;
 };
 
 TEST_F(ClientTest, read)
 {
-    opc::Client c{"opc.tcp://localhost:4840"};
+    modernopc::Client c{"opc.tcp://localhost:4840"};
     c.connect();
 
     auto id =
@@ -64,9 +64,9 @@ TEST_F(ClientTest, read)
 
 TEST_F(ClientTest, write)
 {
-    opc::Client c{"opc.tcp://localhost:4840"};
+    modernopc::Client c{"opc.tcp://localhost:4840"};
     c.connect();
 
-    c.write(opc::NodeId(1, "demoInt"), opc::Variant(20));
+    c.write(modernopc::NodeId(1, "demoInt"), modernopc::Variant(20));
     s.stop();
 }

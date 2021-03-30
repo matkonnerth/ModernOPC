@@ -8,7 +8,7 @@
 
 struct UA_Server;
 
-namespace opc
+namespace modernopc
 {
 class BaseEventType;
 class MethodNode;
@@ -105,4 +105,4 @@ class Server
     std::unordered_map<NodeId, std::shared_ptr<MethodNode>> methods{};
     std::unordered_map<NodeId, std::shared_ptr<VariableNode>> variables{};
 };
-} // namespace opc
+} // namespace modernopc

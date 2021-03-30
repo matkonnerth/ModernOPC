@@ -9,7 +9,7 @@
 
 int main()
 {
-    opc::Server s;
+    modernopc::Server s;
 
 
     if(!s.loadNodeset("../models/serviceobject.xml"))
@@ -18,7 +18,7 @@ int main()
     }
     std::function load = [&](std::string path) { s.loadNodeset(path); };
 
-    //s.getMethod(opc::NodeId(2, 7003))->bindCallable(load);
+    //s.getMethod(modernopc::NodeId(2, 7003))->bindCallable(load);
 
     s.run();
 }
@@ -26,5 +26,5 @@ int main()
 /**
  * Used methods
  *
- * .. doxygenfunction:: opc::Server::loadNodeset
- * .. doxygenfunction:: opc::Server::getMethod */
+ * .. doxygenfunction:: modernopc::Server::loadNodeset
+ * .. doxygenfunction:: modernopc::Server::getMethod */

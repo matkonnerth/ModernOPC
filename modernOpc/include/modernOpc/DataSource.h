@@ -3,7 +3,7 @@
 #include <open62541/types.h>
 #include <string>
 
-namespace opc {
+namespace modernopc {
 class Variant;
 class NodeId;
 
@@ -38,4 +38,4 @@ class DataSource {
     ReadFn m_read;
     WriteFn m_write;
 };
-}  // namespace opc
+}  // namespace modernopc

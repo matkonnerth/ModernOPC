@@ -4,7 +4,7 @@
 #include <string>
 #include <open62541/types.h>
 
-namespace opc
+namespace modernopc
 {
 inline std::string fromUAString(const UA_String& s)
 {
@@ -20,6 +20,6 @@ inline UA_String fromString(const std::string &v)
     return UA_STRING(const_cast<char *>(v.c_str()));
 }
 
-} // namespace opc
+} // namespace modernopc
 
 

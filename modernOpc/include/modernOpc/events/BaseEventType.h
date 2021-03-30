@@ -6,7 +6,7 @@
 #include <utility>
 #include <vector>
 
-namespace opc
+namespace modernopc
 {
 
 class BaseEventType
@@ -74,4 +74,4 @@ class TransitionEventType : public BaseEventType
     }
 };
 
-} // namespace opc
+} // namespace modernopc

@@ -3,7 +3,7 @@
 #include <modernOpc/types/String.h>
 #include <ostream>
 
-namespace opc
+namespace modernopc
 {
 
 template <>
@@ -27,7 +27,7 @@ QualifiedName fromUAQualifiedName(const UA_QualifiedName *qn)
 void toUAVariantImpl(const QualifiedName &qn, UA_Variant *var)
 {
     UA_QualifiedName n = fromQualifiedName(qn);
-    UA_Variant_setScalarCopy(var, &n, opc::getDataType<QualifiedName>());
+    UA_Variant_setScalarCopy(var, &n, modernopc::getDataType<QualifiedName>());
     var->storageType = UA_VariantStorageType::UA_VARIANT_DATA;
 }
 
@@ -37,4 +37,4 @@ std::ostream &operator<<(std::ostream &os, const QualifiedName &qn)
     return os;
 }
 
-} // namespace opc
+} // namespace modernopc

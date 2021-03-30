@@ -3,7 +3,7 @@
 #include <open62541/types.h>
 #include <string>
 
-namespace opc
+namespace modernopc
 {
 class QualifiedName
 {

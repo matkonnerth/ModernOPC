@@ -6,18 +6,18 @@
 #include <modernOpc/nodes/ObjectNode.h>
 #include <vector>
 
-using opc::NodeId;
-using opc::QualifiedName;
-using opc::Variant;
+using modernopc::NodeId;
+using modernopc::QualifiedName;
+using modernopc::Variant;
 using namespace std::string_literals;
 
 TEST(Methods, std_function)
 {
     std::function test = []() { return "hello"s; };
-    opc::Server s;
+    modernopc::Server s;
 
     auto objectsFolder = s.getObject(NodeId(0, 85));
-    objectsFolder->addMethod(opc::NodeId(1, "test"s), QualifiedName(1, "open"),
+    objectsFolder->addMethod(modernopc::NodeId(1, "test"s), QualifiedName(1, "open"),
                              test);
 
     auto server = s.getUAServer();
@@ -49,14 +49,14 @@ TEST(Methods, memberFunction)
         int32_t run(int a) { return a + 12; }
     };
     Callable c;
-    opc::Server s;
+    modernopc::Server s;
     std::function fn = [&](int32_t a) { return c.run(a); };
     auto objectsFolder = s.getObject(NodeId(0, 85));
 
-    objectsFolder->addMethod(opc::NodeId(1, 2222), QualifiedName(1, "open"),
+    objectsFolder->addMethod(modernopc::NodeId(1, 2222), QualifiedName(1, "open"),
                              fn);
 
-    objectsFolder->addMethod(opc::NodeId(1, 2223), QualifiedName(1, "run"),
+    objectsFolder->addMethod(modernopc::NodeId(1, 2223), QualifiedName(1, "run"),
                              &Callable::run);
 
     auto server = s.getUAServer();
@@ -88,9 +88,9 @@ void freeVoidVoid() {}
 
 TEST(Methods, freeVoidVoid)
 {
-    opc::Server s;
+    modernopc::Server s;
     auto objectsFolder = s.getObject(NodeId(0, 85));
-    objectsFolder->addMethod(opc::NodeId(1, 2222), QualifiedName(1, "open"),
+    objectsFolder->addMethod(modernopc::NodeId(1, 2222), QualifiedName(1, "open"),
                              &freeVoidVoid);
 
     auto server = s.getUAServer();
@@ -114,9 +114,9 @@ void freeVoidConstStdString(const std::string &test) { (void)test; }
 
 TEST(Methods, freeVoidConstString)
 {
-    opc::Server s;
+    modernopc::Server s;
     auto objectsFolder = s.getObject(NodeId(0, 85));
-    objectsFolder->addMethod(opc::NodeId(1, 2222), QualifiedName(1, "open"),
+    objectsFolder->addMethod(modernopc::NodeId(1, 2222), QualifiedName(1, "open"),
                              &freeVoidConstStdString);
 }
 
@@ -127,9 +127,9 @@ std::vector<std::string> freeVectorOfString()
 
 TEST(Methods, freeVectorString)
 {
-    opc::Server s;
+    modernopc::Server s;
     s.getObjectsFolder()->addMethod(
-        opc::NodeId(1, 2222), QualifiedName(1, "open"), &freeVectorOfString);
+        modernopc::NodeId(1, 2222), QualifiedName(1, "open"), &freeVectorOfString);
 
     auto server = s.getUAServer();
     UA_StatusCode retval = UA_Server_run_startup(server);
@@ -172,8 +172,8 @@ int32_t testOrder(int a0, int a1, int a2, int a3, int a4, int a5, int a6,
 
 TEST(Methods, testOrder)
 {
-    opc::Server s;
-    s.getObjectsFolder()->addMethod(opc::NodeId(1, 2222),
+    modernopc::Server s;
+    s.getObjectsFolder()->addMethod(modernopc::NodeId(1, 2222),
                                     QualifiedName(1, "open"), &testOrder);
 
     auto server = s.getUAServer();
@@ -214,8 +214,8 @@ TEST(Methods, opc_Call_int_int)
         return a + b + c;
     };
 
-    std::unique_ptr<opc::ICallable> c =
-        std::make_unique<opc::Call<decltype(fn)>>(opc::Call<decltype(fn)>{fn});
+    std::unique_ptr<modernopc::ICallable> c =
+        std::make_unique<modernopc::Call<decltype(fn)>>(modernopc::Call<decltype(fn)>{fn});
 
     std::vector<Variant> in{};
     in.emplace_back(Variant(23));
@@ -234,8 +234,8 @@ TEST(Methods, opc_Call_void_int)
 
     };
 
-    std::unique_ptr<opc::ICallable> c =
-        std::make_unique<opc::Call<decltype(fn)>>(opc::Call<decltype(fn)>{fn});
+    std::unique_ptr<modernopc::ICallable> c =
+        std::make_unique<modernopc::Call<decltype(fn)>>(modernopc::Call<decltype(fn)>{fn});
 
     std::vector<Variant> in{};
     in.emplace_back(Variant(23));
@@ -258,8 +258,8 @@ TEST(Methods, opc_Call_int_ptr_int)
 
     std::function<int32_t(Callable23 *, int, int, int)> fn = &Callable23::calc;
 
-    std::unique_ptr<opc::ICallable> c =
-        std::make_unique<opc::Call<decltype(fn)>>(opc::Call<decltype(fn)>{fn});
+    std::unique_ptr<modernopc::ICallable> c =
+        std::make_unique<modernopc::Call<decltype(fn)>>(modernopc::Call<decltype(fn)>{fn});
 
     std::vector<Variant> in{};
     in.emplace_back(Variant(23));
@@ -283,8 +283,8 @@ TEST(Methods, opc_Call_void_ptr_int)
 
     std::function<void(Callable23 *, int, int, int)> fn = &Callable23::calc;
 
-    std::unique_ptr<opc::ICallable> c =
-        std::make_unique<opc::Call<decltype(fn)>>(opc::Call<decltype(fn)>{fn});
+    std::unique_ptr<modernopc::ICallable> c =
+        std::make_unique<modernopc::Call<decltype(fn)>>(modernopc::Call<decltype(fn)>{fn});
 
     std::vector<Variant> in{};
     in.emplace_back(Variant(23));
@@ -301,11 +301,11 @@ TEST(Methods, lambda)
 
     std::function fn = []() { std::cout << "test" << std::endl; };
 
-    opc::Server s;
-    s.getObjectsFolder()->addMethod(opc::NodeId(1, 2222),
+    modernopc::Server s;
+    s.getObjectsFolder()->addMethod(modernopc::NodeId(1, 2222),
                                     QualifiedName(1, "open"), fn);
 
-    auto method = s.getMethod(opc::NodeId(1, 2222));
+    auto method = s.getMethod(modernopc::NodeId(1, 2222));
     ASSERT_TRUE(method);
     std::vector<Variant> out{};
     method->invoke(nullptr, std::vector<Variant>{}, out);
@@ -313,15 +313,15 @@ TEST(Methods, lambda)
 
 TEST(Methods, getExistingNode)
 {
-    opc::Server s;
-    auto method = s.getMethod(opc::NodeId(0, 11492));
+    modernopc::Server s;
+    auto method = s.getMethod(modernopc::NodeId(0, 11492));
     ASSERT_TRUE(method);
     ASSERT_EQ(method->getId(), NodeId(0, 11492));
 }
 
 TEST(Methods, getExistingNode_butNoMethod)
 {
-    opc::Server s;
-    auto method = s.getMethod(opc::NodeId(0, 85));
+    modernopc::Server s;
+    auto method = s.getMethod(modernopc::NodeId(0, 85));
     ASSERT_FALSE(method);
 }

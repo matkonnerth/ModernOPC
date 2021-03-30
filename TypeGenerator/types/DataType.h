@@ -12,13 +12,13 @@ class TypeGenerator;
 struct DataTypeDefinitionField
 {
     DataTypeDefinitionField(const std::string &name, int valueRank,
-                            const opc::NodeId &id)
+                            const modernopc::NodeId &id)
         : name{name}, valueRank{valueRank}, dataType{id}
     {
     }
     std::string name{};
     int valueRank{-1};
-    opc::NodeId dataType{0, 0};
+    modernopc::NodeId dataType{0, 0};
     virtual ~DataTypeDefinitionField() = default;
     virtual std::ostream &operator<<(std::ostream &os) const = 0;
 };
@@ -27,12 +27,12 @@ struct DataType
 {
     DataType() {}
     virtual ~DataType() = default;
-    DataType(const std::string &name, const opc::NodeId &id)
+    DataType(const std::string &name, const modernopc::NodeId &id)
         : name{name}, id{id}
     {
     }
     const std::string name{};
-    const opc::NodeId id;
+    const modernopc::NodeId id;
     virtual std::ostream &operator<<(std::ostream &os) const = 0;
     virtual void generate(TypeGenerator &g) const = 0;
     virtual void getScalarConversion(std::ostream &os,

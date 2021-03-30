@@ -7,7 +7,7 @@
 #include <open62541/plugin/log_stdout.h>
 #include <optional>
 
-namespace opc
+namespace modernopc
 {
 std::shared_ptr<ObjectNode>
 ObjectNode::addObject(const NodeId &objId, const QualifiedName &browseName,
@@ -107,4 +107,4 @@ UA_StatusCode ObjectNode::eventNotifier(UA_Byte& value)
     return UA_Server_readEventNotifier(server->getUAServer(), fromNodeId(id), &value);
 }
 
-} // namespace opc
+} // namespace modernopc

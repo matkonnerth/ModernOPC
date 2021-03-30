@@ -1,6 +1,6 @@
 #include <modernOpc/Variant.h>
 
-namespace opc
+namespace modernopc
 {
 
 Variant::Variant()
@@ -47,4 +47,4 @@ Variant &Variant::operator=(Variant &&other) noexcept
 bool Variant::isScalar() { return UA_Variant_isScalar(variant); }
 bool Variant::isEmpty() const { return UA_Variant_isEmpty(variant); }
 
-} // namespace opc
+} // namespace modernopc

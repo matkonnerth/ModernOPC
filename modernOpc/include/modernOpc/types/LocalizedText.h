@@ -3,7 +3,7 @@
 #include <open62541/types.h>
 #include <string>
 
-namespace opc
+namespace modernopc
 {
 
 class LocalizedText
@@ -34,4 +34,4 @@ inline const UA_DataType *getDataType<LocalizedText>()
     return &UA_TYPES[UA_TYPES_LOCALIZEDTEXT];
 }
 
-} // namespace opc
+} // namespace modernopc

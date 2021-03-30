@@ -5,7 +5,7 @@
 
 namespace gen
 {
-using opc::NodeId;
+using modernopc::NodeId;
 inline std::string str_toupper(std::string s)
 {
     std::transform(s.begin(), s.end(), s.begin(),

@@ -6,7 +6,7 @@ std::string path = "";
 
 TEST(import, nodeclass)
 {
-    opc::Server server;
+    modernopc::Server server;
     ASSERT_TRUE(server.loadNodeset(path + "/" + "extension.xml"));
 }
 

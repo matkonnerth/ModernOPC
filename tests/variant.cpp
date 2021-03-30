@@ -12,13 +12,13 @@ TEST(variant, baseTypes)
     UA_Variant v;
     UA_Boolean b = UA_TRUE;
     UA_Variant_setScalar(&v, &b, &UA_TYPES[UA_TYPES_BOOLEAN]);
-    opc::Variant var{&v};
+    modernopc::Variant var{&v};
 
     ASSERT_EQ(var.get<bool>(), true);
 
     UA_Int32 i = 42;
     UA_Variant_setScalar(&v, &i, &UA_TYPES[UA_TYPES_INT32]);
-    var = opc::Variant(&v);
+    var = modernopc::Variant(&v);
     ASSERT_EQ(var.get<int>(), 42);
 }
 
@@ -27,7 +27,7 @@ TEST(variant, arrays)
     UA_Variant v;
     UA_Int32 arr[3] = {1, 2, 3};
     UA_Variant_setArray(&v, &arr, 3, &UA_TYPES[UA_TYPES_INT32]);
-    opc::Variant var{&v};
+    modernopc::Variant var{&v};
     auto vec = var.get<std::vector<int>>();
     ASSERT_EQ(vec.size(), 3);
     ASSERT_EQ(vec[0], 1);
@@ -35,24 +35,24 @@ TEST(variant, arrays)
     ASSERT_EQ(vec[2], 3);
 }
 
-opc::Variant getVariant()
+modernopc::Variant getVariant()
 {
     UA_Variant *v = UA_Variant_new();
     UA_Int32 arr[3] = {1, 2, 3};
     UA_Variant_setArrayCopy(v, &arr, 3, &UA_TYPES[UA_TYPES_INT32]);
-    opc::Variant var{v, true};
+    modernopc::Variant var{v, true};
     return var;
 }
 
 TEST(variant, ownership)
 {
     UA_Variant *v = UA_Variant_new();
-    opc::Variant var{v, true};
+    modernopc::Variant var{v, true};
 }
 
 TEST(variant, ownership2)
 {
-    opc::Variant var = getVariant();
+    modernopc::Variant var = getVariant();
     auto vec = var.get<std::vector<int>>();
     ASSERT_EQ(vec.size(), 3);
     ASSERT_EQ(vec[0], 1);
@@ -62,7 +62,7 @@ TEST(variant, ownership2)
 
 TEST(variant, setPerReference)
 {
-    opc::Variant var;
+    modernopc::Variant var;
     std::string s{"myString"};
     const std::string& sref=s;
     var(sref);
@@ -70,40 +70,40 @@ TEST(variant, setPerReference)
 
 TEST(variant, setAndGet)
 {
-    opc::Variant var{std::string{"myString"}};
+    modernopc::Variant var{std::string{"myString"}};
     auto s2 = var.get<std::string>();
 }
 
 TEST(variant, localizedText)
 {
-    opc::LocalizedText lt{"de", "Hallo"};
-    opc::Variant var;
+    modernopc::LocalizedText lt{"de", "Hallo"};
+    modernopc::Variant var;
     var(std::move(lt));
-    ASSERT_TRUE(var.is_a<opc::LocalizedText>());
+    ASSERT_TRUE(var.is_a<modernopc::LocalizedText>());
     std::cout << lt << "\n";
 }
 
 TEST(variant, rvalueVector)
 {
     std::vector v{1,2,3};
-    opc::Variant var{std::move(v)};
+    modernopc::Variant var{std::move(v)};
 }
 
 TEST(variant, stringVector)
 {
     std::vector v{"1"s, "2"s, "3"s};
-    opc::Variant var{v};
+    modernopc::Variant var{v};
 }
 
 TEST(variant, stringVectorRValue)
 {
     std::vector v{"1"s, "2"s, "3"s};
-    opc::Variant var{std::move(v)};
+    modernopc::Variant var{std::move(v)};
 }
 
 TEST(variant, primitiveTypes)
 {
-    opc::Variant var;
+    modernopc::Variant var;
     var = true;
     ASSERT_TRUE(var.is_a<bool>());
     ASSERT_EQ(var.get<bool>(), true);
@@ -141,7 +141,7 @@ TEST(variant, primitiveTypes)
 
 TEST(variant, string)
 {
-    opc::Variant var {"helloWorld"s};
+    modernopc::Variant var {"helloWorld"s};
     ASSERT_TRUE(var.is_a<std::string>());
     std::string s = var.get<std::string>();
     ASSERT_EQ("helloWorld"s, s);
@@ -149,18 +149,18 @@ TEST(variant, string)
 
 TEST(variant, qualifiedName)
 {
-    opc::QualifiedName qn {9, "name1"};
-    opc::Variant var{qn};
-    ASSERT_TRUE(var.is_a<opc::QualifiedName>());
-    opc::QualifiedName q2 = var.get<opc::QualifiedName>();
+    modernopc::QualifiedName qn {9, "name1"};
+    modernopc::Variant var{qn};
+    ASSERT_TRUE(var.is_a<modernopc::QualifiedName>());
+    modernopc::QualifiedName q2 = var.get<modernopc::QualifiedName>();
     std::cout << q2 << "\n";
 }
 
 TEST(variant, NodeId)
 {
-    opc::NodeId id{2, "stringId"};
-    opc::Variant var {id};
-    ASSERT_TRUE(var.is_a<opc::NodeId>());
-    auto id2 = var.get<opc::NodeId>();
+    modernopc::NodeId id{2, "stringId"};
+    modernopc::Variant var {id};
+    ASSERT_TRUE(var.is_a<modernopc::NodeId>());
+    auto id2 = var.get<modernopc::NodeId>();
     std::cout << id2 << "\n";
 }

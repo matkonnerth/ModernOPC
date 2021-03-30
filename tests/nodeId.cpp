@@ -3,7 +3,7 @@
 #include <string>
 #include <unordered_map>
 
-using opc::NodeId;
+using modernopc::NodeId;
 using namespace std::string_literals;
 
 TEST(NodeId, mem)
@@ -47,7 +47,7 @@ TEST(NodeId, conversion_NodeId_to_UANodeId)
 TEST(NodeId, conversion_constUaNodeId_to_constNodeId)
 {
     const UA_NodeId uacId = UA_NODEID_STRING(3, (char*)"string");
-    const NodeId& cid = opc::fromUaNodeId(uacId);
+    const NodeId& cid = modernopc::fromUaNodeId(uacId);
     //cannot bind -> good
-    //NodeId& id = opc::fromUaNodeId(uacId);
+    //NodeId& id = modernopc::fromUaNodeId(uacId);
 }

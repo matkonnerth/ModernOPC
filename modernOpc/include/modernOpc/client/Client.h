@@ -12,7 +12,7 @@
 #include <vector>
 
 struct UA_Client;
-namespace opc {
+namespace modernopc {
 
 class Client
 {

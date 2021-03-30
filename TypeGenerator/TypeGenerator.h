@@ -11,13 +11,13 @@
 
 namespace gen
 {
-using opc::NodeId;
+using modernopc::NodeId;
 class TypeGenerator
 {
   public:
     TypeGenerator(
         std::string cppTargetNamespace,
-        const std::unordered_map<opc::NodeId, std::unique_ptr<gen::DataType>>
+        const std::unordered_map<modernopc::NodeId, std::unique_ptr<gen::DataType>>
             &types,
         std::ostream &hdr, std::ostream &impl)
         : cppTargetNamespace{cppTargetNamespace}, types{types}, header{hdr},
@@ -368,7 +368,7 @@ class TypeGenerator
   private:
     std::string cppTargetNamespace{};
 
-    const std::unordered_map<opc::NodeId, std::unique_ptr<gen::DataType>>
+    const std::unordered_map<modernopc::NodeId, std::unique_ptr<gen::DataType>>
         &types{};
 
     std::vector<NodeId> order{};

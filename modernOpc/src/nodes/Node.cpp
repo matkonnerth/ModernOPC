@@ -2,7 +2,7 @@
 #include <modernOpc/types/NodeId.h>
 #include <modernOpc/Server.h>
 
-namespace opc
+namespace modernopc
 {
 
 const NodeId &Node::getId() const
@@ -31,4 +31,4 @@ QualifiedName Node::browseName() const
 }
 
 
-} // namespace opc
+} // namespace modernopc

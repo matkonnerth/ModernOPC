@@ -3,7 +3,7 @@
 #include <modernOpc/types/String.h>
 #include <ostream>
 
-namespace opc
+namespace modernopc
 {
 
 template <>
@@ -51,4 +51,4 @@ std::ostream &operator<<(std::ostream &os, const LocalizedText &lt)
     return os;
 }
 
-} // namespace opc
+} // namespace modernopc

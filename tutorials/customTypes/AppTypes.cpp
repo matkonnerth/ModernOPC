@@ -1,7 +1,7 @@
 #include <AppTypes.h>
 #include <modernOpc/Variant.h>
 
-namespace opc
+namespace modernopc
 {
 
 template <>
@@ -9,7 +9,7 @@ app::types::Range2 Variant::get<app::types::Range2>() const
 {
     return *static_cast<app::types::Range2 *>(variant->data);
 }
-} // namespace opc
+} // namespace modernopc
 
 namespace app
 {
@@ -23,7 +23,7 @@ void toUAVariantImpl(const Range2 &m, UA_Variant *var)
     range.low = m.min;
     UA_Variant_setScalarCopy(
         var, &range,
-        opc::getDataType<
+        modernopc::getDataType<
             std::remove_const_t<std::remove_reference_t<decltype(m)>>>());
 }
 

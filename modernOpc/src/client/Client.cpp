@@ -7,7 +7,7 @@
 #include <open62541/client_subscriptions.h>
 #include <open62541/plugin/log_stdout.h>
 
-namespace opc
+namespace modernopc
 {
 Client::Client(const std::string &endpointUri)
 {
@@ -121,7 +121,7 @@ Client::ConnectionState Client::getConnectionState() { return connState; }
 Variant Client::read(const NodeId &id)
 {
     UA_Variant *v = UA_Variant_new();
-    opc::Variant var{v, true};
+    modernopc::Variant var{v, true};
     auto status = UA_Client_readValueAttribute(client, fromNodeId(id), v);
     if (status != UA_STATUSCODE_GOOD)
     {
@@ -147,4 +147,4 @@ void Client::write(const NodeId &id, const Variant &var)
     }
 }
 
-} // namespace opc
+} // namespace modernopc

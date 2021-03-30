@@ -4,7 +4,7 @@
 #include <variant>
 #include <ostream>
 
-namespace opc
+namespace modernopc
 {
 
 std::ostream &operator<<(std::ostream &os, const NodeId &id)
@@ -54,4 +54,4 @@ std::size_t getHash(const NodeId &id)
     return h1 ^ (h2 << 1);
 }
 
-} // namespace opc
+} // namespace modernopc

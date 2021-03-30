@@ -8,7 +8,7 @@ namespace gen
 struct StructureDefinitionField : public DataTypeDefinitionField
 {
     StructureDefinitionField(const std::string &name, int valueRank,
-                             const opc::NodeId &id)
+                             const modernopc::NodeId &id)
         : DataTypeDefinitionField(name, valueRank, id)
     {
     }
@@ -23,7 +23,7 @@ struct StructureDefinitionField : public DataTypeDefinitionField
 struct EnumDefinitionField : public DataTypeDefinitionField
 {
     EnumDefinitionField(const std::string &name, int valueRank,
-                        const opc::NodeId &id, int value)
+                        const modernopc::NodeId &id, int value)
         : DataTypeDefinitionField(name, valueRank, id), value{value}
     {
     }
@@ -37,7 +37,7 @@ struct EnumDefinitionField : public DataTypeDefinitionField
 class EnumDataType : public DataType
 {
   public:
-    EnumDataType(const std::string &name, const opc::NodeId &id)
+    EnumDataType(const std::string &name, const modernopc::NodeId &id)
         : DataType(name, id)
     {
     }
@@ -57,7 +57,7 @@ class EnumDataType : public DataType
 class StructureDataType : public DataType
 {
   public:
-    StructureDataType(const std::string &name, const opc::NodeId &id)
+    StructureDataType(const std::string &name, const modernopc::NodeId &id)
         : DataType(name, id)
     {
     }
@@ -77,7 +77,7 @@ class StructureDataType : public DataType
 class BaseDataType : public DataType
 {
   public:
-    BaseDataType(const std::string &name, const opc::NodeId &id)
+    BaseDataType(const std::string &name, const modernopc::NodeId &id)
         : DataType(name, id)
     {
     }

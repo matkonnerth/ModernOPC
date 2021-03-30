@@ -17,7 +17,7 @@ int addNamespace(void *userContext, const char *uri) { return 1; }
 void addNode(void *userContext, const TNode *node)
 {
 
-    auto types = static_cast<std::unordered_map<opc::NodeId, std::unique_ptr<gen::DataType>> *>(
+    auto types = static_cast<std::unordered_map<modernopc::NodeId, std::unique_ptr<gen::DataType>> *>(
         userContext);
     if (node->nodeClass == NODECLASS_DATATYPE)
     {

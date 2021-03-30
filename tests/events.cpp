@@ -5,36 +5,36 @@
 #include <modernOpc/types/NodeId.h>
 #include <modernOpc/types/QualifiedName.h>
 
-using opc::Variant;
-using opc::ObjectNode;
+using modernopc::Variant;
+using modernopc::ObjectNode;
 using namespace std::string_literals;
 TEST(Events, BaseEventType)
 {
-    opc::BaseEventType event;
-    event.setMessage(opc::LocalizedText{"de", "Nachricht"});
+    modernopc::BaseEventType event;
+    event.setMessage(modernopc::LocalizedText{"de", "Nachricht"});
 
-    opc::Server s { 4844 };
+    modernopc::Server s { 4844 };
     s.getObjectsFolder()->setEvent(event);
 }
 
 TEST(Events, wrong_eventField)
 {
-    opc::BaseEventType event;
-    event.setMessage(opc::LocalizedText{"de", "Nachricht"});
+    modernopc::BaseEventType event;
+    event.setMessage(modernopc::LocalizedText{"de", "Nachricht"});
 
     event.setEventField(
-        std::vector<opc::QualifiedName>{opc::QualifiedName(34, "dasdf"s)},
-        opc::Variant());
+        std::vector<modernopc::QualifiedName>{modernopc::QualifiedName(34, "dasdf"s)},
+        modernopc::Variant());
 
-    opc::Server s{4844};
+    modernopc::Server s{4844};
     s.getObjectsFolder()->setEvent(event);
 }
 
 TEST(Events, BaseEventType2)
 {
-    opc::BaseEventType event;
-    event.setMessage(opc::LocalizedText{"de", "Nachricht"});
+    modernopc::BaseEventType event;
+    event.setMessage(modernopc::LocalizedText{"de", "Nachricht"});
 
-    opc::Server s{4844};
+    modernopc::Server s{4844};
     s.getObjectsFolder()->setEvent(event);
 }
