@@ -36,7 +36,7 @@ find_package(open62541 REQUIRED)
 find_package(NodesetLoader REQUIRED)
 #add_subdirectory(TypeGenerator)
 
-add_library(wrapper SHARED
+add_library(modernOpc SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Server.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/client/Client.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/import/Extension.cpp
@@ -49,16 +49,16 @@ add_library(wrapper SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/nodes/ObjectNode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/nodes/VariableNode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/nodes/Node.cpp)
-target_include_directories(wrapper PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
-target_include_directories(wrapper PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src)
-target_include_directories(wrapper PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/generated)
-target_link_libraries(wrapper PRIVATE ${LIB_GCOV} NodesetLoader)
-target_link_libraries(wrapper PUBLIC CONAN_PKG::spdlog)
-target_link_libraries(wrapper PUBLIC open62541::open62541)
-target_compile_features(wrapper PRIVATE cxx_std_17)
-target_compile_options(wrapper PRIVATE ${COMPILER_OPTIONS})
+target_include_directories(modernOpc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
+target_include_directories(modernOpc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src)
+target_include_directories(modernOpc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/generated)
+target_link_libraries(modernOpc PRIVATE ${LIB_GCOV} NodesetLoader)
+target_link_libraries(modernOpc PUBLIC CONAN_PKG::spdlog)
+target_link_libraries(modernOpc PUBLIC open62541::open62541)
+target_compile_features(modernOpc PRIVATE cxx_std_17)
+target_compile_options(modernOpc PRIVATE ${COMPILER_OPTIONS})
 if(${ENABLE_ASAN})
-    target_link_libraries(wrapper INTERFACE "-fsanitize=address")
+    target_link_libraries(modernOpc INTERFACE "-fsanitize=address")
 endif()
 
 add_subdirectory(tests)
@@ -74,4 +74,28 @@ option(BUILD_DOC "Build documentation" OFF)
 
 if(${BUILD_DOC})
     add_subdirectory(docs)
+endif()
+
+#install
+if(NOT ${CALC_COVERAGE})
+    set(MODERNOPC_PUBLIC_HEADER 
+        ${PROJECT_SOURCE_DIR}/wrapper/include/NodesetLoader/NodesetLoader.h
+        ${PROJECT_SOURCE_DIR}/include/NodesetLoader/TNodeId.h
+        ${PROJECT_SOURCE_DIR}/include/NodesetLoader/Logger.h
+        ${PROJECT_SOURCE_DIR}/include/NodesetLoader/arch.h
+        ${PROJECT_SOURCE_DIR}/include/NodesetLoader/ReferenceService.h
+        ${PROJECT_SOURCE_DIR}/include/NodesetLoader/Extension.h
+    )
+
+    set_target_properties(modernOpc PROPERTIES PUBLIC_HEADER "${NODESETLOADER_PUBLIC_HEADER}")
+
+    install(TARGETS modernOpc
+            EXPORT modernOpc
+            LIBRARY DESTINATION lib
+            ARCHIVE DESTINATION lib
+            RUNTIME DESTINATION bin
+            PUBLIC_HEADER DESTINATION include/NodesetLoader)
+    install(FILES modernOpc-config.cmake DESTINATION lib/cmake/modernOpc)
+
+    install(EXPORT modernOpc DESTINATION lib/cmake/modernOpc)
 endif()
