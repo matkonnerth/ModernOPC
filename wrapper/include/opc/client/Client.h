@@ -35,7 +35,9 @@ public:
    NodeId resolve(const UnresolvedNodeId& id);
    ConnectionState getConnectionState();
 
+
    Variant read(const NodeId& id);
+   void write(const NodeId& id, const Variant& var);
 
 private:
    UA_Client* client{ nullptr };
