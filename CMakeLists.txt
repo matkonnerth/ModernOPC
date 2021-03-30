@@ -37,21 +37,22 @@ find_package(NodesetLoader REQUIRED)
 #add_subdirectory(TypeGenerator)
 
 add_library(modernOpc SHARED
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Server.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/client/Client.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/import/Extension.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Variant.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/Variant_get.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/types/LocalizedText.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/types/QualifiedName.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/types/String.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/types/NodeId.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/nodes/ObjectNode.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/nodes/VariableNode.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src/nodes/Node.cpp)
-target_include_directories(modernOpc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/include)
-target_include_directories(modernOpc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/wrapper/src)
-target_include_directories(modernOpc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/generated)
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src/Server.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src/client/Client.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src/import/Extension.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src/Variant.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src/Variant_get.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src/types/LocalizedText.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src/types/QualifiedName.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src/types/String.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src/types/NodeId.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src/nodes/ObjectNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src/nodes/VariableNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src/nodes/Node.cpp)
+target_include_directories(modernOpc PUBLIC 
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/include>
+    $<INSTALL_INTERFACE:include/modernOpc>)
+target_include_directories(modernOpc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src)
 target_link_libraries(modernOpc PRIVATE ${LIB_GCOV} NodesetLoader)
 target_link_libraries(modernOpc PUBLIC CONAN_PKG::spdlog)
 target_link_libraries(modernOpc PUBLIC open62541::open62541)
@@ -78,24 +79,16 @@ endif()
 
 #install
 if(NOT ${CALC_COVERAGE})
-    set(MODERNOPC_PUBLIC_HEADER 
-        ${PROJECT_SOURCE_DIR}/wrapper/include/NodesetLoader/NodesetLoader.h
-        ${PROJECT_SOURCE_DIR}/include/NodesetLoader/TNodeId.h
-        ${PROJECT_SOURCE_DIR}/include/NodesetLoader/Logger.h
-        ${PROJECT_SOURCE_DIR}/include/NodesetLoader/arch.h
-        ${PROJECT_SOURCE_DIR}/include/NodesetLoader/ReferenceService.h
-        ${PROJECT_SOURCE_DIR}/include/NodesetLoader/Extension.h
-    )
-
-    set_target_properties(modernOpc PROPERTIES PUBLIC_HEADER "${NODESETLOADER_PUBLIC_HEADER}")
-
     install(TARGETS modernOpc
             EXPORT modernOpc
             LIBRARY DESTINATION lib
             ARCHIVE DESTINATION lib
-            RUNTIME DESTINATION bin
-            PUBLIC_HEADER DESTINATION include/NodesetLoader)
-    install(FILES modernOpc-config.cmake DESTINATION lib/cmake/modernOpc)
+            RUNTIME
+            INCLUDES DESTINATION include
+            PUBLIC_HEADER DESTINATION include)
+    #install(FILES modernOpc-config.cmake DESTINATION lib/cmake/modernOpc)
 
-    install(EXPORT modernOpc DESTINATION lib/cmake/modernOpc)
+    install(EXPORT modernOpc DESTINATION lib/cmake)
+
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/modernOpc/include/opc DESTINATION include/opc)
 endif()

@@ -1,4 +1,3 @@
-
 opc_add_test("importBase")
 opc_add_test("importValues")
 opc_add_test("importValueRank")

@@ -1,5 +1,5 @@
 add_executable(tutorial_events events.cpp)
 target_include_directories(tutorial_events PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(tutorial_events PRIVATE ${LIB_ASAN} ${LIB_GCOV} wrapper)
+target_link_libraries(tutorial_events PRIVATE ${LIB_ASAN} ${LIB_GCOV} modernOpc)
 target_compile_features(tutorial_events PRIVATE cxx_std_17)
 target_compile_options(tutorial_events PRIVATE ${COMPILER_OPTIONS})

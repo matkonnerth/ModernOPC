@@ -2,7 +2,7 @@ macro(opc_add_benchmark arg)
     add_executable(${arg}_benchmark ${arg}.cpp)
     target_compile_options(${arg}_benchmark PRIVATE ${COMPILER_OPTIONS})
     target_compile_features(${arg}_benchmark PRIVATE cxx_std_17)
-    target_link_libraries(${arg}_benchmark PRIVATE ${LIB_GCOV} wrapper CONAN_PKG::benchmark)
+    target_link_libraries(${arg}_benchmark PRIVATE ${LIB_GCOV} modernOpc CONAN_PKG::benchmark)
 endmacro()
 
 opc_add_benchmark("variant")
