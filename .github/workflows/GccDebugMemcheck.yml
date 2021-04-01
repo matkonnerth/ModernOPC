@@ -14,6 +14,14 @@ jobs:
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: ubuntu-latest
     steps:
+    - name: update
+      run: sudo apt-get update
+    
+    - name: Install valgrind
+      run: sudo apt-get install valgrind
+    
+    - name: install conan
+      run:  pip3 install conan
 
     - uses: actions/checkout@master
       with:
@@ -42,15 +50,6 @@ jobs:
     - uses: actions/setup-python@v2
       with:
         python-version: '3.x' # Version range or exact version of a Python version to use, using SemVer's version range syntax
-        
-    - name: update
-      run: sudo apt-get update
-    
-    - name: Install valgrind
-      run: sudo apt-get install valgrind
-    
-    - name: install conan
-      run:  pip3 install conan
 
     - name: Create Build Environment
       # Some projects don't allow in-source building, so create a separate build directory
