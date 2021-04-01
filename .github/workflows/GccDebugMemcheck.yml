@@ -23,6 +23,32 @@ jobs:
     - name: install conan
       run:  pip3 install conan
 
+##open62541
+    - uses: actions/checkout@master
+      with:
+        repository: open62541/open62541
+        ref: refs/tags/v1.2
+        path: ./openRoot
+
+    - name: Create Build Environment for open62541
+      run: cmake -E make_directory ./NodesetLoaderRoot/build
+
+    - name: Configure CMake
+      shell: bash
+      working-directory: ./openRoot/build
+      run: cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON ..
+
+    - name: Build open62541
+      working-directory: ./openRoot/build
+      shell: bash
+      run: cmake --build . --config $BUILD_TYPE
+
+    - name: install open
+      working-directory: ./openRoot/build
+      shell: bash
+      run: cmake --install .
+
+##NodesetLoader
     - uses: actions/checkout@master
       with:
         repository: matkonnerth/nodesetLoader
