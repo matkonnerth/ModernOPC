@@ -31,14 +31,14 @@ jobs:
         path: ./openRoot
 
     - name: Create Build Environment for open62541
-      run: cmake -E make_directory ./NodesetLoaderRoot/build
+      run: cmake -E make_directory ./openRoot/build
 
-    - name: Configure CMake
+    - name: Configure open
       shell: bash
       working-directory: ./openRoot/build
       run: cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON ..
 
-    - name: Build open62541
+    - name: Build open
       working-directory: ./openRoot/build
       shell: bash
       run: cmake --build . --config $BUILD_TYPE
