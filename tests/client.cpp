@@ -39,11 +39,14 @@ UA_StatusCode setValue(const modernopc::NodeId &id,
 class TestServer
 {
 public:
-    TestServer()
+    explicit TestServer(uint16_t port):m_port{port}, s{port}
     {
         char hostname[HOST_NAME_MAX + 1];
         gethostname(hostname, HOST_NAME_MAX + 1);
-        m_hostname = hostname;
+        //m_hostname = hostname;
+        m_hostname = "localhost"s;
+        m_endpointUri = "opc.tcp://"s + m_hostname + ":"s + std::to_string(m_port);
+
 
         auto root = s.getObjectsFolder();
         auto var = root->addVariable(NodeId(1, "demoInt"),
@@ -64,18 +67,23 @@ public:
         s.stop();
         f.wait();
     }
+    
+    const std::string& Hostname() {return m_hostname;};
+    const std::string& EndpointUri() {return m_endpointUri;}
 private:
   Server s;
+  uint16_t m_port;
   std::future<void> f;
   std::function<std::string()> test;
   std::string m_hostname;
+  std::string m_endpointUri;
 };
 
 TEST(ClientTest, read)
 {
-    TestServer s{};
+    TestServer s{4840};
 
-    Client c{"opc.tcp://localhost:4840"s};
+    Client c{s.EndpointUri()};
     c.connect();
 
     auto id =
@@ -86,9 +94,9 @@ TEST(ClientTest, read)
 
 TEST(ClientTest, write)
 {
-    TestServer s{};
+    TestServer s{4841};
 
-    Client c{"opc.tcp://localhost:4840"s};
+    Client c{s.EndpointUri()};
     c.connect();
 
     c.write(NodeId(1, "demoInt"), Variant(20));
@@ -96,9 +104,10 @@ TEST(ClientTest, write)
 
 TEST(ClientTest, call)
 {
-    TestServer s{};
+    TestServer s{4842};
 
-    Client c{"opc.tcp://localhost:4840"s};
+    Client c{s.EndpointUri()};
+
     c.connect();
 
     auto output =
