@@ -36,41 +36,46 @@ UA_StatusCode setValue(const modernopc::NodeId &id,
     return UA_STATUSCODE_GOOD;
 }
 
-class ClientTest : public ::testing::Test
+class TestServer
 {
-  protected:
-    void SetUp() override
+public:
+    TestServer()
     {
+        char hostname[HOST_NAME_MAX + 1];
+        gethostname(hostname, HOST_NAME_MAX + 1);
+        m_hostname = hostname;
+
         auto root = s.getObjectsFolder();
-        auto var = root->addVariable(
-            NodeId(1, "demoInt"),
-            NodeId(0, UA_NS0ID_BASEDATAVARIABLETYPE),
-            QualifiedName(1, "demoInt"), 27);
-        var->connectCallback(std::make_unique<DataSource>(
-            "simpleVal", getValue, setValue));
+        auto var = root->addVariable(NodeId(1, "demoInt"),
+                                     NodeId(0, UA_NS0ID_BASEDATAVARIABLETYPE),
+                                     QualifiedName(1, "demoInt"), 27);
+        var->connectCallback(
+            std::make_unique<DataSource>("simpleVal", getValue, setValue));
 
         test = []() { return "hello"s; };
 
         auto objectsFolder = s.getObject(NodeId(0, 85));
-        objectsFolder->addMethod(NodeId(1, "test"s),
-                                 QualifiedName(1, "open"), test);
+        objectsFolder->addMethod(NodeId(1, "test"s), QualifiedName(1, "open"),
+                                 test);
         f = std::async(std::launch::async, [&] { s.run(); });
     }
-
-    void TearDown() override
+    ~TestServer()
     {
         s.stop();
         f.wait();
     }
-
-    Server s;
-    std::future<void> f;
-    std::function<std::string()> test;
+private:
+  Server s;
+  std::future<void> f;
+  std::function<std::string()> test;
+  std::string m_hostname;
 };
 
-TEST_F(ClientTest, read)
+TEST(ClientTest, read)
 {
-    Client c{"opc.tcp://localhost:4840"};
+    TestServer s{};
+
+    Client c{"opc.tcp://localhost:4840"s};
     c.connect();
 
     auto id =
@@ -79,18 +84,21 @@ TEST_F(ClientTest, read)
     ASSERT_TRUE(var.is_a<std::vector<std::string>>());
 }
 
-TEST_F(ClientTest, write)
+TEST(ClientTest, write)
 {
-    Client c{"opc.tcp://localhost:4840"};
+    TestServer s{};
+
+    Client c{"opc.tcp://localhost:4840"s};
     c.connect();
 
     c.write(NodeId(1, "demoInt"), Variant(20));
-    s.stop();
 }
 
-TEST_F(ClientTest, call)
+TEST(ClientTest, call)
 {
-    modernopc::Client c{"opc.tcp://localhost:4840"};
+    TestServer s{};
+
+    Client c{"opc.tcp://localhost:4840"s};
     c.connect();
 
     auto output =
@@ -98,5 +106,4 @@ TEST_F(ClientTest, call)
     ASSERT_TRUE(output.size() == 1);
     ASSERT_TRUE(output[0].is_a<std::string>());
     std::cout << output[0].get<std::string>() << "\n";
-    s.stop();
 }
