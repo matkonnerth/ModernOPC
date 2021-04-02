@@ -24,7 +24,7 @@ which uses open62541 (https://github.com/open62541/open62541) for the heavy lift
 * C++ Standard 17
 
 # CI
-[![Build Status](https://travis-ci.org/matkonnerth/ModernOPC.svg?branch=master)](https://travis-ci.org/matkonnerth/ModernOPC)
+![IntegrationTests](https://github.com/matkonnerth/ModernOpc/workflows/GccDebugMemcheck/badge.svg)
 [![codecov](https://codecov.io/gh/matkonnerth/ModernOPC/branch/master/graph/badge.svg)](https://codecov.io/gh/matkonnerth/ModernOPC)
 
 # license
