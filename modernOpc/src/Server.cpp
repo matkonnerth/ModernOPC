@@ -61,6 +61,7 @@ Server::~Server() {
 void Server::stop()
 {
     isRunning = false;
+    UA_Server_run_shutdown(server);
 }
 
 void Server::create(uint16_t port)
