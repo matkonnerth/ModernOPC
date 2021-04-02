@@ -12,6 +12,7 @@
 #include <modernOpc/types/QualifiedName.h>
 #include <string>
 #include <vector>
+#include <chrono>
 
 using modernopc::Client;
 using modernopc::NodeId;
@@ -63,6 +64,9 @@ class TestServer
         objectsFolder->addMethod(NodeId(1, "test"s), QualifiedName(1, "open"),
                                  test);
         f = std::async(std::launch::async, [&] { s.run(); });
+
+        using namespace std::chrono_literals;
+        std::this_thread::sleep_for(100ms);
     }
     ~TestServer()
     {
