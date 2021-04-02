@@ -148,38 +148,74 @@ void Client::write(const NodeId &id, const Variant &var)
 }
 
 std::vector<Variant> Client::call(const NodeId &objId, const NodeId &methodId,
-                          const std::vector<Variant> &inputArgs)
+                                  const std::vector<Variant> &inputArgs)
 {
-
     UA_Variant input[inputArgs.size()];
     size_t cnt = 0;
-    for(const auto& inputVar : inputArgs)
+    for (const auto &inputVar : inputArgs)
     {
         input[cnt] = *inputVar.getUAVariant();
         cnt++;
     }
 
     size_t outputSize;
-    UA_Variant* output;
+    UA_Variant *output;
 
-
-    auto status = UA_Client_call(client, fromNodeId(objId), fromNodeId(methodId), 
-        inputArgs.size(), input, &outputSize, &output);
+    auto status =
+        UA_Client_call(client, fromNodeId(objId), fromNodeId(methodId),
+                       inputArgs.size(), input, &outputSize, &output);
 
     if (status != UA_STATUSCODE_GOOD)
     {
-        UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
-                     "error on call %s",
+        UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "error on call %s",
                      UA_StatusCode_name(status));
         throw OpcException("error on call");
     }
 
     std::vector<Variant> out;
-    for(auto var = output; var < output+outputSize; var++)
+    for (auto var = output; var < output + outputSize; var++)
     {
         out.emplace_back(Variant(var, true));
     }
     return out;
+}
+
+std::vector<BrowseResult> Client::browse(const NodeId &id)
+{
+    UA_BrowseRequest bReq;
+    UA_BrowseRequest_init(&bReq);
+    bReq.requestedMaxReferencesPerNode = 0;
+    bReq.nodesToBrowse = UA_BrowseDescription_new();
+    bReq.nodesToBrowseSize = 1;
+    bReq.nodesToBrowse[0].nodeId = fromNodeId(id);
+    bReq.nodesToBrowse[0].resultMask =
+        UA_BROWSERESULTMASK_ALL; /* return everything */
+    UA_BrowseResponse bResp = UA_Client_Service_browse(client, bReq);
+
+    if (bResp.responseHeader.serviceResult != UA_STATUSCODE_GOOD)
+    {
+        UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+                     "error on browse %s",
+                     UA_StatusCode_name(bResp.responseHeader.serviceResult));
+        throw OpcException("error on browse");
+    }
+
+    std::vector<BrowseResult> results;
+
+    for (size_t i = 0; i < bResp.resultsSize; ++i)
+    {
+        for (size_t j = 0; j < bResp.results[i].referencesSize; ++j)
+        {
+            UA_ReferenceDescription *ref = &(bResp.results[i].references[j]);
+
+            results.emplace_back(
+                BrowseResult(fromUaNodeId(ref->nodeId.nodeId),
+                             fromUAQualifiedName(&ref->browseName)));
+        }
+    }
+    UA_BrowseRequest_clear(&bReq);
+    UA_BrowseResponse_clear(&bResp);
+    return results;
 }
 
 } // namespace modernopc

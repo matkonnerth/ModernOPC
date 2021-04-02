@@ -13,6 +13,11 @@ class QualifiedName
     {
     }
 
+    QualifiedName(const QualifiedName&)=default;
+    QualifiedName& operator=(const QualifiedName&)=default;
+    QualifiedName(QualifiedName&&)=default;
+    QualifiedName& operator=(QualifiedName&&)=default;
+
     uint16_t namespaceIndex() const { return nsIdx; }
     const std::string &name() const { return n; }
 
