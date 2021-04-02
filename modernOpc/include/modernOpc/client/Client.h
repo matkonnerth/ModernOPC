@@ -1,6 +1,7 @@
 #pragma once
 #include <functional>
 #include <map>
+#include <modernOpc/BrowseResult.h>
 #include <modernOpc/Logger.h>
 #include <modernOpc/UnresolvedNodeId.h>
 #include <modernOpc/Variant.h>
@@ -12,41 +13,44 @@
 #include <vector>
 
 struct UA_Client;
-namespace modernopc {
+namespace modernopc
+{
 
 class Client
 {
-public:
-   enum class ConnectionState
-   {
-      DISCONNECTED,
-      CONNECTED
-   };
-   using ConnectionStateCallback = std::function<void(const Client* client, ConnectionState state)>;
-   Client(const std::string& endpointUri);
-   ~Client();
-   Client(const Client&) = delete;
-   Client& operator=(const Client&) = delete;
-   void connect();
-   void disconnect();
-   //void doComm();
-   void registerConnectionCallback(ConnectionStateCallback fn);
-   void notifyConnectionState(ConnectionState state);
-   NodeId resolve(const UnresolvedNodeId& id);
-   ConnectionState getConnectionState();
+  public:
+    enum class ConnectionState
+    {
+        DISCONNECTED,
+        CONNECTED
+    };
+    using ConnectionStateCallback =
+        std::function<void(const Client *client, ConnectionState state)>;
+    Client(const std::string &endpointUri);
+    ~Client();
+    Client(const Client &) = delete;
+    Client &operator=(const Client &) = delete;
+    void connect();
+    void disconnect();
+    // void doComm();
+    void registerConnectionCallback(ConnectionStateCallback fn);
+    void notifyConnectionState(ConnectionState state);
+    NodeId resolve(const UnresolvedNodeId &id);
+    ConnectionState getConnectionState();
 
+    Variant read(const NodeId &id);
+    void write(const NodeId &id, const Variant &var);
+    std::vector<Variant> call(const NodeId &objId, const NodeId &methodId,
+                              const std::vector<Variant> &inputArgs);
+    std::vector<BrowseResult> browse(const NodeId &id);
 
-   Variant read(const NodeId& id);
-   void write(const NodeId& id, const Variant& var);
-   std::vector<Variant> call(const NodeId& objId, const NodeId& methodId, const std::vector<Variant>& inputArgs);
-
-private:
-   UA_Client* client{ nullptr };
-   std::string uri{};
-   std::vector<ConnectionStateCallback> connectionStateCallbacks{};
-   ConnectionState connState{ ConnectionState::DISCONNECTED };
-   std::vector<std::string> namespaces{};
-   Logger logger{"Client"};
+  private:
+    UA_Client *client{nullptr};
+    std::string uri{};
+    std::vector<ConnectionStateCallback> connectionStateCallbacks{};
+    ConnectionState connState{ConnectionState::DISCONNECTED};
+    std::vector<std::string> namespaces{};
+    Logger logger{"Client"};
 };
 
-} // namespace tt
+} // namespace modernopc
