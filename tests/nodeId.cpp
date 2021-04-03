@@ -40,8 +40,8 @@ TEST(NodeId, conversion_constNodeId_to_constUANodeId)
 TEST(NodeId, conversion_NodeId_to_UANodeId)
 {
     NodeId cId(1, "test"s);
-    UA_NodeId uaId = fromNodeId(cId);
-    UA_clear(&uaId, &UA_TYPES[UA_TYPES_NODEID]);
+    const UA_NodeId uaId = fromNodeId(cId);
+    //UA_clear(&uaId, &UA_TYPES[UA_TYPES_NODEID]);
 }
 
 TEST(NodeId, conversion_constUaNodeId_to_constNodeId)

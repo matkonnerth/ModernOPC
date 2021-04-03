@@ -6,6 +6,7 @@
 #include <open62541/server.h>
 
 using namespace std::string_literals;
+using modernopc::NodeId;
 
 TEST(variant, baseTypes)
 {

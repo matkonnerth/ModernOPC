@@ -187,7 +187,8 @@ std::vector<BrowseResult> Client::browse(const NodeId &id)
     bReq.requestedMaxReferencesPerNode = 0;
     bReq.nodesToBrowse = UA_BrowseDescription_new();
     bReq.nodesToBrowseSize = 1;
-    bReq.nodesToBrowse[0].nodeId = fromNodeId(id);
+    const UA_NodeId startId = fromNodeId(id);
+    UA_NodeId_copy(&startId, &bReq.nodesToBrowse[0].nodeId);
     bReq.nodesToBrowse[0].resultMask =
         UA_BROWSERESULTMASK_ALL; /* return everything */
     bReq.nodesToBrowse->referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_HIERARCHICALREFERENCES);
