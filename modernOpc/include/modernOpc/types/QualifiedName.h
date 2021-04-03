@@ -8,6 +8,7 @@ namespace modernopc
 class QualifiedName
 {
   public:
+    QualifiedName() = default;
     QualifiedName(uint16_t namespaceIndex, const std::string &name)
         : nsIdx{namespaceIndex}, n{name}
     {
@@ -22,8 +23,8 @@ class QualifiedName
     const std::string &name() const { return n; }
 
   private:
-    uint16_t nsIdx;
-    std::string n;
+    uint16_t nsIdx{};
+    std::string n{};
 
     friend std::ostream &operator<<(std::ostream &os, const QualifiedName &qn);
     friend void toUAVariantImpl(const QualifiedName &qn,

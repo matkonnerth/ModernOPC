@@ -36,7 +36,7 @@ class NodeId
 
     friend std::ostream &operator<<(std::ostream &os, const NodeId &id);
     friend void toUAVariantImpl(const NodeId &qn, UA_Variant *var);
-    friend UA_NodeId fromNodeId(NodeId &nodeId);
+    friend UA_NodeId fromNodeId(NodeId &&nodeId);
     friend const UA_NodeId fromNodeId(const NodeId &nodeId);
 
   private:

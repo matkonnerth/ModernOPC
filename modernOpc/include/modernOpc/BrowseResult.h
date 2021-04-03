@@ -7,6 +7,7 @@ namespace modernopc
 class BrowseResult final
 {
   public:
+    BrowseResult()=default;
     BrowseResult(const NodeId &id, const QualifiedName &name)
         : m_id{id}, m_qn{name}
     {
@@ -22,7 +23,7 @@ class BrowseResult final
     const QualifiedName &Name() const { return m_qn; }
 
   private:
-    NodeId m_id;
-    QualifiedName m_qn;
+    NodeId m_id{};
+    QualifiedName m_qn{};
 };
 } // namespace modernOpc

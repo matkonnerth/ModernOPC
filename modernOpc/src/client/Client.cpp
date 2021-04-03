@@ -190,6 +190,8 @@ std::vector<BrowseResult> Client::browse(const NodeId &id)
     bReq.nodesToBrowse[0].nodeId = fromNodeId(id);
     bReq.nodesToBrowse[0].resultMask =
         UA_BROWSERESULTMASK_ALL; /* return everything */
+    bReq.nodesToBrowse->referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_HIERARCHICALREFERENCES);
+    bReq.nodesToBrowse->includeSubtypes = UA_TRUE;
     UA_BrowseResponse bResp = UA_Client_Service_browse(client, bReq);
 
     if (bResp.responseHeader.serviceResult != UA_STATUSCODE_GOOD)

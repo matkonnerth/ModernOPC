@@ -31,7 +31,7 @@ const NodeId fromUaNodeId(const UA_NodeId &id)
     return NodeId(0, 0);
 }
 
-UA_NodeId fromNodeId(NodeId &nodeId)
+UA_NodeId fromNodeId(NodeId &&nodeId)
 {
     UA_NodeId id;
     UA_NodeId_init(&id);
@@ -45,8 +45,8 @@ UA_NodeId fromNodeId(NodeId &nodeId)
         break;
     case NodeId::IdentifierType::STRING:
         id.identifierType = UA_NodeIdType::UA_NODEIDTYPE_STRING;
-        id.identifier.string = UA_STRING_ALLOC(
-            std::get<std::string>(nodeId.getIdentifier()).c_str());
+        id.identifier.string = UA_STRING(const_cast<char*>(
+            std::get<std::string>(nodeId.getIdentifier()).c_str()));
         break;
     }
     return id;
@@ -66,8 +66,8 @@ const UA_NodeId fromNodeId(const NodeId &nodeId)
         break;
     case NodeId::IdentifierType::STRING:
         id.identifierType = UA_NodeIdType::UA_NODEIDTYPE_STRING;
-        id.identifier.string = UA_STRING(const_cast<char *>(
-            std::get<std::string>(nodeId.getIdentifier()).c_str()));
+        id.identifier.string = UA_STRING_ALLOC(
+            std::get<std::string>(nodeId.getIdentifier()).c_str());
         break;
     }
     return id;

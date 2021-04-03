@@ -17,7 +17,7 @@ inline std::string fromUAString(const UA_String& s)
 
 inline UA_String fromString(const std::string &v)
 {
-    return UA_STRING(const_cast<char *>(v.c_str()));
+    return UA_STRING_ALLOC(const_cast<char *>(v.c_str()));
 }
 
 } // namespace modernopc
