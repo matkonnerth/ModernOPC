@@ -17,7 +17,7 @@ which uses open62541 (https://github.com/open62541/open62541) for the heavy lift
 
 # dependencies
 * open62541 (https://github.com/open62541/open62541)
-* libXml2 for parsinger nodesets (http://xmlsoft.org/)
+* nodesetLoader for importing nodesets (https://github.com/matkonnerth/nodesetLoader)
 * cmake for makefile generation (https://cmake.org/)
 * gtest for testing (https://github.com/google/googletest)
 * conan for pulling dependencies (conan.io)
