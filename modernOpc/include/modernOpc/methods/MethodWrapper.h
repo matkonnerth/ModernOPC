@@ -97,16 +97,34 @@ class Call<std::function<R(INARGS...)>> : public ICallable
         else
         {
             R result = std::apply(m_f, inputArgs);
-            //Variant var;
-            //var(result);
-            Variant& var = outputArguments[0];
+            // Variant var;
+            // var(result);
+            Variant &var = outputArguments[0];
             var(result);
-            //outputArguments.
+            // outputArguments.
         }
         return true;
     }
 
   private:
     std::function<R(INARGS...)> m_f{};
+};
+
+using FunctionCall = std::function<bool(const std::vector<Variant> &in,
+                                        std::vector<Variant> &out)>;
+
+template <>
+class Call<FunctionCall> : public ICallable
+{
+  public:
+    Call(FunctionCall f) : m_f(f) {}
+    bool call(void *obj, const std::vector<Variant> &inputArguments,
+              std::vector<Variant> &outputArguments) final
+    {
+        return m_f(inputArguments, outputArguments);
+    }
+
+  private:
+    FunctionCall m_f{};
 };
 } // namespace modernopc
