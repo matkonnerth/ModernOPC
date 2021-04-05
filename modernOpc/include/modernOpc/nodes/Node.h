@@ -2,9 +2,26 @@
 #include <modernOpc/types/LocalizedText.h>
 #include <modernOpc/types/NodeId.h>
 #include <modernOpc/types/QualifiedName.h>
+#include <open62541/types_generated.h>
 
 namespace modernopc
 {
+
+enum class NodeType
+{
+    UNKNOWN,
+    OBJECT,
+    OBJECTTYPE,
+    VARIABLE,
+    VARIABLETYPE,
+    DATATYPE,
+    REFERENCETYPE,
+    METHOD,
+    VIEW
+};
+
+NodeType getNodeType(UA_NodeClass kind);
+
 class Server;
 class Node
 {

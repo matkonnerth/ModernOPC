@@ -5,6 +5,29 @@
 namespace modernopc
 {
 
+NodeType getNodeType(UA_NodeClass kind)
+{
+    switch(kind)
+    {
+        case UA_NODECLASS_VARIABLE:
+            return NodeType::VARIABLE;
+        case UA_NODECLASS_OBJECT:
+            return NodeType::OBJECT;
+        case UA_NODECLASS_METHOD:
+            return NodeType::METHOD;
+        case UA_NODECLASS_OBJECTTYPE:
+            return NodeType::OBJECTTYPE;
+        case UA_NODECLASS_REFERENCETYPE:
+            return NodeType::REFERENCETYPE;
+        case UA_NODECLASS_DATATYPE:
+            return NodeType::DATATYPE;
+        case UA_NODECLASS_VIEW:
+            return NodeType::VIEW;
+        case UA_NODECLASS_UNSPECIFIED:
+            return NodeType::UNKNOWN;
+    };
+}
+
 const NodeId &Node::getId() const
 {
     return id;

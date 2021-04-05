@@ -6,6 +6,7 @@
 #include <open62541/client_highlevel_async.h>
 #include <open62541/client_subscriptions.h>
 #include <open62541/plugin/log_stdout.h>
+#include <modernOpc/nodes/Node.h>
 
 namespace modernopc
 {
@@ -60,17 +61,6 @@ void Client::connect()
 }
 
 void Client::disconnect() { UA_Client_disconnect(client); }
-
-/*void Client::doComm()
-{
-   auto status = UA_Client_connect(client, uri.c_str());
-   if (!(status == UA_STATUSCODE_GOOD))
-   {
-      UA_sleep_ms(100);
-      return;
-   }
-   UA_Client_run_iterate(client, 0);
-}*/
 
 void Client::registerConnectionCallback(ConnectionStateCallback fn)
 {
@@ -191,7 +181,8 @@ std::vector<BrowseResult> Client::browse(const NodeId &id)
     UA_NodeId_copy(&startId, &bReq.nodesToBrowse[0].nodeId);
     bReq.nodesToBrowse[0].resultMask =
         UA_BROWSERESULTMASK_ALL; /* return everything */
-    bReq.nodesToBrowse->referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_HIERARCHICALREFERENCES);
+    bReq.nodesToBrowse->referenceTypeId =
+        UA_NODEID_NUMERIC(0, UA_NS0ID_HIERARCHICALREFERENCES);
     bReq.nodesToBrowse->includeSubtypes = UA_TRUE;
     UA_BrowseResponse bResp = UA_Client_Service_browse(client, bReq);
 
@@ -213,7 +204,7 @@ std::vector<BrowseResult> Client::browse(const NodeId &id)
 
             results.emplace_back(
                 BrowseResult(fromUaNodeId(ref->nodeId.nodeId),
-                             fromUAQualifiedName(&ref->browseName)));
+                             fromUAQualifiedName(&ref->browseName), getNodeType(ref->nodeClass)));
         }
     }
     UA_BrowseRequest_clear(&bReq);
