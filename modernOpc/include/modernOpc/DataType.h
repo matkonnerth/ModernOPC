@@ -1,19 +1,21 @@
 #pragma once
+#include <cassert>
 #include <open62541/types.h>
 #include <open62541/types_generated.h>
-#include <vector>
 #include <string>
-#include <cassert>
+#include <vector>
 namespace modernopc
 {
 template <typename T>
-inline const UA_DataType *getDataType();
-
-template <>
-inline const UA_DataType *getDataType<void>()
+inline const UA_DataType *getDataType()
 {
-    assert(false && "hey there ..");
-    return &UA_TYPES[UA_TYPES_BOOLEAN];
+    static_assert(std::is_void_v<T>,
+                  "type not supported, not template specialization found");
+    static_assert(std::is_integral_v<T>,
+                  "type not supported, not template specialization found");
+    static_assert(std::is_floating_point_v<T>,
+                  "type not supported, not template specialization found");
+    return nullptr;
 }
 
 template <>

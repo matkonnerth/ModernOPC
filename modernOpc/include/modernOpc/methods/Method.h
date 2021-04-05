@@ -44,7 +44,10 @@ struct MethodTraitsBase
         {
             return {};
         }
-        return {getOutputArgument<ReturnType>()};
+        else
+        {
+            return {getOutputArgument<ReturnType>()};
+        }
     }
 
     template <typename T>
