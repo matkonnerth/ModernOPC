@@ -26,6 +26,7 @@ NodeType getNodeType(UA_NodeClass kind)
         case UA_NODECLASS_UNSPECIFIED:
             return NodeType::UNKNOWN;
     };
+    return NodeType::UNKNOWN;
 }
 
 const NodeId &Node::getId() const
