@@ -75,13 +75,13 @@ void Client::notifyConnectionState(ConnectionState state)
     }
 }
 
-NodeId Client::resolve(const UnresolvedNodeId &id)
+int Client::resolveNamespaceUri(const std::string&uri)
 {
     bool found = false;
-    size_t idx = 0;
+    int idx = 0;
     for (const auto &nsUri : namespaces)
     {
-        if (!id.namespaceUri.compare(nsUri))
+        if (!uri.compare(nsUri))
         {
             found = true;
             break;
@@ -92,6 +92,12 @@ NodeId Client::resolve(const UnresolvedNodeId &id)
     {
         throw OpcException("namespaceUri of nodeId not found");
     }
+    return idx;
+}
+
+NodeId Client::resolve(const UnresolvedNodeId &id)
+{
+    auto idx = static_cast<uint16_t>(resolveNamespaceUri(id.namespaceUri));
 
     switch (id.identifier[0])
     {

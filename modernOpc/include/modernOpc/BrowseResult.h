@@ -11,7 +11,7 @@ class BrowseResult final
   public:
     BrowseResult() = default;
     BrowseResult(const NodeId &id, const QualifiedName &name, NodeType type)
-        : m_id{id}, m_qn{name}, m_type{type}
+        : m_id{id}, m_qn{name}, m_type{type}  
     {
     }
 

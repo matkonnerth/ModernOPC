@@ -36,6 +36,7 @@ class Client
     void registerConnectionCallback(ConnectionStateCallback fn);
     void notifyConnectionState(ConnectionState state);
     NodeId resolve(const UnresolvedNodeId &id);
+    int resolveNamespaceUri(const std::string &uri);
     ConnectionState getConnectionState();
 
     Variant read(const NodeId &id);
