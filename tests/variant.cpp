@@ -165,3 +165,27 @@ TEST(variant, NodeId)
     auto id2 = var.get<modernopc::NodeId>();
     std::cout << id2 << "\n";
 }
+
+TEST(variant, copyCtor)
+{
+    modernopc::Variant var1{"myString"s};
+    ASSERT_TRUE(var1.is_a<std::string>());
+    //copy ctor
+    auto var2 = var1;
+    ASSERT_TRUE(var2.is_a<std::string>());
+    auto s = var2.get<std::string>();
+    ASSERT_TRUE(!s.compare("myString"s));
+    //copy Assignment
+    var1 = var2;
+    ASSERT_TRUE(var1.is_a<std::string>());
+}
+
+TEST(variant, operatorEqual)
+{
+    modernopc::Variant var1{"myString"s};
+    auto var2 = var1;
+    ASSERT_TRUE(var1==var2);
+
+    modernopc::Variant var3{"myString2"s};
+    ASSERT_FALSE(var1==var3);
+}

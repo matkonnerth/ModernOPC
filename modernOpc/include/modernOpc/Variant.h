@@ -1,4 +1,5 @@
 #pragma once
+#include <cstring>
 #include <modernOpc/DataType.h>
 #include <modernOpc/util.h>
 #include <open62541/types.h>
@@ -12,10 +13,10 @@ namespace modernopc
 {
 
 template <typename T>
-void toUAVariantImpl(const T& val, UA_Variant *var);
+void toUAVariantImpl(const T &val, UA_Variant *var);
 
 template <typename T>
-void toUAVariantImpl(const std::vector<T>& val, UA_Variant *var)
+void toUAVariantImpl(const std::vector<T> &val, UA_Variant *var)
 {
     static_assert(std::is_arithmetic_v<removeConstRef_t<T>>,
                   "Type not integral");
@@ -30,7 +31,7 @@ void toUAVariantImpl(const std::vector<std::string> &v, UA_Variant *var);
 
 template <typename T>
 typename std::enable_if<!std::is_arithmetic_v<removeConstRef_t<T>>, void>::type
-toUAVariant(const T& val, UA_Variant *var)
+toUAVariant(const T &val, UA_Variant *var)
 {
     toUAVariantImpl(val, var);
 }
@@ -58,20 +59,20 @@ class Variant
         owned = true;
         toUAVariant(std::forward<T>(val), variant);
     }
-    template<typename T>
+    template <typename T>
     Variant(T &&val, bool owned)
     {
         variant = UA_Variant_new();
         tUAVariant(std::forward<T>(val), variant);
     }
     ~Variant();
-    Variant(const Variant &other) = delete;
-    Variant &operator=(const Variant &other) = delete;
+    Variant(const Variant &other);
+    Variant &operator=(const Variant &other);
     Variant(Variant &&other) noexcept;
     Variant &operator=(Variant &&other) noexcept;
 
     template <typename T>
-    void operator()(const T& val)
+    void operator()(const T &val)
     {
         toUAVariant(val, variant);
     }
@@ -79,16 +80,10 @@ class Variant
     template <typename T>
     T get() const;
 
-    inline const UA_Variant *getUAVariant() const
-    {
-        return variant;
-    }
-    inline UA_Variant *getUAVariant()
-    {
-        return variant;
-    }
+    inline const UA_Variant *getUAVariant() const { return variant; }
+    inline UA_Variant *getUAVariant() { return variant; }
 
-    bool isScalar();
+    bool isScalar() const;
     bool isEmpty() const;
     template <typename T>
     bool is_a() const
@@ -100,8 +95,13 @@ class Variant
         return variant->type == getDataType<removeConstRef_t<T>>();
     }
 
+    bool operator==(const Variant &other) const;
+    
+
   private:
     UA_Variant *variant{nullptr};
     bool owned = false;
 };
+
+void toUAVariantImpl(const Variant &v, UA_Variant *var);
 } // namespace modernopc
