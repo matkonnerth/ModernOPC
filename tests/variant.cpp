@@ -180,7 +180,7 @@ TEST(variant, copyCtor)
     ASSERT_TRUE(var1.is_a<std::string>());
 }
 
-TEST(variant, operatorEqual)
+TEST(variant, operatorEqual_String)
 {
     modernopc::Variant var1{"myString"s};
     auto var2 = var1;
@@ -188,4 +188,35 @@ TEST(variant, operatorEqual)
 
     modernopc::Variant var3{"myString2"s};
     ASSERT_FALSE(var1==var3);
+}
+
+TEST(variant, operatorEqual_Integer)
+{
+    modernopc::Variant var1{(uint8_t)1};
+    auto var2 = var1;
+    ASSERT_TRUE(var1 == var2);
+
+    modernopc::Variant var3{(int8_t)1};
+    ASSERT_FALSE(var1 == var3);
+
+    var1 = 1234;
+    var2 = 1234;
+    ASSERT_TRUE(var1 == var2);
+
+    modernopc::Variant var4{INT64_MAX};
+    modernopc::Variant var5{INT64_MAX-1};
+    ASSERT_FALSE(var4==var5);
+}
+
+TEST(variant, operatorEqual_FloatingPoint)
+{
+    modernopc::Variant var1{1.1f};
+    auto var2 = var1;
+    ASSERT_TRUE(var1 == var2);
+
+    modernopc::Variant var3{1.1f};
+    ASSERT_TRUE(var1 == var3);
+
+    modernopc::Variant var4{1.1};
+    ASSERT_FALSE(var1 == var4);
 }
