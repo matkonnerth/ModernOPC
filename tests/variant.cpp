@@ -4,6 +4,7 @@
 #include <modernOpc/types/NodeId.h>
 #include <modernOpc/types/QualifiedName.h>
 #include <open62541/server.h>
+#include <iostream>
 
 using namespace std::string_literals;
 using modernopc::NodeId;
@@ -219,4 +220,19 @@ TEST(variant, operatorEqual_FloatingPoint)
 
     modernopc::Variant var4{1.1};
     ASSERT_FALSE(var1 == var4);
+}
+
+TEST(variant, toString)
+{
+    modernopc::Variant var1{123};
+    std::cout << var1.toString() << "\n";
+
+    modernopc::Variant var2{std::vector<int>{1,2,3}};
+    std::cout << var2.toString() << "\n";
+
+    modernopc::Variant var3{std::vector<std::string>{"1", "2", "3"}};
+    std::cout << var3.toString() << "\n";
+
+    modernopc::Variant var4{std::vector<unsigned int>{1u, 2u, 3u}};
+    std::cout << var4.toString() << "\n";
 }

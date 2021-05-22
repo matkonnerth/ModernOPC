@@ -96,6 +96,8 @@ class Variant
     }
 
     bool operator==(const Variant &other) const;
+
+    std::string toString() const;
     
 
   private:

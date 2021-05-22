@@ -1,4 +1,5 @@
 #include <modernOpc/Variant.h>
+#include <modernOpc/types/String.h>
 
 namespace modernopc
 {
@@ -225,5 +226,20 @@ void toUAVariantImpl(const Variant &v, UA_Variant *var)
     UA_Variant_init(var);
     UA_Variant_copy(v.getUAVariant(), var);
 }
+
+std::string Variant::toString() const
+{
+    if(!variant || isEmpty())
+    {
+        return "NULL or EMPTY";
+    }
+    UA_String out = UA_STRING_NULL;
+    UA_print(variant, &UA_TYPES[UA_TYPES_VARIANT], &out);
+    auto s = fromUAString(out);
+    UA_String_clear(&out);
+    return s;
+}
+
+
 
 } // namespace modernopc
