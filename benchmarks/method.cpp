@@ -1,8 +1,8 @@
 #include <benchmark/benchmark.h>
-#include <modernOpc/Server.h>
-#include <modernOpc/nodes/MethodNode.h>
-#include <modernOpc/nodes/ObjectNode.h>
-#include <modernOpc/types/NodeId.h>
+#include <modernopc/Server.h>
+#include <modernopc/nodes/MethodNode.h>
+#include <modernopc/nodes/ObjectNode.h>
+#include <modernopc/types/NodeId.h>
 #include <open62541/client_config_default.h>
 #include <open62541/plugin/log_stdout.h>
 #include <open62541/server.h>

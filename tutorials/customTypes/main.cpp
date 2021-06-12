@@ -1,8 +1,8 @@
 #include "AppTypes.h"
 #include <iostream>
-#include <modernOpc/Server.h>
-#include <modernOpc/nodes/ObjectNode.h>
-#include <modernOpc/nodes/VariableNode.h>
+#include <modernopc/Server.h>
+#include <modernopc/nodes/ObjectNode.h>
+#include <modernopc/nodes/VariableNode.h>
 //#include <generated.h>
 
 using modernopc::NodeId;
@@ -24,7 +24,7 @@ int main()
 
     auto obj = s.getObjectsFolder();
     //modernopc::BuildInfo info;
-    //info.productUri = "matkonnerth - modernOPC";
+    //info.productUri = "matkonnerth - modernopc";
     //obj->addVariable(NodeId(1, "myBuildInfo"), NodeId(0, 0),
     //                 QualifiedName(1, "test"), info);
     s.run();

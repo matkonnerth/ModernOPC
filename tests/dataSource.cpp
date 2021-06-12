@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
-#include <modernOpc/DataSource.h>
-#include <modernOpc/Server.h>
-#include <modernOpc/nodes/ObjectNode.h>
-#include <modernOpc/nodes/VariableNode.h>
+#include <modernopc/DataSource.h>
+#include <modernopc/Server.h>
+#include <modernopc/nodes/ObjectNode.h>
+#include <modernopc/nodes/VariableNode.h>
 
 UA_StatusCode getValue(const modernopc::NodeId &id, modernopc::Variant &var)
 {

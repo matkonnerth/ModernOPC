@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <modernOpc/Server.h>
+#include <modernopc/Server.h>
 #include <open62541/server.h>
 
 std::string path = "";

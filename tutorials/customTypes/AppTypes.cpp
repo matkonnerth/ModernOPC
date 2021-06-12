@@ -1,5 +1,5 @@
 #include <AppTypes.h>
-#include <modernOpc/Variant.h>
+#include <modernopc/Variant.h>
 
 namespace modernopc
 {

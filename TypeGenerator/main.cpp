@@ -103,9 +103,9 @@ int main(int argc, char *argv[])
     }
     std::cout << "Types count: " << types.size() << std::endl;
 
-    std::ofstream header("/home/matzy/git/modernOPC/generated/generated.h",
+    std::ofstream header("/home/matzy/git/modernopc/generated/generated.h",
                          std::ios::out);
-    std::ofstream impl("/home/matzy/git/modernOPC/generated/generated.cpp",
+    std::ofstream impl("/home/matzy/git/modernopc/generated/generated.cpp",
                        std::ios::out);
     gen::TypeGenerator g{"opc", types, header, impl};
 

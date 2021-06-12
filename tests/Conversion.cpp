@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <modernOpc/DataType.h>
+#include <modernopc/DataType.h>
 #include <open62541/types_generated.h>
 
 TEST(TypeConverter, boolean) {

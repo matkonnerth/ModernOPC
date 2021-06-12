@@ -1,5 +1,5 @@
 #pragma once
-#include <modernOpc/Variant.h>
+#include <modernopc/Variant.h>
 
 namespace app
 {

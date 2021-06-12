@@ -1,8 +1,8 @@
 #include <benchmark/benchmark.h>
-#include <modernOpc/Server.h>
-#include <modernOpc/Variant.h>
-#include <modernOpc/nodes/ObjectNode.h>
-#include <modernOpc/nodes/VariableNode.h>
+#include <modernopc/Server.h>
+#include <modernopc/Variant.h>
+#include <modernopc/nodes/ObjectNode.h>
+#include <modernopc/nodes/VariableNode.h>
 #include <open62541/server.h>
 #include <vector>
 

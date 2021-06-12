@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <modernOpc/types/NodeId.h>
+#include <modernopc/types/NodeId.h>
 #include <string>
 #include <unordered_map>
 

@@ -4,8 +4,8 @@
  * By providing a path a valid nodeset xml can be loaded into the addresspace of the server. */
 
 #include <functional>
-#include <modernOpc/Server.h>
-#include <modernOpc/nodes/MethodNode.h>
+#include <modernopc/Server.h>
+#include <modernopc/nodes/MethodNode.h>
 
 int main()
 {

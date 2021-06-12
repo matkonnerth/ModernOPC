@@ -9,13 +9,13 @@
 
 #include <functional>
 #include <iostream>
-#include <modernOpc/DataSource.h>
-#include <modernOpc/Server.h>
-#include <modernOpc/Variant.h>
-#include <modernOpc/nodes/ObjectNode.h>
-#include <modernOpc/nodes/VariableNode.h>
-#include <modernOpc/types/NodeId.h>
-#include <modernOpc/types/QualifiedName.h>
+#include <modernopc/DataSource.h>
+#include <modernopc/Server.h>
+#include <modernopc/Variant.h>
+#include <modernopc/nodes/ObjectNode.h>
+#include <modernopc/nodes/VariableNode.h>
+#include <modernopc/types/NodeId.h>
+#include <modernopc/types/QualifiedName.h>
 #include <vector>
 
 using modernopc::DataSource;

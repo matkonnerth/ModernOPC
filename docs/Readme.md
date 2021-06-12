@@ -1,6 +1,6 @@
-# ModernOPC
-![IntegrationTests](https://github.com/matkonnerth/ModernOpc/workflows/GccDebugMemcheck/badge.svg)
-[![codecov](https://codecov.io/gh/matkonnerth/ModernOPC/branch/master/graph/badge.svg)](https://codecov.io/gh/matkonnerth/ModernOPC)
+# modernopc
+![IntegrationTests](https://github.com/matkonnerth/modernopc/workflows/GccDebugMemcheck/badge.svg)
+[![codecov](https://codecov.io/gh/matkonnerth/modernopc/branch/master/graph/badge.svg)](https://codecov.io/gh/matkonnerth/modernopc)
 
 ## a lightweight c++ opc ua library
 which uses open62541 (https://github.com/open62541/open62541) for the heavy lifting
@@ -24,13 +24,13 @@ which uses open62541 (https://github.com/open62541/open62541) for the heavy lift
 * C++ Standard 17
 
 # CI
-![IntegrationTests](https://github.com/matkonnerth/ModernOpc/workflows/GccDebugMemcheck/badge.svg)
-[![codecov](https://codecov.io/gh/matkonnerth/ModernOPC/branch/master/graph/badge.svg)](https://codecov.io/gh/matkonnerth/ModernOPC)
+![IntegrationTests](https://github.com/matkonnerth/modernopc/workflows/GccDebugMemcheck/badge.svg)
+[![codecov](https://codecov.io/gh/matkonnerth/modernopc/branch/master/graph/badge.svg)](https://codecov.io/gh/matkonnerth/modernopc)
 
 # license
-MPL 2.0, take a look on [license](https://github.com/matkonnerth/ModernOPC/blob/master/LICENSE.md) for further information.
+MPL 2.0, take a look on [license](https://github.com/matkonnerth/modernopc/blob/master/LICENSE.md) for further information.
 
 # Quick start
 
-# [Documentation](https://matkonnerth.github.io/ModernOPC-Docu/)
+# [Documentation](https://matkonnerth.github.io/modernopc-Docu/)
 

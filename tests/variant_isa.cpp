@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <modernOpc/Variant.h>
+#include <modernopc/Variant.h>
 #include <open62541/server.h>
 #include <vector>
 

@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
-#include <modernOpc/Server.h>
-#include <modernOpc/Variant.h>
-#include <modernOpc/nodes/VariableNode.h>
-#include <modernOpc/types/NodeId.h>
+#include <modernopc/Server.h>
+#include <modernopc/Variant.h>
+#include <modernopc/nodes/VariableNode.h>
+#include <modernopc/types/NodeId.h>
 #include <string>
 #include <vector>
 
