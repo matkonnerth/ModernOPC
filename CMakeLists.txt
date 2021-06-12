@@ -4,7 +4,6 @@ project(ModernOPC)
 option(ENABLE_ASAN "enable address sanitizer" OFF)
 option(CALC_COVERAGE "calculate code coverage" OFF)
 option(BUILD_Benchmark "Build benchmark tests" OFF)
-option(ENABLE_CONAN "consume dependencies via conan" OFF)
 
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
 message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")

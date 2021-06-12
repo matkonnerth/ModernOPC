@@ -6,6 +6,7 @@
 #include <type_traits>
 #include <typeinfo>
 #include <vector>
+#include "TupleHelper.h"
 
 namespace modernopc
 {
@@ -14,19 +15,18 @@ template <typename ClassType, typename ReturnType, typename... Args>
 struct MethodTraitsBase
 {
 
-    inline static size_t getNumArgs() { return sizeof...(Args); }
+    inline static size_t getInputArgsSize() { return sizeof...(Args); }
 
     inline static std::vector<UA_Argument> getInputArguments()
     {
-        int iArg = 0;
-        const size_t nArgs = getNumArgs();
+        const size_t nArgs = getInputArgsSize();
         if (nArgs <= 0)
             return std::vector<UA_Argument>();
-        return {getInputArgument<Args>(iArg++)...};
+        return {getInputArgument<Args>()...};
     }
 
     template <typename T>
-    inline static UA_Argument getInputArgument(const int &iArg = 0)
+    inline static UA_Argument getInputArgument()
     {
         UA_Argument inputArgument;
         UA_Argument_init(&inputArgument);
@@ -43,6 +43,18 @@ struct MethodTraitsBase
         if constexpr(std::is_void_v<ReturnType>)
         {
             return {};
+        }
+        else if constexpr (is_tuple<ReturnType>::value)
+        {
+            ReturnType outputArgs;
+            std::vector<UA_Argument> args;
+            size_t i = 0;
+
+            for_each(outputArgs, [&](auto &x) {
+                args.push_back(getOutputArgument<typename std::remove_reference<decltype(x)>::type>());
+                i++;
+            });
+            return args;
         }
         else
         {

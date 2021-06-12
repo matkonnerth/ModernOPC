@@ -1,29 +1,11 @@
 #pragma once
 #include <functional>
 #include <modernOpc/Variant.h>
-#include <tuple>
+#include "TupleHelper.h"
 #include <vector>
 
 namespace modernopc
 {
-
-template <typename Tuple, typename F, std::size_t... Indices>
-void for_each_impl(Tuple &&tuple, F &&f, std::index_sequence<Indices...>)
-{
-    using swallow = int[];
-    (void)swallow{1, (f(std::get<Indices>(std::forward<Tuple>(tuple))), void(),
-                      int{})...};
-}
-
-template <typename Tuple, typename F>
-void for_each(Tuple &&tuple, F &&f)
-{
-    constexpr std::size_t N =
-        std::tuple_size<std::remove_reference_t<Tuple>>::value;
-    for_each_impl(std::forward<Tuple>(tuple), std::forward<F>(f),
-                  std::make_index_sequence<N>{});
-}
-
 class ICallable
 {
   public:
@@ -63,8 +45,21 @@ class Call<std::function<R(ClassType *, INARGS...)>> : public ICallable
         else
         {
             R result = std::apply(m_f, t2);
-            Variant &var = outputArguments[0];
-            var(result);
+
+            if constexpr (is_tuple<R>::value)
+            {
+                auto i = 0;
+                for_each(result, [&](auto &x) {
+                    Variant &var = outputArguments[i];
+                    var(x);
+                    i++;
+                });
+            }
+            else
+            {
+                Variant &var = outputArguments[0];
+                var(result);
+            }
         }
         return true;
     }
@@ -97,11 +92,21 @@ class Call<std::function<R(INARGS...)>> : public ICallable
         else
         {
             R result = std::apply(m_f, inputArgs);
-            // Variant var;
-            // var(result);
-            Variant &var = outputArguments[0];
-            var(result);
-            // outputArguments.
+            
+            if constexpr (is_tuple<R>::value)
+            {
+                auto i = 0;
+                for_each(result, [&](auto &x) {
+                    Variant &var = outputArguments[i];
+                    var(x);
+                    i++;
+                });
+            }
+            else
+            {
+              Variant &var = outputArguments[0];
+              var(result);
+            }
         }
         return true;
     }
@@ -110,8 +115,8 @@ class Call<std::function<R(INARGS...)>> : public ICallable
     std::function<R(INARGS...)> m_f{};
 };
 
-using FunctionCall = std::function<bool(const std::vector<Variant> &in,
-                                        std::vector<Variant> &out)>;
+using FunctionCall =
+    std::function<bool(const std::vector<Variant> &in, std::vector<Variant> &out)>;
 
 template <>
 class Call<FunctionCall> : public ICallable
