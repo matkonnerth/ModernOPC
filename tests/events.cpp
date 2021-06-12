@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include <modernOpc/Server.h>
-#include <modernOpc/events/BaseEventType.h>
-#include <modernOpc/nodes/ObjectNode.h>
-#include <modernOpc/types/NodeId.h>
-#include <modernOpc/types/QualifiedName.h>
+#include <modernopc/Server.h>
+#include <modernopc/events/BaseEventType.h>
+#include <modernopc/nodes/ObjectNode.h>
+#include <modernopc/types/NodeId.h>
+#include <modernopc/types/QualifiedName.h>
 
 using modernopc::Variant;
 using modernopc::ObjectNode;

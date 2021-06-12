@@ -45,7 +45,7 @@ add_custom_target(Sphinx ALL
                   COMMAND
                   #${SPHINX_EXECUTABLE} -b html
                   /usr/local/bin/sphinx-build -v -b html
-                  -Dbreathe_projects.ModernOPC=${CMAKE_CURRENT_BINARY_DIR}/doc_doxygen/xml/
+                  -Dbreathe_projects.modernopc=${CMAKE_CURRENT_BINARY_DIR}/doc_doxygen/xml/
                   ${SPHINX_SOURCE} ${SPHINX_BUILD}
                   DEPENDS ${GENERATED_RST}
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}

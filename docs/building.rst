@@ -1,9 +1,9 @@
 .. _building:
 
-Building ModernOPC
+Building modernopc
 ==================
 
-ModernOPC uses cmake and conan to build the library. conan is a python based C/C++ package manager.
+modernopc uses cmake and conan to build the library. conan is a python based C/C++ package manager.
 Installation guidelines for conan: https://docs.conan.io/en/latest/installation.html
 
 Building the Library
@@ -22,12 +22,12 @@ Building with CMake on Ubuntu or Debian
 
 .. code-block:: bash
 
-    git clone git@github.com:matkonnerth/ModernOPC.git
-    cd modernOPC
+    git clone git@github.com:matkonnerth/modernopc.git
+    cd modernopc
     git submodule init
     git submodule update
 
-    cd modernOPC
+    cd modernopc
     mkdir build
     cd build
     conan install ..

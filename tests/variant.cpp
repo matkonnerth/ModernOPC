@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
-#include <modernOpc/Variant.h>
-#include <modernOpc/types/LocalizedText.h>
-#include <modernOpc/types/NodeId.h>
-#include <modernOpc/types/QualifiedName.h>
+#include <modernopc/Variant.h>
+#include <modernopc/types/LocalizedText.h>
+#include <modernopc/types/NodeId.h>
+#include <modernopc/types/QualifiedName.h>
 #include <open62541/server.h>
 #include <iostream>
 

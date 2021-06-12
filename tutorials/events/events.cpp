@@ -1,9 +1,9 @@
 #include <functional>
 #include <iostream>
-#include <modernOpc/Server.h>
-#include <modernOpc/nodes/MethodNode.h>
-#include <modernOpc/nodes/ObjectNode.h>
-#include <modernOpc/events/BaseEventType.h>
+#include <modernopc/Server.h>
+#include <modernopc/nodes/MethodNode.h>
+#include <modernopc/nodes/ObjectNode.h>
+#include <modernopc/events/BaseEventType.h>
 
 using modernopc::ObjectNode;
 using namespace std::string_literals;

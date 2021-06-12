@@ -6,8 +6,8 @@
 
 #include <functional>
 #include <iostream>
-#include <modernOpc/Server.h>
-#include <modernOpc/nodes/ObjectNode.h>
+#include <modernopc/Server.h>
+#include <modernopc/nodes/ObjectNode.h>
 #include <tuple>
 
 using modernopc::QualifiedName;

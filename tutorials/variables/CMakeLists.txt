@@ -1,5 +1,5 @@
 add_executable(tutorial_variables main.cpp)
 target_include_directories(tutorial_variables PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(tutorial_variables PRIVATE ${LIB_ASAN} ${LIB_GCOV} modernOpc)
+target_link_libraries(tutorial_variables PRIVATE ${LIB_ASAN} ${LIB_GCOV} modernopc)
 target_compile_features(tutorial_variables PRIVATE cxx_std_17)
 target_compile_options(tutorial_variables PRIVATE ${COMPILER_OPTIONS})

@@ -1,8 +1,8 @@
 #include "FileService.h"
 #include <functional>
-#include <modernOpc/Server.h>
-#include <modernOpc/nodes/MethodNode.h>
-#include <modernOpc/nodes/ObjectNode.h>
+#include <modernopc/Server.h>
+#include <modernopc/nodes/MethodNode.h>
+#include <modernopc/nodes/ObjectNode.h>
 
 int main()
 {

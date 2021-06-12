@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(ModernOPC)
+project(modernopc)
 
 option(ENABLE_ASAN "enable address sanitizer" OFF)
 option(CALC_COVERAGE "calculate code coverage" OFF)
@@ -35,30 +35,30 @@ find_package(open62541 REQUIRED)
 find_package(NodesetLoader REQUIRED)
 #add_subdirectory(TypeGenerator)
 
-add_library(modernOpc SHARED
-    ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src/Server.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src/client/Client.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src/import/Extension.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src/Variant.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src/Variant_get.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src/types/LocalizedText.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src/types/QualifiedName.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src/types/String.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src/types/NodeId.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src/nodes/ObjectNode.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src/nodes/VariableNode.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src/nodes/Node.cpp)
-target_include_directories(modernOpc PUBLIC 
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/include>
-    $<INSTALL_INTERFACE:include/modernOpc>)
-target_include_directories(modernOpc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/modernOpc/src)
-target_link_libraries(modernOpc PRIVATE ${LIB_GCOV} NodesetLoader)
-target_link_libraries(modernOpc PUBLIC CONAN_PKG::spdlog)
-target_link_libraries(modernOpc PUBLIC open62541::open62541)
-target_compile_features(modernOpc PRIVATE cxx_std_17)
-target_compile_options(modernOpc PRIVATE ${COMPILER_OPTIONS})
+add_library(modernopc SHARED
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/Server.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/client/Client.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/import/Extension.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/Variant.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/Variant_get.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/types/LocalizedText.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/types/QualifiedName.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/types/String.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/types/NodeId.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/nodes/ObjectNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/nodes/VariableNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/nodes/Node.cpp)
+target_include_directories(modernopc PUBLIC 
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/modernopc/include>
+    $<INSTALL_INTERFACE:include/modernopc>)
+target_include_directories(modernopc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src)
+target_link_libraries(modernopc PRIVATE ${LIB_GCOV} NodesetLoader)
+target_link_libraries(modernopc PUBLIC CONAN_PKG::spdlog)
+target_link_libraries(modernopc PUBLIC open62541::open62541)
+target_compile_features(modernopc PRIVATE cxx_std_17)
+target_compile_options(modernopc PRIVATE ${COMPILER_OPTIONS})
 if(${ENABLE_ASAN})
-    target_link_libraries(modernOpc INTERFACE "-fsanitize=address")
+    target_link_libraries(modernopc INTERFACE "-fsanitize=address")
 endif()
 
 add_subdirectory(tests)
@@ -78,16 +78,16 @@ endif()
 
 #install
 if(NOT ${CALC_COVERAGE})
-    install(TARGETS modernOpc
-            EXPORT modernOpc
+    install(TARGETS modernopc
+            EXPORT modernopc
             LIBRARY DESTINATION lib
             ARCHIVE DESTINATION lib
             RUNTIME DESTINATION bin
             INCLUDES DESTINATION include
             PUBLIC_HEADER DESTINATION include)
 
-    install(EXPORT modernOpc DESTINATION lib/cmake/modernOpc)
-    install(FILES modernOpcConfig.cmake DESTINATION lib/cmake/modernOpc)
+    install(EXPORT modernopc DESTINATION lib/cmake/modernopc)
+    install(FILES modernopcConfig.cmake DESTINATION lib/cmake/modernopc)
 
-    install(DIRECTORY ${PROJECT_SOURCE_DIR}/modernOpc/include/modernOpc DESTINATION include)
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/modernopc/include/modernopc DESTINATION include)
 endif()

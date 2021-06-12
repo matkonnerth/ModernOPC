@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 #include <memory>
-#include <modernOpc/Server.h>
-#include <modernOpc/Variant.h>
-#include <modernOpc/nodes/MethodNode.h>
-#include <modernOpc/nodes/ObjectNode.h>
+#include <modernopc/Server.h>
+#include <modernopc/Variant.h>
+#include <modernopc/nodes/MethodNode.h>
+#include <modernopc/nodes/ObjectNode.h>
 #include <vector>
 
 using modernopc::NodeId;

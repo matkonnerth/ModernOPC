@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <modernOpc/Server.h>
-#include <modernOpc/Variant.h>
-#include <modernOpc/nodes/VariableNode.h>
+#include <modernopc/Server.h>
+#include <modernopc/Variant.h>
+#include <modernopc/nodes/VariableNode.h>
 
 std::string path = "";
 using modernopc::NodeId;

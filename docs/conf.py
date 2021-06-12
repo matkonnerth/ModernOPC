@@ -19,7 +19,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'ModernOPC'
+project = 'modernopc'
 copyright = '2020, Matthias Konnerth'
 author = 'Matthias Konnerth'
 
@@ -42,7 +42,7 @@ extensions = [ "breathe" ]
 #extensions = [ ]
 
 # Breathe Configuration
-breathe_default_project = "ModernOPC"
+breathe_default_project = "modernopc"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -105,7 +105,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'ModernOPCdoc'
+htmlhelp_basename = 'modernopcdoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -132,7 +132,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'ModernOPC.tex', 'ModernOPC Documentation',
+    (master_doc, 'modernopc.tex', 'modernopc Documentation',
      'Matthias Konnerth', 'manual'),
 ]
 
@@ -142,7 +142,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'modernopc', 'ModernOPC Documentation',
+    (master_doc, 'modernopc', 'modernopc Documentation',
      [author], 1)
 ]
 
@@ -153,8 +153,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'ModernOPC', 'ModernOPC Documentation',
-     author, 'ModernOPC', 'One line description of project.',
+    (master_doc, 'modernopc', 'modernopc Documentation',
+     author, 'modernopc', 'One line description of project.',
      'Miscellaneous'),
 ]
 
