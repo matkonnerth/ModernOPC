@@ -8,6 +8,7 @@
 #include <iostream>
 #include <modernOpc/Server.h>
 #include <modernOpc/nodes/ObjectNode.h>
+#include <tuple>
 
 using modernopc::QualifiedName;
 struct Callable
@@ -22,6 +23,8 @@ struct Callable
   private:
     std::string state;
 };
+
+
 
 int main()
 {
@@ -47,6 +50,14 @@ int main()
     // add a MethodNode and bind it to a lambda function
     std::function fVoidIntInt = [](int a, int b) { std::cout << a+b << std::endl;};
     root->addMethod(modernopc::NodeId(1, "doIt4"), QualifiedName(1, "getVector"), fVoidIntInt);
+
+    // multiple output arguments via std::tuple
+    using namespace std::string_literals;
+    std::function multipleOutputs = []()
+    {
+        return std::make_tuple(42, "helloWorld"s);
+    };
+    root->addMethod(modernopc::NodeId(1, "multiOutputArgs"), QualifiedName(1, "multi"), multipleOutputs);
 
     s.run();
 }

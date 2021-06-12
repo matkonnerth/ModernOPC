@@ -5,9 +5,9 @@
 #include <modernOpc/Variant.h>
 #include <modernOpc/nodes/MethodNode.h>
 #include <modernOpc/nodes/ObjectNode.h>
+#include <modernOpc/nodes/VariableNode.h>
 #include <modernOpc/types/NodeId.h>
 #include <modernOpc/types/String.h>
-#include <modernOpc/nodes/VariableNode.h>
 #include <open62541/plugin/log_stdout.h>
 #include <open62541/server.h>
 #include <open62541/server_config_default.h>
@@ -50,7 +50,8 @@ static void cleanupCustomTypes(const UA_DataTypeArray *types)
     }
 }
 
-Server::~Server() {
+Server::~Server()
+{
     stop();
     const UA_DataTypeArray *customTypes =
         UA_Server_getConfig(server)->customDataTypes;
@@ -126,7 +127,10 @@ UA_StatusCode Server::internalMethodCallback(
 
         std::vector<Variant> inputArgs;
         std::vector<Variant> outputArgs;
-        outputArgs.emplace_back(Variant(const_cast<UA_Variant *>(output)));
+        for (auto it = output; it != output + outputSize; it++)
+        {
+            outputArgs.emplace_back(Variant{it});
+        }
         for (auto it = input; it != input + inputSize; it++)
         {
             inputArgs.emplace_back(Variant(const_cast<UA_Variant *>(it)));
