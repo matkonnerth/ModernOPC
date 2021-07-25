@@ -18,5 +18,8 @@ opc_add_test("server2")
 opc_add_test("dataSource")
 opc_add_test("client")
 opc_add_test("statusCode")
+if(DECODE_JSON)
+    opc_add_test("variant_fromJson")
+endif()
 
 add_subdirectory(import)

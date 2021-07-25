@@ -4,6 +4,7 @@ project(modernopc)
 option(ENABLE_ASAN "enable address sanitizer" OFF)
 option(CALC_COVERAGE "calculate code coverage" OFF)
 option(BUILD_Benchmark "Build benchmark tests" OFF)
+option(DECODE_JSON "Enable support of json decoding, open62541 must be patched (EXPERIMENTAL)" OFF)
 
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
 message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
@@ -35,7 +36,7 @@ find_package(open62541 REQUIRED)
 find_package(NodesetLoader REQUIRED)
 #add_subdirectory(TypeGenerator)
 
-add_library(modernopc SHARED
+set(sources 
     ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/Server.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/client/Client.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/import/Extension.cpp
@@ -47,7 +48,15 @@ add_library(modernopc SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/types/NodeId.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/nodes/ObjectNode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/nodes/VariableNode.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/nodes/Node.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/nodes/Node.cpp
+)
+
+if(DECODE_JSON)
+    set(sources ${sources} 
+        ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/Variant_fromJson.cpp)
+endif()
+
+add_library(modernopc SHARED ${sources})
 target_include_directories(modernopc PUBLIC 
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/modernopc/include>
     $<INSTALL_INTERFACE:include/modernopc>)
