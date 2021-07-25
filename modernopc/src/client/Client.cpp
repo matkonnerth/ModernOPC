@@ -1,12 +1,15 @@
+#include <NodesetLoader/backendOpen62541.h>
 #include <modernopc/OpcException.h>
 #include <modernopc/client/Client.h>
+#include <modernopc/nodes/Node.h>
 #include <open62541/client.h>
 #include <open62541/client_config_default.h>
 #include <open62541/client_highlevel.h>
 #include <open62541/client_highlevel_async.h>
 #include <open62541/client_subscriptions.h>
 #include <open62541/plugin/log_stdout.h>
-#include <modernopc/nodes/Node.h>
+#include <open62541/server.h>
+#include <open62541/server_config_default.h>
 
 namespace modernopc
 {
@@ -216,6 +219,61 @@ std::vector<BrowseResult> Client::browse(const NodeId &id)
     UA_BrowseRequest_clear(&bReq);
     UA_BrowseResponse_clear(&bResp);
     return results;
+}
+
+bool Client::loadNodeset(const std::string& path)
+{
+    auto* server = UA_Server_new();
+    if(!NodesetLoader_loadFile(server, path.c_str(), nullptr))
+    {
+        UA_Server_delete(server);
+        return false;
+    }
+
+    auto* customDataTypes = UA_Server_getConfig(server)->customDataTypes;
+    UA_Server_getConfig(server)->customDataTypes = nullptr;
+    UA_Client_getConfig(client)->customDataTypes = customDataTypes;
+
+    UA_Server_delete(server);
+    return true;
+}
+
+const struct UA_DataType *
+findCustomDataType(UA_Client *client,
+                                const UA_NodeId *typeId)
+{
+    UA_ClientConfig *config = UA_Client_getConfig(client);
+    const UA_DataTypeArray *types = config->customDataTypes;
+    while (types)
+    {
+        const UA_DataTypeArray *next = types->next;
+        if (types->types)
+        {
+            for (const UA_DataType *type = types->types;
+                 type != types->types + types->typesSize; type++)
+            {
+                if (UA_NodeId_equal(&type->typeId, typeId))
+                {
+                    return type;
+                }
+            }
+        }
+        types = next;
+    }
+    return NULL;
+}
+
+Variant Client::createVariantFromJson(const std::string &jsonString, const NodeId &dataType)
+{
+    auto &id = fromNodeId(dataType);
+    const auto* type = findCustomDataType(client, &id);
+
+    if(!type)
+    {
+        return Variant();
+    }
+
+    return fromJson(jsonString, type);
 }
 
 } // namespace modernopc

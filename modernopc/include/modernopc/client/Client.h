@@ -45,6 +45,15 @@ class Client
                               const std::vector<Variant> &inputArgs);
     std::vector<BrowseResult> browse(const NodeId &id);
 
+    /**
+     * loads a nodeset xml into an temporary server namespace and add the datatypes to the client
+     * \param path path to nodeset file
+     * \return true on success, otherwise false. */
+    bool loadNodeset(const std::string &path);
+
+    Variant createVariantFromJson(const std::string &jsonString,
+                     const NodeId& dataType);
+
   private:
     UA_Client *client{nullptr};
     std::string uri{};
