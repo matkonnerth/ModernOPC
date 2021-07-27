@@ -54,8 +54,9 @@ class Client
     Variant createVariantFromJson(const std::string &jsonString,
                      const NodeId& dataType);
 
-  private:
-    UA_Client *client{nullptr};
+    const struct UA_DataType * findCustomDataType(const UA_NodeId& typeId);
+
+private : UA_Client *client{nullptr};
     std::string uri{};
     std::vector<ConnectionStateCallback> connectionStateCallbacks{};
     ConnectionState connState{ConnectionState::DISCONNECTED};

@@ -25,6 +25,8 @@ using modernopc::ObjectNode;
 using modernopc::QualifiedName;
 using modernopc::Variant;
 
+std::string path = "";
+
 UA_StatusCode getValue(const modernopc::NodeId &id, modernopc::Variant &var)
 {
     var(42);
@@ -137,4 +139,38 @@ TEST(ClientTest, browse)
     {
         std::cout << "id: " << r.Id() << " name: " << r.Name() << "\n";
     }
+}
+
+TEST(ClientTest, import)
+{
+    TestServer s{4844};
+
+    Client c{s.EndpointUri()};
+
+    ASSERT_TRUE(c.loadNodeset(path + "/" + "struct.xml"));
+
+    auto v = c.createVariantFromJson("{\"X\": 1, \"Y\":2, \"Z\": 3}", NodeId(2, 3002));
+
+    struct Point
+    {
+        int32_t X;
+        int32_t Y;
+        int32_t Z;
+    };
+
+    Point p {1,2,3};
+
+    ASSERT_EQ(0, memcmp(&p, v.getUAVariant()->data, c.findCustomDataType(UA_NODEID_NUMERIC(2, 3002))->memSize));
+}
+
+int main(int argc, char **argv)
+{
+
+    testing::InitGoogleTest(&argc, argv);
+
+    if (!(argc > 1))
+        return 1;
+    path = argv[1];
+
+    return RUN_ALL_TESTS();
 }

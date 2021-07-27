@@ -26,7 +26,7 @@ Variant fromJson(const std::string &jsonString, const UA_DataType *dataType)
     if (!status == UA_STATUSCODE_GOOD)
     {
         free(data);
-        Variant();
+        return Variant();
     }
 
     auto var = UA_Variant_new();

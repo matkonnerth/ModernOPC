@@ -239,8 +239,7 @@ bool Client::loadNodeset(const std::string& path)
 }
 
 const struct UA_DataType *
-findCustomDataType(UA_Client *client,
-                                const UA_NodeId *typeId)
+Client::findCustomDataType(const UA_NodeId& typeId)
 {
     UA_ClientConfig *config = UA_Client_getConfig(client);
     const UA_DataTypeArray *types = config->customDataTypes;
@@ -252,7 +251,7 @@ findCustomDataType(UA_Client *client,
             for (const UA_DataType *type = types->types;
                  type != types->types + types->typesSize; type++)
             {
-                if (UA_NodeId_equal(&type->typeId, typeId))
+                if (UA_NodeId_equal(&type->typeId, &typeId))
                 {
                     return type;
                 }
@@ -265,8 +264,7 @@ findCustomDataType(UA_Client *client,
 
 Variant Client::createVariantFromJson(const std::string &jsonString, const NodeId &dataType)
 {
-    auto &id = fromNodeId(dataType);
-    const auto* type = findCustomDataType(client, &id);
+    const auto *type = findCustomDataType(fromNodeId(dataType));
 
     if(!type)
     {
