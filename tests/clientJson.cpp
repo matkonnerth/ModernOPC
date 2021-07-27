@@ -88,57 +88,26 @@ class TestServer
     std::string m_endpointUri;
 };
 
-TEST(ClientTest, read)
+TEST(ClientTest, import)
 {
-    TestServer s{4840};
-
-    Client c{s.EndpointUri()};
-    c.connect();
-
-    auto id =
-        c.resolve(UnresolvedNodeId("http://opcfoundation.org/UA/", "i=2255"));
-    auto var = c.read(id);
-    ASSERT_TRUE(var.is_a<std::vector<std::string>>());
-}
-
-TEST(ClientTest, write)
-{
-    TestServer s{4841};
-
-    Client c{s.EndpointUri()};
-    c.connect();
-
-    c.write(NodeId(1, "demoInt"), Variant(20));
-}
-
-TEST(ClientTest, call)
-{
-    TestServer s{4842};
+    TestServer s{4844};
 
     Client c{s.EndpointUri()};
 
-    c.connect();
+    ASSERT_TRUE(c.loadNodeset(path + "/" + "struct.xml"));
 
-    auto output =
-        c.call(NodeId(0, 85), NodeId(1, "test"s), std::vector<Variant>{});
-    ASSERT_TRUE(output.size() == 1);
-    ASSERT_TRUE(output[0].is_a<std::string>());
-    std::cout << output[0].get<std::string>() << "\n";
-}
+    auto v = c.createVariantFromJson("{\"X\": 1, \"Y\":2, \"Z\": 3}", NodeId(2, 3002));
 
-TEST(ClientTest, browse)
-{
-    TestServer s{4843};
-
-    Client c{s.EndpointUri()};
-
-    c.connect();
-
-    auto results = c.browse(NodeId(0, 85));
-    for(const auto& r : results)
+    struct Point
     {
-        std::cout << "id: " << r.Id() << " name: " << r.Name() << "\n";
-    }
+        int32_t X;
+        int32_t Y;
+        int32_t Z;
+    };
+
+    Point p {1,2,3};
+
+    ASSERT_EQ(0, memcmp(&p, v.getUAVariant()->data, c.findCustomDataType(UA_NODEID_NUMERIC(2, 3002))->memSize));
 }
 
 int main(int argc, char **argv)

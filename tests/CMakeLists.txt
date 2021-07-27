@@ -20,6 +20,7 @@ opc_add_test("client")
 opc_add_test("statusCode")
 if(DECODE_JSON)
     opc_add_test("variant_fromJson")
+    opc_add_test("clientJson")
 endif()
 
 add_subdirectory(import)

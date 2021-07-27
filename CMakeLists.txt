@@ -25,8 +25,6 @@ if(CALC_COVERAGE)
     set(LIB_GCOV gcov)
 endif()
 
-#set(DO_CLANG_TIDY clang-tidy -checks=-*,modernize-*,performance-*,boost-*)
-#set(CMAKE_CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
 set(${COMPILER_OPTIONS} -Wall -Wextra -pedantic-errors -Wconversion -Wsign-conversion -Wpedantic -Weffc++ -Wno-unused-parameter)
 if(ENABLE_ASAN)
     set(COMPILER_OPTIONS -fsanitize=address -fsanitize-address-use-after-scope)
@@ -34,7 +32,6 @@ endif()
 
 find_package(open62541 REQUIRED)
 find_package(NodesetLoader REQUIRED)
-#add_subdirectory(TypeGenerator)
 
 set(sources 
     ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/Server.cpp
@@ -53,7 +50,8 @@ set(sources
 
 if(DECODE_JSON)
     set(sources ${sources} 
-        ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/Variant_fromJson.cpp)
+        ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/Variant_fromJson.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/client/ClientJson.cpp)
 endif()
 
 add_library(modernopc SHARED ${sources})
