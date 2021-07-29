@@ -12,7 +12,6 @@
 #include <modernopc/types/QualifiedName.h>
 #include <string>
 #include <vector>
-#include <chrono>
 
 using modernopc::Client;
 using modernopc::NodeId;
@@ -94,9 +93,10 @@ TEST(ClientTest, import)
 
     Client c{s.EndpointUri()};
 
-    ASSERT_TRUE(c.loadNodeset(path + "/" + "struct.xml"));
+    ASSERT_TRUE(c.loadNodeset(path + "/" + "struct.xml", 2));
 
-    auto v = c.createVariantFromJson("{\"X\": 1, \"Y\":2, \"Z\": 3}", NodeId(2, 3002));
+    auto v = c.createVariantFromJson("{\"X\": 1, \"Y\":2, \"Z\": 3}",
+                                     NodeId(2, 3002));
 
     struct Point
     {
@@ -105,10 +105,33 @@ TEST(ClientTest, import)
         int32_t Z;
     };
 
-    Point p {1,2,3};
+    Point p{1, 2, 3};
 
-    ASSERT_EQ(0, memcmp(&p, v.getUAVariant()->data, c.findCustomDataType(UA_NODEID_NUMERIC(2, 3002))->memSize));
+    ASSERT_EQ(
+        0, memcmp(&p, v.getUAVariant()->data,
+                  c.findCustomDataType(UA_NODEID_NUMERIC(2, 3002))->memSize));
 }
+
+/*
+TEST(ClientTest, readVariant)
+{
+    Client c{"opc.tcp://localhost:4840"};
+    c.connect();
+    ASSERT_TRUE(
+        c.loadNodeset(path + "/" + "struct.xml", 1));
+
+    struct Point3D
+    {
+        float X;
+        float Y;
+        float Z;
+    };
+
+    auto var = c.read(NodeId(1, "3D.Point"));
+
+    std::cout << var.toString() << "\n";
+}
+*/
 
 int main(int argc, char **argv)
 {

@@ -221,7 +221,7 @@ std::vector<BrowseResult> Client::browse(const NodeId &id)
     return results;
 }
 
-bool Client::loadNodeset(const std::string& path)
+bool Client::loadNodeset(const std::string& path, int namespaceIndex)
 {
     auto* server = UA_Server_new();
     if(!NodesetLoader_loadFile(server, path.c_str(), nullptr))
@@ -233,6 +233,12 @@ bool Client::loadNodeset(const std::string& path)
     auto* customDataTypes = UA_Server_getConfig(server)->customDataTypes;
     UA_Server_getConfig(server)->customDataTypes = nullptr;
     UA_Client_getConfig(client)->customDataTypes = customDataTypes;
+
+    for(auto*t = (UA_DataType*)customDataTypes->types; t!=customDataTypes->types+customDataTypes->typesSize; t++)
+    {
+        t->binaryEncodingId.namespaceIndex=namespaceIndex;
+        t->typeId.namespaceIndex=namespaceIndex;
+    }
 
     UA_Server_delete(server);
     return true;

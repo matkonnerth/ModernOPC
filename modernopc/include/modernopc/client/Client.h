@@ -48,8 +48,9 @@ class Client
     /**
      * loads a nodeset xml into an temporary server namespace and add the datatypes to the client
      * \param path path to nodeset file
+     * \param namespaceIndex, in which the nodes are on server side, can be retrieved with resolveNamespaceUri
      * \return true on success, otherwise false. */
-    bool loadNodeset(const std::string &path);
+    bool loadNodeset(const std::string &path, int namespaceIndex);
 
     Variant createVariantFromJson(const std::string &jsonString,
                      const NodeId& dataType);
