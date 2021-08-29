@@ -45,8 +45,19 @@ class Client
                               const std::vector<Variant> &inputArgs);
     std::vector<BrowseResult> browse(const NodeId &id);
 
-  private:
-    UA_Client *client{nullptr};
+    /**
+     * loads a nodeset xml into an temporary server namespace and add the datatypes to the client
+     * \param path path to nodeset file
+     * \param namespaceIndex, in which the nodes are on server side, can be retrieved with resolveNamespaceUri
+     * \return true on success, otherwise false. */
+    bool loadNodeset(const std::string &path, int namespaceIndex);
+
+    Variant createVariantFromJson(const std::string &jsonString,
+                     const NodeId& dataType);
+
+    const struct UA_DataType * findCustomDataType(const UA_NodeId& typeId);
+
+private : UA_Client *client{nullptr};
     std::string uri{};
     std::vector<ConnectionStateCallback> connectionStateCallbacks{};
     ConnectionState connState{ConnectionState::DISCONNECTED};

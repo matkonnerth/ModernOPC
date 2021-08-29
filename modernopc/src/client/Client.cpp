@@ -1,12 +1,15 @@
+#include <NodesetLoader/backendOpen62541.h>
 #include <modernopc/OpcException.h>
 #include <modernopc/client/Client.h>
+#include <modernopc/nodes/Node.h>
 #include <open62541/client.h>
 #include <open62541/client_config_default.h>
 #include <open62541/client_highlevel.h>
 #include <open62541/client_highlevel_async.h>
 #include <open62541/client_subscriptions.h>
 #include <open62541/plugin/log_stdout.h>
-#include <modernopc/nodes/Node.h>
+#include <open62541/server.h>
+#include <open62541/server_config_default.h>
 
 namespace modernopc
 {
@@ -218,4 +221,27 @@ std::vector<BrowseResult> Client::browse(const NodeId &id)
     return results;
 }
 
-} // namespace modernopc
+bool Client::loadNodeset(const std::string& path, int namespaceIndex)
+{
+    auto* server = UA_Server_new();
+    if(!NodesetLoader_loadFile(server, path.c_str(), nullptr))
+    {
+        UA_Server_delete(server);
+        return false;
+    }
+
+    auto* customDataTypes = UA_Server_getConfig(server)->customDataTypes;
+    UA_Server_getConfig(server)->customDataTypes = nullptr;
+    UA_Client_getConfig(client)->customDataTypes = customDataTypes;
+
+    for(auto*t = (UA_DataType*)customDataTypes->types; t!=customDataTypes->types+customDataTypes->typesSize; t++)
+    {
+        t->binaryEncodingId.namespaceIndex=namespaceIndex;
+        t->typeId.namespaceIndex=namespaceIndex;
+    }
+
+    UA_Server_delete(server);
+    return true;
+}
+
+}

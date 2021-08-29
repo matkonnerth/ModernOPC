@@ -24,8 +24,6 @@ if(CALC_COVERAGE)
     set(LIB_GCOV gcov)
 endif()
 
-#set(DO_CLANG_TIDY clang-tidy -checks=-*,modernize-*,performance-*,boost-*)
-#set(CMAKE_CXX_CLANG_TIDY "${DO_CLANG_TIDY}")
 set(${COMPILER_OPTIONS} -Wall -Wextra -pedantic-errors -Wconversion -Wsign-conversion -Wpedantic -Weffc++ -Wno-unused-parameter)
 if(ENABLE_ASAN)
     set(COMPILER_OPTIONS -fsanitize=address -fsanitize-address-use-after-scope)
@@ -33,9 +31,8 @@ endif()
 
 find_package(open62541 REQUIRED)
 find_package(NodesetLoader REQUIRED)
-#add_subdirectory(TypeGenerator)
 
-add_library(modernopc SHARED
+set(sources 
     ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/Server.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/client/Client.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/import/Extension.cpp
@@ -47,7 +44,12 @@ add_library(modernopc SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/types/NodeId.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/nodes/ObjectNode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/nodes/VariableNode.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/nodes/Node.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/nodes/Node.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/Variant_fromJson.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/client/ClientJson.cpp
+)
+
+add_library(modernopc SHARED ${sources})
 target_include_directories(modernopc PUBLIC 
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/modernopc/include>
     $<INSTALL_INTERFACE:include/modernopc>)

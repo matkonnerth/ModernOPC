@@ -27,7 +27,6 @@ jobs:
     - uses: actions/checkout@master
       with:
         repository: open62541/open62541
-        ref: refs/tags/v1.2
         path: ./openRoot
 
     - name: Create Build Environment for open62541
@@ -36,7 +35,7 @@ jobs:
     - name: Configure open
       shell: bash
       working-directory: ./openRoot/build
-      run: cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DUA_ENABLE_SUBSCRIPTIONS_EVENTS=ON ..
+      run: cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DUA_ENABLE_SUBSCRIPTIONS_EVENTS=ON -DUA_ENABLE_JSON_ENCODING=ON ..
 
     - name: Build open
       working-directory: ./openRoot/build
@@ -60,7 +59,7 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ./NodesetLoaderRoot/build
-      run: cmake -DCMAKE_BUILD_TYPE=Debug -DENABLE_CONAN=OFF -DBUILD_SHARED_LIBS=ON -DENABLE_BACKEND_OPEN62541=ON ..
+      run: cmake -DCMAKE_BUILD_TYPE=Debug -DENABLE_CONAN=OFF -DBUILD_SHARED_LIBS=ON -DENABLE_BACKEND_OPEN62541=ON -DUSE_MEMBERTYPE_INDEX=OFF ..
 
     - name: Build nodesetloader
       working-directory: ./NodesetLoaderRoot/build
@@ -90,7 +89,7 @@ jobs:
       # Note the current convention is to use the -S and -B options here to specify source 
       # and build directories, but this is only available with CMake 3.13 and higher.  
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=Debug -DENABLE_TESTING=ON -DBUILD_SHARED_LIBS=ON -DENABLE_BACKEND_OPEN62541=ON -DENABLE_DATATYPEIMPORT_TEST=ON -DCALC_COVERAGE=ON ..
+      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=Debug -DENABLE_TESTING=ON -DBUILD_SHARED_LIBS=ON -DCALC_COVERAGE=ON ..
 
     - name: Build
       working-directory: ${{runner.workspace}}/build

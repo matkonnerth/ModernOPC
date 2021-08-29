@@ -106,4 +106,7 @@ class Variant
 };
 
 void toUAVariantImpl(const Variant &v, UA_Variant *var);
+
+Variant fromJson(const std::string& jsonString, const UA_DataType* dataType);
+
 } // namespace modernopc
