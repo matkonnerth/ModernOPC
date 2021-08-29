@@ -24,8 +24,8 @@ TEST(import, namespaceZeroValues)
     ASSERT_TRUE(var.get<std::vector<uint>>()[2] == 140);
     ASSERT_TRUE(server.getVariable(modernopc::NodeId(2, 1005))->read(var));
 
-    ASSERT_TRUE(var.getUAVariant()->type->typeIndex ==
-                UA_TYPES_SERVERSTATUSDATATYPE);
+    ASSERT_TRUE(var.getUAVariant()->type ==
+                &UA_TYPES[UA_TYPES_SERVERSTATUSDATATYPE]);
     ASSERT_TRUE(static_cast<UA_ServerStatusDataType *>(var.getUAVariant()->data)
                     ->state == 5);
     ASSERT_TRUE(server.getVariable(modernopc::NodeId(2, 1006))->read(var));

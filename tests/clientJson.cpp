@@ -112,6 +112,21 @@ TEST(ClientTest, import)
                   c.findCustomDataType(UA_NODEID_NUMERIC(2, 3002))->memSize));
 }
 
+TEST(ClientTest, importStructWithAbstractDataTypeMember)
+{
+    TestServer s{4845};
+
+    Client c{s.EndpointUri()};
+
+    ASSERT_TRUE(c.loadNodeset(path + "/" + "abstractdatatypemember.xml", 2));
+
+    auto v = c.createVariantFromJson(
+        "{\"used\": false, \"value\": { \"Type\": 6,\"Body\":12.34}}",
+        NodeId(2, 3002));
+
+    std::cout << v.toString() << "\n";
+}
+
 /*
 TEST(ClientTest, readVariant)
 {
