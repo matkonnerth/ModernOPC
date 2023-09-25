@@ -244,4 +244,9 @@ bool Client::loadNodeset(const std::string& path, int namespaceIndex)
     return true;
 }
 
+void Client::doComm()
+{   
+    UA_Client_run_iterate(client, 50);
+}
+
 }

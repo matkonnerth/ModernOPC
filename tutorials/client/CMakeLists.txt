@@ -1,0 +1,5 @@
+add_executable(tutorial_client client.cpp)
+target_include_directories(tutorial_client PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(tutorial_client PRIVATE ${LIB_ASAN} ${LIB_GCOV}  modernopc)
+target_compile_features(tutorial_client PRIVATE cxx_std_17)
+target_compile_options(tutorial_client PRIVATE ${COMPILER_OPTIONS})

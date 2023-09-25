@@ -32,7 +32,7 @@ class Client
     Client &operator=(const Client &) = delete;
     void connect();
     void disconnect();
-    // void doComm();
+    void doComm();
     void registerConnectionCallback(ConnectionStateCallback fn);
     void notifyConnectionState(ConnectionState state);
     NodeId resolve(const UnresolvedNodeId &id);
@@ -56,6 +56,8 @@ class Client
                      const NodeId& dataType);
 
     const struct UA_DataType * findCustomDataType(const UA_NodeId& typeId);
+
+    void createSubscription();
 
 private : UA_Client *client{nullptr};
     std::string uri{};
