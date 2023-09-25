@@ -1,4 +1,5 @@
 #pragma once
+#include "Subscription.h"
 #include <functional>
 #include <map>
 #include <modernopc/BrowseResult.h>
@@ -59,12 +60,16 @@ class Client
 
     void createSubscription();
 
+    void createMonitoredItem(const NodeId& id);
+    void clearMonitoredItems();
+
 private : UA_Client *client{nullptr};
     std::string uri{};
     std::vector<ConnectionStateCallback> connectionStateCallbacks{};
     ConnectionState connState{ConnectionState::DISCONNECTED};
     std::vector<std::string> namespaces{};
     Logger logger{"Client"};
+    Subscription m_subscription{};
 };
 
 } // namespace modernopc

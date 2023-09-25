@@ -11,6 +11,7 @@
 #include <open62541/server.h>
 #include <open62541/server_config_default.h>
 
+
 namespace modernopc
 {
 Client::Client(const std::string &endpointUri)
@@ -249,4 +250,18 @@ void Client::doComm()
     UA_Client_run_iterate(client, 50);
 }
 
+void Client::createSubscription()
+{
+    m_subscription.create(client);
+}
+
+void Client::createMonitoredItem(const NodeId& id)
+{
+    m_subscription.createMonitoredItem(client, id);
+}
+
+void Client::clearMonitoredItems()
+{
+    m_subscription.clearAllMonitoredItems(client);
+}
 }
