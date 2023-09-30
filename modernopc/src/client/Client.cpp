@@ -257,7 +257,7 @@ void Client::createSubscription()
 
 void Client::createMonitoredItem(const NodeId& id)
 {
-    m_subscription.createMonitoredItem(client, id);
+    m_subscription.createMonitoredItemAsyncBegin(client, id);
 }
 
 void Client::clearMonitoredItems()

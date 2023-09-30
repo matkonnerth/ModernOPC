@@ -3,8 +3,7 @@
 #include <open62541/client_subscriptions.h>
 #include <open62541/plugin/log_stdout.h>
 #include <vector>
-
-
+#include <unordered_map>
 
 namespace modernopc
 {
@@ -17,6 +16,8 @@ public:
 
     }
 
+    MonitoredItem(const NodeId&id): m_nodeId{id}, m_id{0}{}
+
     const NodeId& Node_Id() const
     {
         return m_nodeId;
@@ -25,6 +26,11 @@ public:
     UA_UInt32 Id() const
     {
         return m_id;
+    }
+
+    void setId(UA_UInt32 id)
+    {
+        m_id=id;
     }
 
 private:
@@ -57,13 +63,14 @@ public:
         }
     }
 
+    /*
     void createMonitoredItem(UA_Client* client, const NodeId& id)
     {
         UA_MonitoredItemCreateRequest monRequest =
             UA_MonitoredItemCreateRequest_default(fromNodeId(id));
 
         UA_MonitoredItemCreateResult monResponse =
-            UA_Client_MonitoredItems_createDataChange(
+            UA_Client_MonitoredItems_createDataChanges(
                 client, m_subscriptionId, UA_TIMESTAMPSTORETURN_BOTH,
                 monRequest, NULL, valueChangedCallback, NULL);
         if (monResponse.statusCode == UA_STATUSCODE_GOOD)
@@ -75,9 +82,38 @@ public:
 
             m_monitoredItems.push_back(MonitoredItem(id, monResponse.monitoredItemId));
         }
-    }
+    }*/
 
-    
+    void createMonitoredItemAsyncBegin(UA_Client *client, const NodeId &id)
+    {
+        /* monitor the server state */
+        UA_MonitoredItemCreateRequest singleMonRequest =
+            UA_MonitoredItemCreateRequest_default(fromNodeId(id));
+        void *contexts = NULL;
+        UA_Client_DataChangeNotificationCallback notifications =
+            valueChangedCallback;
+        UA_Client_DeleteMonitoredItemCallback deleteCallbacks = NULL;
+
+        UA_CreateMonitoredItemsRequest monRequest;
+        UA_CreateMonitoredItemsRequest_init(&monRequest);
+        monRequest.subscriptionId = m_subscriptionId;
+        monRequest.itemsToCreate = &singleMonRequest;
+        monRequest.itemsToCreateSize = 1;
+        UA_CreateMonitoredItemsResponse monResponse;
+        UA_CreateMonitoredItemsResponse_init(&monResponse);
+        UA_UInt32 requestId{};
+        auto retval = UA_Client_MonitoredItems_createDataChanges_async(
+            client, monRequest, &contexts, &notifications, &deleteCallbacks,
+            createDataChangesCallback, this, &requestId);
+
+        m_pendingRequests.emplace(std::make_pair(requestId, MonitoredItem{id}));
+
+        if (retval != UA_STATUSCODE_GOOD)
+        {
+            UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+                        "sending async monitoring request failed");
+        }
+    }
 
     void clearAllMonitoredItems(UA_Client* client)
     {
@@ -87,6 +123,18 @@ public:
         }
         //TODO: check statuscode
         m_monitoredItems.clear();
+    }
+
+    void createMonitoredItemAsyncEnd(UA_UInt32 requestId, UA_UInt32 monitoredItemId)
+    {
+        auto entry = m_pendingRequests.find(requestId);
+        if(entry == m_pendingRequests.end())
+        {
+            return;
+        }
+        entry->second.setId(monitoredItemId);
+        m_monitoredItems.push_back(entry->second);
+        m_pendingRequests.erase(entry);
     }
 
 private:
@@ -100,15 +148,7 @@ private:
         req.monitoredItemIds = &monitoredItemId;
         req.monitoredItemIdsSize = 1;
 
-        UA_DeleteMonitoredItemsResponse deleteResponse =
-        UA_Client_MonitoredItems_delete(client, req);
-
-        if(deleteResponse.responseHeader.serviceResult!=UA_STATUSCODE_GOOD)
-        {
-            UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
-                        "removing monitoredItem failed");
-        }
-        return deleteResponse.responseHeader.serviceResult;
+        return UA_Client_MonitoredItems_delete_async(client, req, nullptr, nullptr, nullptr);
     }
 
     static void deleteSubscriptionCallback(UA_Client *client,
@@ -126,8 +166,24 @@ private:
     {
         
     }
-    UA_UInt32 m_subscriptionId{0u};
 
+    static void createDataChangesCallback(UA_Client *client, void *userdata,
+                                          UA_UInt32 requestId, void *r){
+
+        auto response = static_cast<UA_CreateMonitoredItemsResponse*>(r);
+
+        if(response->responseHeader.serviceResult==UA_STATUSCODE_GOOD)
+        {
+            auto* subscription = static_cast<Subscription*>(userdata);
+            for(auto i=0u; i<response->resultsSize; ++i)
+            {
+                subscription->createMonitoredItemAsyncEnd(requestId, response->results[i].monitoredItemId);
+            }            
+        }
+    } 
+    
+    UA_UInt32 m_subscriptionId{0u};
     std::vector<MonitoredItem> m_monitoredItems{};
+    std::unordered_map<UA_UInt32, MonitoredItem> m_pendingRequests{};
 };
 }

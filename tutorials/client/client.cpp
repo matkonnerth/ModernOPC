@@ -43,7 +43,7 @@ void monitorVars(Client& client, const std::vector<NodeId>& ids)
 
 int main()
 { 
-	Client client{"opc.tcp://localhost:4840"};
+	Client client{"opc.tcp://localhost:48010"};
     client.connect();
 
     /*
@@ -55,7 +55,7 @@ int main()
         */
 
 
-    auto vars = getAllVariables(client, NodeId(0, 85));
+    auto vars = getAllVariables(client, NodeId(3, "PSTV"));
 
     client.createSubscription();
 
