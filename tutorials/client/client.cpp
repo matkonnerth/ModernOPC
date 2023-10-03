@@ -15,6 +15,10 @@ using modernopc::NodeId;
 
 void browseRecursive(Client& client, const NodeId& root, std::vector<NodeId>& results)
 {
+    if(results.size()>100)
+    {
+        return;
+    }
     auto refs = client.browse(root);
     for (const auto &ref : refs)
     {
@@ -78,21 +82,24 @@ int main()
         client.doComm();
         if(loopCount>=10)
         {
-            client.clearMonitoredItems();
+
+            client.clearMonitoredItems();          
             
+            monitorVars(client, vars);
             loopCount=0;
-            
+        }
+
+        if(loopCount==5)
+        {
             if (actLocale == "de")
             {
-                client.activateSession("en");
                 actLocale = "en";
             }
             else
             {
-                client.activateSession("de");
                 actLocale = "de";
             }
-            monitorVars(client, vars);
+            client.activateSession(actLocale);
         }
         loopCount++;
     }

@@ -253,7 +253,7 @@ void Client::createSubscription() { m_subscription.create(client); }
 
 void Client::createMonitoredItem(const NodeId &id)
 {
-    m_subscription.createMonitoredItem(client, id);
+    m_subscription.createMonitoredItemAsyncBegin(client, id);
 }
 
 void Client::clearMonitoredItems()
@@ -261,19 +261,17 @@ void Client::clearMonitoredItems()
     m_subscription.clearAllMonitoredItems(client);
 }
 
-void Client::activateSession(const std::string &locale)
+void Client::activateSession(const std::string& locale)
 {
     m_config->sessionLocaleIdsSize = 1;
     m_config->sessionLocaleIds =
-        (UA_LocaleId *)(UA_Array_new(1, &UA_TYPES[UA_TYPES_LOCALEID]));
-    auto uaString = modernopc::fromString(locale);
-    UA_String_copy(&uaString, &m_config->sessionLocaleIds[0]);
+        (UA_LocaleId *)UA_Array_new(1, &UA_TYPES[UA_TYPES_LOCALEID]);
 
-    auto status = UA_Client_activateCurrentSessionAsync(client);
-    if (status != UA_STATUSCODE_GOOD)
-    {
-        std::cout << "changing language failed"
-                  << "\n";
-    }
+    UA_String s{};
+    s.data = (UA_Byte*)(locale.c_str());
+    s.length = locale.length();
+    UA_String_copy(&s, &m_config->sessionLocaleIds[0]);
+
+    UA_Client_activateCurrentSession(client);
 }
-} // namespace modernopc
+}
