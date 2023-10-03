@@ -2,6 +2,7 @@
 #include <modernopc/OpcException.h>
 #include <modernopc/client/Client.h>
 #include <modernopc/nodes/Node.h>
+#include <modernopc/types/String.h>
 #include <open62541/client.h>
 #include <open62541/client_config_default.h>
 #include <open62541/client_highlevel.h>
@@ -11,17 +12,16 @@
 #include <open62541/server.h>
 #include <open62541/server_config_default.h>
 
-
 namespace modernopc
 {
 Client::Client(const std::string &endpointUri)
 {
     uri = endpointUri;
     client = UA_Client_new();
-    UA_ClientConfig *cc = UA_Client_getConfig(client);
-    UA_ClientConfig_setDefault(cc);
-    cc->clientContext = this;
-    cc->logger = logger.getUALogger();
+    m_config = UA_Client_getConfig(client);
+    UA_ClientConfig_setDefault(m_config);
+    m_config->clientContext = this;
+    m_config->logger = logger.getUALogger();
 }
 
 Client::~Client()
@@ -79,7 +79,7 @@ void Client::notifyConnectionState(ConnectionState state)
     }
 }
 
-int Client::resolveNamespaceUri(const std::string&uri)
+int Client::resolveNamespaceUri(const std::string &uri)
 {
     bool found = false;
     int idx = 0;
@@ -214,7 +214,8 @@ std::vector<BrowseResult> Client::browse(const NodeId &id)
 
             results.emplace_back(
                 BrowseResult(fromUaNodeId(ref->nodeId.nodeId),
-                             fromUAQualifiedName(&ref->browseName), getNodeType(ref->nodeClass)));
+                             fromUAQualifiedName(&ref->browseName),
+                             getNodeType(ref->nodeClass)));
         }
     }
     UA_BrowseRequest_clear(&bReq);
@@ -222,40 +223,35 @@ std::vector<BrowseResult> Client::browse(const NodeId &id)
     return results;
 }
 
-bool Client::loadNodeset(const std::string& path, int namespaceIndex)
+bool Client::loadNodeset(const std::string &path, int namespaceIndex)
 {
-    auto* server = UA_Server_new();
-    if(!NodesetLoader_loadFile(server, path.c_str(), nullptr))
+    auto *server = UA_Server_new();
+    if (!NodesetLoader_loadFile(server, path.c_str(), nullptr))
     {
         UA_Server_delete(server);
         return false;
     }
 
-    auto* customDataTypes = UA_Server_getConfig(server)->customDataTypes;
+    auto *customDataTypes = UA_Server_getConfig(server)->customDataTypes;
     UA_Server_getConfig(server)->customDataTypes = nullptr;
     UA_Client_getConfig(client)->customDataTypes = customDataTypes;
 
-    for(auto*t = (UA_DataType*)customDataTypes->types; t!=customDataTypes->types+customDataTypes->typesSize; t++)
+    for (auto *t = (UA_DataType *)customDataTypes->types;
+         t != customDataTypes->types + customDataTypes->typesSize; t++)
     {
-        t->binaryEncodingId.namespaceIndex=namespaceIndex;
-        t->typeId.namespaceIndex=namespaceIndex;
+        t->binaryEncodingId.namespaceIndex = namespaceIndex;
+        t->typeId.namespaceIndex = namespaceIndex;
     }
 
     UA_Server_delete(server);
     return true;
 }
 
-void Client::doComm()
-{   
-    UA_Client_run_iterate(client, 50);
-}
+void Client::doComm() { UA_Client_run_iterate(client, 50); }
 
-void Client::createSubscription()
-{
-    m_subscription.create(client);
-}
+void Client::createSubscription() { m_subscription.create(client); }
 
-void Client::createMonitoredItem(const NodeId& id)
+void Client::createMonitoredItem(const NodeId &id)
 {
     m_subscription.createMonitoredItem(client, id);
 }
@@ -264,4 +260,20 @@ void Client::clearMonitoredItems()
 {
     m_subscription.clearAllMonitoredItems(client);
 }
+
+void Client::activateSession(const std::string &locale)
+{
+    m_config->sessionLocaleIdsSize = 1;
+    m_config->sessionLocaleIds =
+        (UA_LocaleId *)(UA_Array_new(1, &UA_TYPES[UA_TYPES_LOCALEID]));
+    auto uaString = modernopc::fromString(locale);
+    UA_String_copy(&uaString, &m_config->sessionLocaleIds[0]);
+
+    auto status = UA_Client_activateCurrentSessionAsync(client);
+    if (status != UA_STATUSCODE_GOOD)
+    {
+        std::cout << "changing language failed"
+                  << "\n";
+    }
 }
+} // namespace modernopc

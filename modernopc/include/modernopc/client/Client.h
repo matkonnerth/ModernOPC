@@ -47,23 +47,27 @@ class Client
     std::vector<BrowseResult> browse(const NodeId &id);
 
     /**
-     * loads a nodeset xml into an temporary server namespace and add the datatypes to the client
-     * \param path path to nodeset file
-     * \param namespaceIndex, in which the nodes are on server side, can be retrieved with resolveNamespaceUri
-     * \return true on success, otherwise false. */
+     * loads a nodeset xml into an temporary server namespace and add the
+     * datatypes to the client \param path path to nodeset file \param
+     * namespaceIndex, in which the nodes are on server side, can be retrieved
+     * with resolveNamespaceUri \return true on success, otherwise false. */
     bool loadNodeset(const std::string &path, int namespaceIndex);
 
     Variant createVariantFromJson(const std::string &jsonString,
-                     const NodeId& dataType);
+                                  const NodeId &dataType);
 
-    const struct UA_DataType * findCustomDataType(const UA_NodeId& typeId);
+    const struct UA_DataType *findCustomDataType(const UA_NodeId &typeId);
 
     void createSubscription();
 
-    void createMonitoredItem(const NodeId& id);
+    void createMonitoredItem(const NodeId &id);
     void clearMonitoredItems();
 
-private : UA_Client *client{nullptr};
+    void activateSession(const std::string &locale);
+
+  private:
+    UA_Client *client{nullptr};
+    UA_ClientConfig *m_config{nullptr};
     std::string uri{};
     std::vector<ConnectionStateCallback> connectionStateCallbacks{};
     ConnectionState connState{ConnectionState::DISCONNECTED};

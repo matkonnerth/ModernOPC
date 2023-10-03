@@ -43,23 +43,34 @@ void monitorVars(Client& client, const std::vector<NodeId>& ids)
 
 int main()
 { 
-	Client client{"opc.tcp://localhost:4840"};
+    Client client{"opc.tcp://localhost:4850"};
+	//Client client{"opc.tcp://192.168.110.10:4850"};
     client.connect();
 
-    /*
+    
 	auto nsUriPlcAction =
-        client.resolveNamespaceUri("http://engelglobal.com/PLCActionModel/");
+        client.resolveNamespaceUri("http://engelglobal.com/IMM/");
+    
 
+    /*
+    auto nsUriPlcAction =
+        client.resolveNamespaceUri("http://engelglobal.com/PLCActionModel/");
+    */
             std::cout
         << "nsIdx: " << std::to_string(nsUriPlcAction) << "\n";
-        */
 
-
-    auto vars = getAllVariables(client, NodeId(0, 85));
+    
+    
+ 
+    //auto vars = getAllVariables(client, NodeId(nsUriPlcAction, "PushButtonDevices"));
+    //auto vars = getAllVariables(client, NodeId(0, 85));
+    auto vars = getAllVariables(client, NodeId(nsUriPlcAction, "IMM.Project"));
 
     client.createSubscription();
 
     int loopCount=0;
+
+    std::string actLocale{"de"};
 
     monitorVars(client, vars);
     while(true)
@@ -68,8 +79,20 @@ int main()
         if(loopCount>=10)
         {
             client.clearMonitoredItems();
-            monitorVars(client, vars);
+            
             loopCount=0;
+            
+            if (actLocale == "de")
+            {
+                client.activateSession("en");
+                actLocale = "en";
+            }
+            else
+            {
+                client.activateSession("de");
+                actLocale = "de";
+            }
+            monitorVars(client, vars);
         }
         loopCount++;
     }

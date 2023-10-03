@@ -3,6 +3,7 @@
 #include <open62541/client_subscriptions.h>
 #include <open62541/plugin/log_stdout.h>
 #include <vector>
+#include <iostream>
 
 
 
@@ -61,6 +62,7 @@ public:
     {
         UA_MonitoredItemCreateRequest monRequest =
             UA_MonitoredItemCreateRequest_default(fromNodeId(id));
+        monRequest.requestedParameters.samplingInterval = 50;
 
         UA_MonitoredItemCreateResult monResponse =
             UA_Client_MonitoredItems_createDataChange(
@@ -68,12 +70,19 @@ public:
                 monRequest, NULL, valueChangedCallback, NULL);
         if (monResponse.statusCode == UA_STATUSCODE_GOOD)
         {
-            UA_LOG_INFO(
+            UA_LOG_DEBUG(
                 UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
                 "Monitoring, id %u",
                 monResponse.monitoredItemId);
 
             m_monitoredItems.push_back(MonitoredItem(id, monResponse.monitoredItemId));
+        }
+        else
+        {
+            //UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+            //            "Create Monitored item failed, id %u", monResponse.monitoredItemId);
+            //std::cout << "nodeId: " << id << "\n";
+            ;
         }
     }
 
