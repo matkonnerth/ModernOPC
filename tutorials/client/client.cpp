@@ -15,15 +15,19 @@ using modernopc::NodeId;
 
 void browseRecursive(Client& client, const NodeId& root, std::vector<NodeId>& results)
 {
-    if(results.size()>100)
-    {
-        return;
-    }
+   
+    
     auto refs = client.browse(root);
     for (const auto &ref : refs)
     {
         if (ref.Type() == modernopc::NodeType::VARIABLE)
         {
+             if(results.size()>10)
+            {
+                return;
+                
+            }
+            
             results.push_back(ref.Id());
         }
         browseRecursive(client, ref.Id(), results);
@@ -45,21 +49,41 @@ void monitorVars(Client& client, const std::vector<NodeId>& ids)
     }
 }
 
+class Container
+{
+
+    const std::vector<Container>& children() const
+    {
+        return m_children;
+    }
+
+private:
+    int id{};
+    std::vector<Container> m_children{};
+};
+
 int main()
 { 
-    Client client{"opc.tcp://localhost:4850"};
+    //Client client{"opc.tcp://localhost:4850"};
+    Client client{"opc.tcp://10.11.65.189:4840"};
 	//Client client{"opc.tcp://192.168.110.10:4850"};
     client.connect();
 
     
+    /*
 	auto nsUriPlcAction =
         client.resolveNamespaceUri("http://engelglobal.com/IMM/");
-    
+    */
+
+   auto nsUriPlcAction =
+        client.resolveNamespaceUri("http://engelglobal.com/IMM/Ejector1/");
 
     /*
     auto nsUriPlcAction =
         client.resolveNamespaceUri("http://engelglobal.com/PLCActionModel/");
     */
+    
+    
             std::cout
         << "nsIdx: " << std::to_string(nsUriPlcAction) << "\n";
 
@@ -67,8 +91,9 @@ int main()
     
  
     //auto vars = getAllVariables(client, NodeId(nsUriPlcAction, "PushButtonDevices"));
+    auto vars = getAllVariables(client, NodeId(nsUriPlcAction, "Ejector1"));
     //auto vars = getAllVariables(client, NodeId(0, 85));
-    auto vars = getAllVariables(client, NodeId(nsUriPlcAction, "IMM.Project"));
+    //auto vars = getAllVariables(client, NodeId(nsUriPlcAction, "IMM.Project"));
 
     client.createSubscription();
 
