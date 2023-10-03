@@ -18,10 +18,10 @@ Client::Client(const std::string &endpointUri)
 {
     uri = endpointUri;
     client = UA_Client_new();
-    UA_ClientConfig *cc = UA_Client_getConfig(client);
-    UA_ClientConfig_setDefault(cc);
-    cc->clientContext = this;
-    cc->logger = logger.getUALogger();
+    m_config = UA_Client_getConfig(client);
+    //UA_ClientConfig_setDefault(m_config);
+    m_config->clientContext = this;
+    m_config->logger = logger.getUALogger();
 }
 
 Client::~Client()
@@ -263,5 +263,19 @@ void Client::createMonitoredItem(const NodeId& id)
 void Client::clearMonitoredItems()
 {
     m_subscription.clearAllMonitoredItems(client);
+}
+
+void Client::activateSession(const std::string& locale)
+{
+    m_config->sessionLocaleIdsSize = 1;
+    m_config->sessionLocaleIds =
+        (UA_LocaleId *)UA_Array_new(1, &UA_TYPES[UA_TYPES_LOCALEID]);
+
+    UA_String s{};
+    s.data = (UA_Byte*)(locale.c_str());
+    s.length = locale.length();
+    UA_String_copy(&s, &m_config->sessionLocaleIds[0]);
+
+    UA_Client_activateCurrentSession(client);
 }
 }

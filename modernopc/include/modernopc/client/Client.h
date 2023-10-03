@@ -62,8 +62,11 @@ class Client
 
     void createMonitoredItem(const NodeId& id);
     void clearMonitoredItems();
+    void activateSession(const std::string& locale);
 
-private : UA_Client *client{nullptr};
+private : 
+    UA_Client *client{nullptr};
+    UA_ClientConfig* m_config{nullptr};
     std::string uri{};
     std::vector<ConnectionStateCallback> connectionStateCallbacks{};
     ConnectionState connState{ConnectionState::DISCONNECTED};

@@ -15,6 +15,10 @@ using modernopc::NodeId;
 
 void browseRecursive(Client& client, const NodeId& root, std::vector<NodeId>& results)
 {
+    if(results.size()>100)
+    {
+        return;
+    }
     auto refs = client.browse(root);
     for (const auto &ref : refs)
     {
@@ -54,12 +58,13 @@ int main()
         << "nsIdx: " << std::to_string(nsUriPlcAction) << "\n";
         */
 
-
-    auto vars = getAllVariables(client, NodeId(3, "PSTV"));
+    auto vars = getAllVariables(client, NodeId(3, "Demo.Massfolder_Static"));
 
     client.createSubscription();
 
     int loopCount=0;
+
+    std::string actLocale{"de"};
 
     monitorVars(client, vars);
     while(true)
@@ -67,9 +72,23 @@ int main()
         client.doComm();
         if(loopCount>=10)
         {
+
             client.clearMonitoredItems();
             monitorVars(client, vars);
             loopCount=0;
+        }
+
+        if(loopCount==5)
+        {
+            if (actLocale == "de")
+            {
+                actLocale = "en";
+            }
+            else
+            {
+                actLocale = "de";
+            }
+            client.activateSession(actLocale);
         }
         loopCount++;
     }
