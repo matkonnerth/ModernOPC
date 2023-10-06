@@ -8,10 +8,18 @@
 #include <iostream>
 #include <modernopc/client/Client.h>
 #include <modernopc/types/NodeId.h>
+#include <open62541/client_highlevel.h>
 
 using modernopc::QualifiedName;
 using modernopc::Client;
 using modernopc::NodeId;
+
+bool tryRead(Client& client, const NodeId& id)
+{
+    UA_StatusCode status = UA_STATUSCODE_BAD;
+    client.read(id, status);
+    return status == UA_STATUSCODE_GOOD;
+}
 
 void browseRecursive(Client& client, const NodeId& root, std::vector<NodeId>& results)
 {
@@ -22,7 +30,12 @@ void browseRecursive(Client& client, const NodeId& root, std::vector<NodeId>& re
     {
         if (ref.Type() == modernopc::NodeType::VARIABLE)
         {
-             if(results.size()>10)
+            if(!tryRead(client, ref.Id()))
+            {
+                std::cout << "reading: " << ref.Id() << " failed" << "\n";
+                continue;
+            }
+            if(results.size()>1000)
             {
                 return;
                 
@@ -64,8 +77,8 @@ private:
 
 int main()
 { 
-    //Client client{"opc.tcp://localhost:4850"};
-    Client client{"opc.tcp://10.11.65.189:4840"};
+    Client client{"opc.tcp://localhost:48010"};
+    //Client client{"opc.tcp://10.11.65.189:4840"};
 	//Client client{"opc.tcp://192.168.110.10:4850"};
     client.connect();
 
@@ -75,8 +88,8 @@ int main()
         client.resolveNamespaceUri("http://engelglobal.com/IMM/");
     */
 
-   auto nsUriPlcAction =
-        client.resolveNamespaceUri("http://engelglobal.com/IMM/Ejector1/");
+   //auto nsUriPlcAction =
+   //     client.resolveNamespaceUri("http://engelglobal.com/IMM/InjectionUnit1/");
 
     /*
     auto nsUriPlcAction =
@@ -84,15 +97,15 @@ int main()
     */
     
     
-            std::cout
-        << "nsIdx: " << std::to_string(nsUriPlcAction) << "\n";
+    //        std::cout
+    //    << "nsIdx: " << std::to_string(nsUriPlcAction) << "\n";
 
     
     
  
     //auto vars = getAllVariables(client, NodeId(nsUriPlcAction, "PushButtonDevices"));
-    auto vars = getAllVariables(client, NodeId(nsUriPlcAction, "Ejector1"));
-    //auto vars = getAllVariables(client, NodeId(0, 85));
+    //auto vars = getAllVariables(client, NodeId(nsUriPlcAction, "InjectionUnit1"));
+    auto vars = getAllVariables(client, NodeId(0, 85));
     //auto vars = getAllVariables(client, NodeId(nsUriPlcAction, "IMM.Project"));
 
     client.createSubscription();

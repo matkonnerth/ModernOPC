@@ -41,6 +41,7 @@ class Client
     ConnectionState getConnectionState();
 
     Variant read(const NodeId &id);
+    Variant read(const NodeId &id, UA_StatusCode& outStatus);
     void write(const NodeId &id, const Variant &var);
     std::vector<Variant> call(const NodeId &objId, const NodeId &methodId,
                               const std::vector<Variant> &inputArgs);

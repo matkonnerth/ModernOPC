@@ -134,6 +134,16 @@ Variant Client::read(const NodeId &id)
     return var;
 }
 
+Variant Client::read(const NodeId &id, UA_StatusCode& out)
+{
+    UA_Variant *v = UA_Variant_new();
+    modernopc::Variant var{v, true};
+    auto status = UA_Client_readValueAttribute(client, fromNodeId(id), v);
+    out=status;
+
+    return var;
+}
+
 void Client::write(const NodeId &id, const Variant &var)
 {
     auto status = UA_Client_writeValueAttribute(client, fromNodeId(id),
