@@ -85,11 +85,13 @@ public:
         }
     }*/
 
-    void createMonitoredItemAsyncBegin(UA_Client *client, const NodeId &id)
+    void createMonitoredItemAsyncBegin(UA_Client *client, const NodeId &id, UA_UInt32 attributeId)
     {
         /* monitor the server state */
         UA_MonitoredItemCreateRequest singleMonRequest =
             UA_MonitoredItemCreateRequest_default(fromNodeId(id));
+        singleMonRequest.itemToMonitor.attributeId = attributeId;
+
         void *contexts = NULL;
         UA_Client_DataChangeNotificationCallback notifications =
             valueChangedCallback;

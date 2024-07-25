@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include <variant>
 #include <vector>
+#include <optional>
 
 struct UA_Client;
 namespace modernopc
@@ -41,7 +42,8 @@ class Client
     ConnectionState getConnectionState();
 
     Variant read(const NodeId &id);
-    Variant read(const NodeId &id, UA_StatusCode& outStatus);
+    Variant read(const NodeId &id, UA_StatusCode &outStatus);
+    std::optional<UA_Byte> readUserAccessLevelAttribute(const NodeId &id);
     void write(const NodeId &id, const Variant &var);
     std::vector<Variant> call(const NodeId &objId, const NodeId &methodId,
                               const std::vector<Variant> &inputArgs);
@@ -61,13 +63,15 @@ class Client
 
     void createSubscription();
 
-    void createMonitoredItem(const NodeId &id);
+    void createMonitoredItem(const NodeId &id, UA_UInt32 attributeId);
     void clearMonitoredItems();
-    void activateSession(const std::string& locale);
+    void activateSession(const std::string &locale);
+    void activateSession(const std::string &locale, const std::string &username,
+                         const std::string &password);
 
-private : 
+  private:
     UA_Client *client{nullptr};
-    UA_ClientConfig* m_config{nullptr};
+    UA_ClientConfig *m_config{nullptr};
     std::string uri{};
     std::vector<ConnectionStateCallback> connectionStateCallbacks{};
     ConnectionState connState{ConnectionState::DISCONNECTED};

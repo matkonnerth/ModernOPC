@@ -17,17 +17,16 @@ public:
        spdlogger = std::make_shared<spdlog::logger>(m_name, console_sink);
        spdlogger->set_level(spdlog::level::debug);
        spdlog::register_logger(spdlogger);
+       m_uaLogger.context = spdlogger.get();
+       m_uaLogger.log = log;
+       m_uaLogger.clear = nullptr;
     }
 
     ~Logger() = default;
 
-    UA_Logger getUALogger()
-    {
-        UA_Logger logger;
-        logger.context = spdlogger.get();
-        logger.log = log;
-        logger.clear=nullptr;
-        return logger;
+    UA_Logger* getUALogger()
+    {        
+        return &m_uaLogger;
     }
 
 
@@ -59,5 +58,6 @@ public:
     }
     std::shared_ptr<spdlog::logger> spdlogger;
     const std::string m_name;
+    UA_Logger m_uaLogger;
 };
 } // namespace modernopctest::client

@@ -30,7 +30,8 @@ if(ENABLE_ASAN)
 endif()
 
 find_package(open62541 REQUIRED)
-find_package(NodesetLoader REQUIRED)
+find_package(OpenSSL REQUIRED)
+#find_package(NodesetLoader REQUIRED)
 
 set(sources 
     ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src/Server.cpp
@@ -54,7 +55,7 @@ target_include_directories(modernopc PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/modernopc/include>
     $<INSTALL_INTERFACE:include/modernopc>)
 target_include_directories(modernopc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/modernopc/src)
-target_link_libraries(modernopc PRIVATE ${LIB_GCOV} NodesetLoader)
+target_link_libraries(modernopc PRIVATE ${LIB_GCOV})
 target_link_libraries(modernopc PUBLIC CONAN_PKG::spdlog)
 target_link_libraries(modernopc PUBLIC open62541::open62541)
 target_compile_features(modernopc PRIVATE cxx_std_17)

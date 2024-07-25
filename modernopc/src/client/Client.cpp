@@ -11,6 +11,41 @@
 #include <open62541/plugin/log_stdout.h>
 #include <open62541/server.h>
 #include <open62541/server_config_default.h>
+#include <open62541/plugin/securitypolicy.h>
+
+static UA_INLINE UA_ByteString loadFile(const char *const path)
+{
+    UA_ByteString fileContents = UA_STRING_NULL;
+
+    /* Open the file */
+    FILE *fp = fopen(path, "rb");
+    if (!fp)
+    {
+        errno = 0; /* We read errno also from the tcp layer... */
+        return fileContents;
+    }
+
+    /* Get the file length, allocate the data and read */
+    fseek(fp, 0, SEEK_END);
+    fileContents.length = (size_t)ftell(fp);
+    fileContents.data =
+        (UA_Byte *)UA_malloc(fileContents.length * sizeof(UA_Byte));
+    if (fileContents.data)
+    {
+        fseek(fp, 0, SEEK_SET);
+        size_t read =
+            fread(fileContents.data, sizeof(UA_Byte), fileContents.length, fp);
+        if (read != fileContents.length)
+            UA_ByteString_clear(&fileContents);
+    }
+    else
+    {
+        fileContents.length = 0;
+    }
+    fclose(fp);
+
+    return fileContents;
+}
 
 namespace modernopc
 {
@@ -19,9 +54,40 @@ Client::Client(const std::string &endpointUri)
     uri = endpointUri;
     client = UA_Client_new();
     m_config = UA_Client_getConfig(client);
-    UA_ClientConfig_setDefault(m_config);
+    //UA_ClientConfig_setDefault(m_config);
     m_config->clientContext = this;
-    m_config->logger = logger.getUALogger();
+    m_config->logging = logger.getUALogger();
+
+    /* Load certificate and private key */
+    
+    UA_ByteString certificate =
+    loadFile("/mnt/c/c2k/backend/git/open62541/tools/certs/server_cert.der"); 
+    UA_ByteString
+    privateKey =
+    loadFile("/mnt/c/c2k/backend/git/open62541/tools/certs/server_key.der");
+
+    /* Load the trustList. Load revocationList is not supported now */
+    size_t trustListSize = 0;
+
+    UA_STACKARRAY(UA_ByteString, trustList, trustListSize + 1);
+
+    UA_ByteString *revocationList = NULL;
+    size_t revocationListSize = 0;
+
+    m_config->securityMode = UA_MESSAGESECURITYMODE_NONE;
+    UA_String_clear(&m_config->clientDescription.applicationUri);
+    m_config->clientDescription.applicationUri =
+        UA_STRING_ALLOC("mkclient");
+    UA_StatusCode retval = UA_ClientConfig_setDefaultEncryption(
+        m_config, certificate, privateKey, trustList, trustListSize,
+        revocationList, revocationListSize);
+    if (retval != UA_STATUSCODE_GOOD)
+    {
+        UA_LOG_FATAL(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+                     "Failed to set encryption.");
+    }
+    
+    
 }
 
 Client::~Client()
@@ -32,13 +98,16 @@ Client::~Client()
 
 void Client::connect()
 {
-    UA_StatusCode retval = UA_Client_connect(client, uri.c_str());
+    //UA_StatusCode retval =
+    //    UA_Client_connectUsername(client, uri.c_str(), "ralfsetup", "engel");
+
+    auto retval = UA_Client_connect(client, uri.c_str());
     if (retval != UA_STATUSCODE_GOOD)
     {
         UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
                      "Could not connect client %s with %s", uri.c_str(),
                      UA_StatusCode_name(retval));
-        throw OpcException("could not connect");
+        return;
     }
 
     UA_NodeId namespaceArrayId =
@@ -51,7 +120,7 @@ void Client::connect()
         UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
                      "could not read namespaceArray with %s",
                      UA_StatusCode_name(retval));
-        throw OpcException("could not read namespace array");
+        return;
     }
     for (auto i = 0u; i < var.arrayLength; i++)
     {
@@ -92,10 +161,6 @@ int Client::resolveNamespaceUri(const std::string &uri)
         }
         idx++;
     }
-    if (!found)
-    {
-        throw OpcException("namespaceUri of nodeId not found");
-    }
     return idx;
 }
 
@@ -134,14 +199,27 @@ Variant Client::read(const NodeId &id)
     return var;
 }
 
-Variant Client::read(const NodeId &id, UA_StatusCode& out)
+Variant Client::read(const NodeId &id, UA_StatusCode &out)
 {
     UA_Variant *v = UA_Variant_new();
     modernopc::Variant var{v, true};
     auto status = UA_Client_readValueAttribute(client, fromNodeId(id), v);
-    out=status;
+    out = status;
 
     return var;
+}
+
+std::optional<UA_Byte> Client::readUserAccessLevelAttribute(const NodeId &id)
+{
+
+    UA_Byte out{};
+    auto status = UA_Client_readUserAccessLevelAttribute(client, fromNodeId(id), &out);
+    if (status != UA_STATUSCODE_GOOD)
+    {
+        return std::nullopt;
+    }
+
+    return out;
 }
 
 void Client::write(const NodeId &id, const Variant &var)
@@ -261,9 +339,9 @@ void Client::doComm() { UA_Client_run_iterate(client, 50); }
 
 void Client::createSubscription() { m_subscription.create(client); }
 
-void Client::createMonitoredItem(const NodeId &id)
+void Client::createMonitoredItem(const NodeId &id, UA_UInt32 attributeId)
 {
-    m_subscription.createMonitoredItemAsyncBegin(client, id);
+    m_subscription.createMonitoredItemAsyncBegin(client, id, attributeId);
 }
 
 void Client::clearMonitoredItems()
@@ -271,17 +349,54 @@ void Client::clearMonitoredItems()
     m_subscription.clearAllMonitoredItems(client);
 }
 
-void Client::activateSession(const std::string& locale)
+void Client::activateSession(const std::string &locale)
 {
     m_config->sessionLocaleIdsSize = 1;
     m_config->sessionLocaleIds =
         (UA_LocaleId *)UA_Array_new(1, &UA_TYPES[UA_TYPES_LOCALEID]);
 
     UA_String s{};
-    s.data = (UA_Byte*)(locale.c_str());
+    s.data = (UA_Byte *)(locale.c_str());
     s.length = locale.length();
     UA_String_copy(&s, &m_config->sessionLocaleIds[0]);
 
-    UA_Client_activateCurrentSession(client);
+    UA_Client_activateCurrentSessionAsync(client);
 }
+
+void Client::activateSession(const std::string &locale,
+                             const std::string &username, const std::string &pw)
+{
+    m_config->sessionLocaleIdsSize = 1;
+    m_config->sessionLocaleIds =
+        (UA_LocaleId *)UA_Array_new(1, &UA_TYPES[UA_TYPES_LOCALEID]);
+
+    UA_String s{};
+    s.data = (UA_Byte *)(locale.c_str());
+    s.length = locale.length();
+    UA_String_copy(&s, &m_config->sessionLocaleIds[0]);
+
+    /*
+    auto policyString = UA_String_fromChars("UserName-[0]-None-None");
+    m_config->userTokenPolicy.policyId = policyString;
+    m_config->userTokenPolicy.securityPolicyUri =
+        UA_String_fromChars("http://www.w3.org/2001/04/xmlenc#rsa-oaep");
+
+        */
+    
+
+    UA_StatusCode res = UA_ClientConfig_setAuthenticationUsername(
+        m_config, username.c_str(), pw.c_str());
+    if (res != UA_STATUSCODE_GOOD)
+    {
+        UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+                     "could not set username %s", UA_StatusCode_name(res));
+        return;
+    }
+    
+
+    //UA_ClientConfig_setAuthenticationUsername
+
+    UA_Client_activateCurrentSessionAsync(client);
 }
+
+} // namespace modernopc
